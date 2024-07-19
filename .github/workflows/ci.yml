@@ -21,4 +21,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: test packages
-        run: GITHUB_ACTIONS='true' pnpm test
+        run: pnpm run test -- --reporter=dot --reporter=junit --outputFile=./test-results.xml
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ./test-results.xml
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Vitest
+          path: ./test-results.xml
+          reporter: junit

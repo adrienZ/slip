@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --outputFile.github-actions=./yolo.json",
     "dev": "vitest watch",
     "lint": "biome format --write "
   },

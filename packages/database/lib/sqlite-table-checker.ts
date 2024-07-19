@@ -27,6 +27,12 @@ const UserTableSchema = z
   .refine((arr) => arr.some((item) => item.name === "id" && item.pk === 1), {
     message: 'users table must contain a column "id" as primary key',
   })
+  .refine(
+    (arr) => arr.some((item) => item.name === "id" && item.notnull === 1),
+    {
+      message: 'users table must contain a column "id" not nullable',
+    },
+  )
   // EMAIL
   .refine((arr) => arr.some((item) => item.name === "email"), {
     message: 'users table must contain a column with name "email"',
@@ -40,7 +46,7 @@ const UserTableSchema = z
   .refine(
     (arr) => arr.some((item) => item.name === "email" && item.notnull === 1),
     {
-      message: 'users table must contain a column "email" non nullable',
+      message: 'users table must contain a column "email" not nullable',
     },
   );
 

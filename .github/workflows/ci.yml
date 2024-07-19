@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: test packages
-        run: pnpm test
+        run: GITHUB_ACTIONS='true' pnpm test

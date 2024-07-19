@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: test packages
-        run: GITHUB_ACTIONS=true pnpm run test -- --reporter=default --reporter=junit --outputFile=../../test-results.xml
+        run: GITHUB_ACTIONS='true' pnpm run test
 
       - name: Archive test results
         if: always()

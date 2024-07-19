@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: test packages
-        run: pnpm run test -- --reporter=dot --reporter=junit --outputFile=./test-results.xml
+        run: pnpm run test -- --reporter=dot --reporter=junit --outputFile=../../test-results.xml
 
       - name: Archive test results
         if: always()

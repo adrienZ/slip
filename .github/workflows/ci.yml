@@ -36,4 +36,4 @@ jobs:
         with:
           name: Vitest
           path: ./test-results.xml
-          reporter: junit
+          format: junit

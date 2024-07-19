@@ -1,17 +1,17 @@
 import { Database } from "db0";
 
 export class TableChecker {
-  dbClient: Database
+  dbClient: Database;
 
   constructor(dbClient: Database) {
-    this.dbClient = dbClient
+    this.dbClient = dbClient;
   }
 
   async checkUserTable(tableName: string): Promise<boolean> {
-    return false
+    throw new Error("not implemented");
   }
 
   async checkSessionTable(tableName: string): Promise<boolean> {
-  return false
-}
+    throw new Error("not implemented");
+  }
 }

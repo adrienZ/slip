@@ -5,12 +5,14 @@
   "main": "index.ts",
   "scripts": {
     "test": "vitest run",
-    "dev": "vitest watch"
+    "dev": "vitest watch",
+    "lint": "biome format --write "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@types/better-sqlite3": "^7.6.11",
     "jiti": "^1.21.6",
     "vitest": "^2.0.3"

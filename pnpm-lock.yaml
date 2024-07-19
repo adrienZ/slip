@@ -40,10 +40,17 @@ importers:
         version: 2.0.3
 
   packages/nitro:
+    dependencies:
+      '@slip/database':
+        specifier: workspace:*
+        version: link:../database
     devDependencies:
+      better-sqlite3:
+        specifier: ^11.1.2
+        version: 11.1.2
       nitropack:
         specifier: latest
-        version: 2.9.7
+        version: 2.9.7(better-sqlite3@11.1.2)
 
 packages:
 
@@ -2446,7 +2453,7 @@ packages:
   /napi-build-utils@1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
 
-  /nitropack@2.9.7:
+  /nitropack@2.9.7(better-sqlite3@11.1.2):
     resolution: {integrity: sha512-aKXvtNrWkOCMsQbsk4A0qQdBjrJ1ZcvwlTQevI/LAgLWLYc5L7Q/YiYxGLal4ITyNSlzir1Cm1D2ZxnYhmpMEw==}
     engines: {node: ^16.11.0 || >=17.0.0}
     hasBin: true

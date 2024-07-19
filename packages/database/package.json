@@ -2,7 +2,7 @@
   "name": "@slip/database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "vitest run",
     "dev": "vitest watch"

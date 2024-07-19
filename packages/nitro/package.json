@@ -6,7 +6,11 @@
     "prepare": "nitro prepare",
     "preview": "node .output/server/index.mjs"
   },
+  "dependencies": {
+    "@slip/database": "workspace:*"
+  },
   "devDependencies": {
+    "better-sqlite3": "^11.1.2",
     "nitropack": "latest"
   }
 }

@@ -26,7 +26,7 @@ describe("sqlite connector", () => {
       const db = createDatabase(sqlite({}));
       await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT)`;
       await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
-        `users table must contain a column "id" as primary key`,
+        `users table must contain a column "id" as primary kdddey`,
       );
     });
 

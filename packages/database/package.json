@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
-    "jiti": "^1.21.6"
+    "jiti": "^1.21.6",
+    "vitest": "^2.0.3"
   },
   "dependencies": {
     "@types/pg": "^8.11.6",

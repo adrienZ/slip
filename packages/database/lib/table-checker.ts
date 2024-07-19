@@ -10,4 +10,8 @@ export class TableChecker {
   async checkUserTable(tableName: string): Promise<boolean> {
     return false
   }
+
+  async checkSessionTable(tableName: string): Promise<boolean> {
+  return false
+}
 }

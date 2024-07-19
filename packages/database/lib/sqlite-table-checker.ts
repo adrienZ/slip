@@ -12,20 +12,23 @@ const sqliteTableInfoRowSchema = z.object({
 
 // Define the main schema for the array
 const UserTableSchema = z.array(sqliteTableInfoRowSchema).min(1).superRefine((arr, ctx) => {
-  const firstNameItem = arr.find(item => item.name === 'firstName');
   const idItem = arr.find(item => item.name === 'id');
 
-  if (!firstNameItem) {
+  if (!idItem) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Array must contain an object with name "firstName"',
+      message: 'Array must contain an object with name "id"',
     });
-  } else if (firstNameItem.type !== 'TEXT') {
+  } else if (idItem.type !== 'TEXT') {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'The object with name "firstName" must have type "TEXT"',
+      message: 'The object with name "id" must have type "TEXT"',
     });
   }
+});
+
+const SessionTableSchema = z.array(sqliteTableInfoRowSchema).min(1).superRefine((arr, ctx) => {
+  const idItem = arr.find(item => item.name === 'id');
 
   if (!idItem) {
     ctx.addIssue({
@@ -41,13 +44,19 @@ const UserTableSchema = z.array(sqliteTableInfoRowSchema).min(1).superRefine((ar
 });
 
 
-
 export class SqliteTableChecker extends TableChecker {
   async checkUserTable(tableName: string) {
     const stmt = this.dbClient.prepare(`PRAGMA table_info(${tableName})`);
     const tableInfo = await stmt.all();
-    
     UserTableSchema.parse(tableInfo);
+
+    return await true
+  }
+
+  async checkSessionTable(tableName: string): Promise<boolean> {
+    const stmt = this.dbClient.prepare(`PRAGMA table_info(${tableName})`);
+    const tableInfo = await stmt.all();
+    SessionTableSchema.parse(tableInfo);
 
     return await true
   }

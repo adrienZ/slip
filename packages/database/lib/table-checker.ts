@@ -1,4 +1,4 @@
-import { Database } from "db0";
+import type { Database } from "db0";
 
 export class TableChecker {
   dbClient: Database;
@@ -8,10 +8,10 @@ export class TableChecker {
   }
 
   async checkUserTable(tableName: string): Promise<boolean> {
-    throw new Error("not implemented");
+    throw new Error("checkUserTable not implemented");
   }
 
   async checkSessionTable(tableName: string): Promise<boolean> {
-    throw new Error("not implemented");
+    throw new Error("checkSessionTable not implemented");
   }
 }

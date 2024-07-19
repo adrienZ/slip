@@ -1,4 +1,4 @@
-import { ConnectorName, Database } from "db0";
+import type { ConnectorName, Database } from "db0";
 import z from "zod";
 import consola from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
@@ -52,8 +52,8 @@ export async function checkDbAndTables(
   const isUserTableOk = await tableChecker.checkUserTable("users");
   consola.success(`Table "users" exists and has a valid schema`);
 
-  // const isSessionTableOk = await tableChecker.checkUserTable("sessions")
-  // consola.success(`Table "sessions" exists and has a valid schema`);
+  const isSessionTableOk = await tableChecker.checkSessionTable("sessions")
+  consola.success(`Table "sessions" exists and has a valid schema`);
 
   return database;
 }

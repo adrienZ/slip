@@ -11,53 +11,31 @@ const sqliteTableInfoRowSchema = z.object({
 });
 
 // Define the main schema for the array
-const UserTableSchema = z.array(sqliteTableInfoRowSchema).min(1).superRefine((arr, ctx) => {
-  const idItem = arr.find(item => item.name === 'id');
-
-  if (!idItem) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Array must contain an object with name "id"',
-    });
-  } else if (idItem.type !== 'TEXT') {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'The object with name "id" must have type "TEXT"',
-    });
-  }
-});
-
-const SessionTableSchema = z.array(sqliteTableInfoRowSchema).min(1).superRefine((arr, ctx) => {
-  const idItem = arr.find(item => item.name === 'id');
-
-  if (!idItem) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Array must contain an object with name "id"',
-    });
-  } else if (idItem.type !== 'TEXT') {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'The object with name "id" must have type "TEXT"',
-    });
-  }
-});
-
+const UserTableSchema = z
+  .array(sqliteTableInfoRowSchema)
+  .min(1, "users table for SLIP does not exist")
+  .refine(arr => arr.some(item => item.name === 'id'), {
+    message: 'users table must contain a column with name "id"'
+  })
+  .refine(arr => arr.some(item => item.name === 'id' && item.type === 'TEXT'), {
+    message: 'users table must contain a column "id" with type "TEXT"',
+  })
+  .refine(arr => arr.some(item => item.name === 'email'), {
+    message: 'users table must contain a column with name "email"'
+  })
+  .refine(arr => arr.some(item => item.name === 'email' && item.type === 'TEXT'), {
+    message: 'users table must contain a column "email" with type "TEXT"',
+  });
 
 export class SqliteTableChecker extends TableChecker {
   async checkUserTable(tableName: string) {
-    const stmt = this.dbClient.prepare(`PRAGMA table_info(${tableName})`);
-    const tableInfo = await stmt.all();
-    UserTableSchema.parse(tableInfo);
+    const tableInfo = await this.dbClient.prepare(`PRAGMA table_info(${tableName})`).all();    
+    const { success, error  } = UserTableSchema.safeParse(tableInfo);
 
-    return await true
-  }
+    if (!success) {
+      throw new Error(error.errors[0].message);
+    }
 
-  async checkSessionTable(tableName: string): Promise<boolean> {
-    const stmt = this.dbClient.prepare(`PRAGMA table_info(${tableName})`);
-    const tableInfo = await stmt.all();
-    SessionTableSchema.parse(tableInfo);
-
-    return await true
+    return success
   }
 }

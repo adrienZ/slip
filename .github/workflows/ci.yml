@@ -25,15 +25,8 @@ jobs:
 
       - name: Archive test results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: ./test-results.xml
-
-      - name: Publish test results
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: Vitest
-          path: ./test-results.xml
-          format: junit
+          retention-days: 30

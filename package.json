@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "pnpm --recursive test"
+    "test": "pnpm --recursive test",
+    "format": "pnpm --recursive format"
   },
   "keywords": [],
   "author": "",

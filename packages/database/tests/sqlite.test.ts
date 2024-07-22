@@ -159,7 +159,7 @@ describe("sqlite connector", () => {
         //     'sessions table must contain a column with name "user_id"',
         //   );
         // });
-        
+
         it("should throw an error when sessions table does not have a user_id foreign key", async () => {
           await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL)`;
           await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
@@ -186,6 +186,21 @@ describe("sqlite connector", () => {
           await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL)`;
           await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
             `sessions table should have a foreign key "user_id"`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have a user_id foreign key to user table", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS othertable ("id" TEXT)`;
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES othertable(id))`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `foreign key "user_id" in sessions table should target the the "id" column from the "user" table`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have a user_id foreign key to user table \"id\" column", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(email))`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `foreign key "user_id" in sessions table should target the the "id" column from the "user" table`,
           );
         });
       });

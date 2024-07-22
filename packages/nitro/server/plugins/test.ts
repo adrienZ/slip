@@ -5,6 +5,7 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   await db.sql`DROP TABLE IF EXISTS users`;
   await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
+  await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id))`;
 
   checkDbAndTables(db, "sqlite");
 

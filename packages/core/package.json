@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/core.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "format": "biome format --write "
   },
   "keywords": [],

@@ -52,7 +52,7 @@ export async function checkDbAndTables(
   const isUserTableOk = await tableChecker.checkUserTable("users");
   consola.success(`Table "users" exists and has a valid schema`);
 
-  const isSessionTableOk = await tableChecker.checkSessionTable("sessions")
+  const isSessionTableOk = await tableChecker.checkSessionTable("sessions");
   consola.success(`Table "sessions" exists and has a valid schema`);
 
   return database;

@@ -49,7 +49,6 @@ const UserTableSchema = z
     },
   );
 
-
 const SessionTableSchema = z
   .array(sqliteTableInfoRowSchema)
   .min(1, "sessions table for SLIP does not exist")
@@ -77,13 +76,16 @@ const SessionTableSchema = z
     message: 'sessions table must contain a column with name "expires_at"',
   })
   .refine(
-    (arr) => arr.some((item) => item.name === "expires_at" && item.type === "INTEGER"),
+    (arr) =>
+      arr.some((item) => item.name === "expires_at" && item.type === "INTEGER"),
     {
-      message: 'sessions table must contain a column "expires_at" with type "INTEGER"',
+      message:
+        'sessions table must contain a column "expires_at" with type "INTEGER"',
     },
   )
   .refine(
-    (arr) => arr.some((item) => item.name === "expires_at" && item.notnull === 1),
+    (arr) =>
+      arr.some((item) => item.name === "expires_at" && item.notnull === 1),
     {
       message: 'sessions table must contain a column "expires_at" not nullable',
     },
@@ -93,9 +95,11 @@ const SessionTableSchema = z
   //   message: 'sessions table must contain a column with name "user_id"',
   // })
   .refine(
-    (arr) => arr.some((item) => item.name === "user_id" && item.type === "TEXT"),
+    (arr) =>
+      arr.some((item) => item.name === "user_id" && item.type === "TEXT"),
     {
-      message: 'sessions table must contain a column "user_id" with type "TEXT"',
+      message:
+        'sessions table must contain a column "user_id" with type "TEXT"',
     },
   )
   .refine(
@@ -128,18 +132,22 @@ export class SqliteTableChecker extends TableChecker {
       throw new Error(error.errors[0].message);
     }
 
-    const foreignKeys = await this.dbClient
+    const foreignKeys = (await this.dbClient
       .prepare(`PRAGMA foreign_key_list(${tableName})`)
-      .all() as Array<{ table?: string, from?: string, to?: string }>;
+      .all()) as Array<{ table?: string; from?: string; to?: string }>;
 
-    const userIdForeignKey = foreignKeys.find(columnInfo => columnInfo.from === "user_id");
+    const userIdForeignKey = foreignKeys.find(
+      (columnInfo) => columnInfo.from === "user_id",
+    );
 
     if (!userIdForeignKey) {
       throw new Error(`${tableName} table should have a foreign key "user_id"`);
     }
 
     if (userIdForeignKey.table !== "user" || userIdForeignKey.to !== "id") {
-      throw new Error(`foreign key "user_id" in ${tableName} table should target the the "id" column from the "user" table`);
+      throw new Error(
+        `foreign key "user_id" in ${tableName} table should target the the "id" column from the "user" table`,
+      );
     }
 
     return success;

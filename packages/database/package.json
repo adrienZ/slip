@@ -2,16 +2,20 @@
   "name": "@slip/database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "dev": "vitest watch",
+    "format": "biome format --write "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@types/better-sqlite3": "^7.6.11",
-    "jiti": "^1.21.6"
+    "jiti": "^1.21.6",
+    "vitest": "^2.0.3"
   },
   "dependencies": {
     "@types/pg": "^8.11.6",

@@ -7,9 +7,12 @@ export default defineNitroPlugin(async (nitroApp) => {
   await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
   await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(id))`;
 
-  const Auth = new SlipAuth(db, "sqlite");
-  console.log({ Auth });
+  const Auth = new SlipAuth(db, "sqlite", {
+    users: "users",
+    sessions: "sessions"
+  });
   
+  console.log({ Auth });
 
   nitroApp.router.add("/auth/register", defineEventHandler(async event => {
     // Add a new user

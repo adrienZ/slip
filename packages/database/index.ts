@@ -12,15 +12,34 @@ const DatabaseSchema = z.object({
   sql: z.function(),
 });
 
-export function checkDatabaseValidity(db: unknown): Database {
+const TableNamesSchema = z.object({
+  users: z.string().min(1),
+  sessions: z.string().min(1),
+});
+
+export interface tableNames {
+  users: string
+  sessions: string
+}
+
+export function checkDatabaseValidity(db: unknown, tableNames: unknown): Database {
   if (!db) {
     throw new Error("No database to check, please provide one");
+  }
+
+  if (!tableNames) {
+    throw new Error("No tableNames provided for SlipAuth, { users: string, sessions: string }");
+  }
+
+  const { success: tableNamesSuccess} = TableNamesSchema.safeParse(tableNames);
+
+  if (!tableNamesSuccess) {
+    throw new Error("tableNames provided for SlipAuth are incorrect, { users: string, sessions: string }");
   }
 
   const {
     data: validatedDatabase,
     success: databaseValidity,
-    error,
   } = DatabaseSchema.safeParse(db);
   if (!databaseValidity) {
     throw new Error(
@@ -34,8 +53,9 @@ export function checkDatabaseValidity(db: unknown): Database {
 export async function checkDbAndTables(
   _database: Database,
   connectorType: supportedConnectors,
+  tableNames: tableNames,
 ): Promise<Database> {
-  const database = checkDatabaseValidity(_database);
+  const database = checkDatabaseValidity(_database, tableNames);
 
   let tableChecker: SqliteTableChecker;
 

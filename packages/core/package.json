@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@lucia-auth/adapter-sqlite": "^3.0.2",
     "@slip/database": "workspace:*",
     "db0": "^0.1.4",
     "h3": "^1.12.0",

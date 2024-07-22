@@ -45,7 +45,7 @@ describe("sqlite connector", () => {
 
       it("should throw an error when users table does not have an id field with type of text", async () => {
         const db = createDatabase(sqlite({}));
-        await db.sql`CREATE TABLE IF NOT EXISTS users ("id" NUMBER PRIMARY KEY)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS users ("id" INTEGER PRIMARY KEY)`;
         await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
           `table must contain a column "id" with type "TEXT"`,
         );
@@ -68,8 +68,8 @@ describe("sqlite connector", () => {
         );
       });
 
-      it("should throw an error when users table does not have an email field with of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT NOT NULL PRIMARY KEY, "email" NUMBER)`;
+      it("should throw an error when users table does not have an email field with type of text", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT NOT NULL PRIMARY KEY, "email" INTEGER)`;
         await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
           `table must contain a column "email" with type "TEXT"`,
         );
@@ -90,7 +90,7 @@ describe("sqlite connector", () => {
       beforeEach(async () => {
         await validUsersTableSetup();
       })
-  
+
 			describe("id field", () => {
 
 				it("should throw an error when sessions table does not exist in database", async () => {
@@ -114,26 +114,80 @@ describe("sqlite connector", () => {
 				});
 
 				it("should throw an error when sessions table does not have an id field with type of text", async () => {
-					await db.sql`CREATE TABLE IF NOT EXISTS users ("sessions" NUMBER PRIMARY KEY)`;
+					await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" INTEGER PRIMARY KEY)`;
 					await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
 						`sessions table must contain a column "id" with type "TEXT"`,
 					);
 				});
 
 				it("should throw an error when sessions table does not have a not nullable id field", async () => {
-					await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT PRIMARY KEY, "email" TEXT)`;
+					await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT PRIMARY KEY)`;
 					await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
 						`sessions table must contain a column "id" not nullable`,
 					);
 				});
 			});
+
+      describe("expires_at field", () => {
+        it("should throw an error when sessions table does not have an expires_at field", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            'sessions table must contain a column with name "expires_at"',
+          );
+        });
+
+        it("should throw an error when sessions table does not have an expires_at field with type of number", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" DATE)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table must contain a column "expires_at" with type "INTEGER"`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have an not nullable expires_at field", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table must contain a column "expires_at" not nullable`,
+          );
+        });
+      });
+
+      describe("user_id field", () => {
+
+        // it("should throw an error when sessions table does not have an user_id field", async () => {
+        //   await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL)`;
+        //   await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+        //     'sessions table must contain a column with name "user_id"',
+        //   );
+        // });
+        
+        it("should throw an error when sessions table does not have a user_id foreign key", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table should have a foreign key "user_id"`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have an user_id field with type of number", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" BLOB)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table must contain a column "user_id" with type "TEXT"`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have an not nullable user_id field", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT, FOREIGN KEY (user_id) REFERENCES user(id))`;
+
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table must contain a column "user_id" not nullable`,
+          );
+        });
+
+        it("should throw an error when sessions table does not have a user_id foreign key", async () => {
+          await db.sql`CREATE TABLE IF NOT EXISTS sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL)`;
+          await expect(checkDbAndTables(db, "sqlite")).rejects.toThrowError(
+            `sessions table should have a foreign key "user_id"`,
+          );
+        });
+      });
 		})
-
 });
-
-// CREATE TABLE session (
-//     id TEXT NOT NULL PRIMARY KEY,
-//     expires_at INTEGER NOT NULL,
-//     user_id TEXT NOT NULL,
-//     FOREIGN KEY (user_id) REFERENCES user(id)
-// )

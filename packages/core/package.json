@@ -4,17 +4,17 @@
   "description": "",
   "main": "src/core.ts",
   "scripts": {
-    "format": "biome format --write "
+    "format": "biome format --write"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@lucia-auth/adapter-sqlite": "^3.0.2",
+    "@node-rs/argon2": "^1.8.3",
     "@slip/database": "workspace:*",
     "db0": "^0.1.4",
-    "h3": "^1.12.0",
-    "lucia": "^3.2.0"
+    "drizzle-orm": "^0.32.0",
+    "h3": "^1.12.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3"

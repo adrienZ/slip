@@ -1,6 +1,9 @@
 import { checkDbAndTables, type tableNames } from "@slip/database";
 // import { hash } from "@node-rs/argon2";
 
+export type { tableNames }
+export { supportedConnectors } from "@slip/database"
+
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 
 export class SlipAuthCore {

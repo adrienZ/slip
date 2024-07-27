@@ -1,20 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import fs from "node:fs";
-import path from "node:path";
 import sqlite from "db0/connectors/better-sqlite3";
 import { checkDbAndTables } from "../index";
 import { createDatabase } from "db0";
 
-const dbPath = path.resolve(import.meta.dirname, "../.data/db.sqlite3");
-let db = createDatabase(sqlite({}));
+const db = createDatabase(sqlite({}));
 
-beforeEach(() => {
-  try {
-    fs.statSync(dbPath);
-    fs.rmSync(dbPath);
-  } catch (error) {}
-
-  db = createDatabase(sqlite({}));
+beforeEach(async() => {
+  await db.sql`DROP TABLE IF EXISTS users`;
+  await db.sql`DROP TABLE IF EXISTS sessions`;
 });
 
 describe("sqlite connector", () => {

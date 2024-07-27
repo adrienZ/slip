@@ -3,7 +3,7 @@ import z from "zod";
 import consola from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
 
-type supportedConnectors = Extract<ConnectorName, "sqlite">;
+export type supportedConnectors = Extract<ConnectorName, "sqlite">;
 const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];
 
 const DatabaseSchema = z.object({
@@ -69,11 +69,11 @@ export async function checkDbAndTables(
       );
   }
 
-  const isUserTableOk = await tableChecker.checkUserTable("users");
-  consola.success(`Table "users" exists and has a valid schema`);
+  const isUserTableOk = await tableChecker.checkUserTable(tableNames.users);
+  consola.success(`Table "${tableNames.users}" exists and has a valid schema`);
 
-  const isSessionTableOk = await tableChecker.checkSessionTable("sessions");
-  consola.success(`Table "sessions" exists and has a valid schema`);
+  const isSessionTableOk = await tableChecker.checkSessionTable(tableNames.sessions);
+  consola.success(`Table "${tableNames.sessions}" exists and has a valid schema`);
 
   return database;
 }

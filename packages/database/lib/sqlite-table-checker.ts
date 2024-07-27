@@ -146,7 +146,7 @@ export class SqliteTableChecker extends TableChecker {
 
     if (userIdForeignKey.table !== "user" || userIdForeignKey.to !== "id") {
       throw new Error(
-        `foreign key "user_id" in ${tableName} table should target the the "id" column from the "user" table`,
+        `foreign key "user_id" in ${tableName} table should target  "id" column from the "user" table`,
       );
     }
 

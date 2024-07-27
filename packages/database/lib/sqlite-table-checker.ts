@@ -21,7 +21,7 @@ const createTableSchema = (tableName: string, requiredColumns: ColumnDefinition[
   let schema = z
     .array(sqliteTableInfoRowSchema)
     .min(1, `${tableName} table for SLIP does not exist`);
-  
+
   requiredColumns.forEach(({ name, type, pk, notnull }) => {
     schema = schema.refine(arr => arr.some(item => item.name === name), {
       message: `${tableName} table must contain a column with name "${name}"`,
@@ -46,23 +46,22 @@ const createTableSchema = (tableName: string, requiredColumns: ColumnDefinition[
   return schema;
 };
 
-const UserTableSchema = createTableSchema("users", [
+const UserTableSchema = (usersTableName: string) => createTableSchema(usersTableName, [
   { name: "id", type: "TEXT", pk: true, notnull: true },
   { name: "email", type: "TEXT", notnull: true },
 ]);
 
-const SessionTableSchema = createTableSchema("sessions", [
+const SessionTableSchema = (sessionsTableName: string) => createTableSchema(sessionsTableName, [
   { name: "id", type: "TEXT", pk: true, notnull: true },
   { name: "expires_at", type: "INTEGER", notnull: true },
   { name: "user_id", type: "TEXT", notnull: true },
 ]);
-
 export class SqliteTableChecker extends TableChecker {
   async checkUserTable(tableName: string) {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-    const { success, error } = UserTableSchema.safeParse(tableInfo);
+    const { success, error } = UserTableSchema(tableName).safeParse(tableInfo);
 
     if (!success) {
       throw new Error(error.errors[0].message);
@@ -75,7 +74,7 @@ export class SqliteTableChecker extends TableChecker {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-    const { success, error } = SessionTableSchema.safeParse(tableInfo);
+    const { success, error } = SessionTableSchema(tableName).safeParse(tableInfo);
 
     if (!success) {
       throw new Error(error.errors[0].message);

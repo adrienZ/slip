@@ -185,14 +185,14 @@ describe("sqlite connector", () => {
         await db.sql`CREATE TABLE IF NOT EXISTS othertable ("id" TEXT)`;
         await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES othertable(id))`;
         await expect(checkDbAndTables(db, "sqlite", { users: "slip_users", sessions: "slip_sessions" })).rejects.toThrowError(
-          `foreign key "user_id" in slip_sessions table should target  "id" column from the "user" table`,
+          `foreign key "user_id" in slip_sessions table should target "id" column from the "user" table`,
         );
       });
 
       it('should throw an error when sessions table does not have a user_id foreign key to user table "id" column', async () => {
         await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(email))`;
         await expect(checkDbAndTables(db, "sqlite", { users: "slip_users", sessions: "slip_sessions" })).rejects.toThrowError(
-          `foreign key "user_id" in slip_sessions table should target  "id" column from the "user" table`,
+          `foreign key "user_id" in slip_sessions table should target "id" column from the "user" table`,
         );
       });
     });

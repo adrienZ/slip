@@ -56,6 +56,13 @@ const SessionTableSchema = (sessionsTableName: string) => createTableSchema(sess
   { name: "expires_at", type: "INTEGER", notnull: true },
   { name: "user_id", type: "TEXT", notnull: true },
 ]);
+
+const OauthAccountTableSchema = (oauthAccountTableName: string) => createTableSchema(oauthAccountTableName, [
+  { name: "provider_id", type: "TEXT", notnull: true, pk: true },
+  { name: "provider_user_id", type: "TEXT", notnull: true },
+  { name: "user_id", type: "TEXT", notnull: true },
+]);
+
 export class SqliteTableChecker extends TableChecker {
   async checkUserTable(tableName: string) {
     const tableInfo = await this.dbClient
@@ -70,7 +77,7 @@ export class SqliteTableChecker extends TableChecker {
     return success;
   }
 
-  async checkSessionTable(tableName: string) {
+  async checkSessionTable(tableName: string, usersTableName: string) {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
@@ -92,9 +99,40 @@ export class SqliteTableChecker extends TableChecker {
       throw new Error(`${tableName} table should have a foreign key "user_id"`);
     }
 
-    if (userIdForeignKey.table !== "user" || userIdForeignKey.to !== "id") {
+    if (userIdForeignKey.table !== usersTableName || userIdForeignKey.to !== "id") {
       throw new Error(
-        `foreign key "user_id" in ${tableName} table should target "id" column from the "user" table`,
+        `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,
+      );
+    }
+
+    return success;
+  }
+
+  async checkOauthAccountTable(tableName: string, usersTableName: string) {
+    const tableInfo = await this.dbClient
+      .prepare(`PRAGMA table_info(${tableName})`)
+      .all();
+    const { success, error } = OauthAccountTableSchema(tableName).safeParse(tableInfo);
+
+    if (!success) {
+      throw new Error(error.errors[0].message);
+    }
+
+    const foreignKeys = (await this.dbClient
+      .prepare(`PRAGMA foreign_key_list(${tableName})`)
+      .all()) as Array<{ table?: string; from?: string; to?: string }>;
+
+    const userIdForeignKey = foreignKeys.find(
+      (columnInfo) => columnInfo.from === "user_id",
+    );
+
+    if (!userIdForeignKey) {
+      throw new Error(`${tableName} table should have a foreign key "user_id"`);
+    }
+
+    if (userIdForeignKey.table !== usersTableName || userIdForeignKey.to !== "id") {
+      throw new Error(
+        `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,
       );
     }
 

@@ -15,6 +15,7 @@ export default defineNuxtModule<ModuleOptions>({
     tableNames: {
       sessions: "slip_auth_sessions",
       users: "slip_auth_users",
+      oauthAccounts: "slip_auth_oauth_accounts",
     },
   },
   async setup(options, nuxt) {

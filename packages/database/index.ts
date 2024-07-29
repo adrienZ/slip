@@ -19,7 +19,8 @@ const TableNamesSchema = z.object({
 
 export interface tableNames {
   users: string
-  sessions: string
+  sessions: string,
+  oauthAccounts: string
 }
 
 export function checkDatabaseValidity(db: unknown, tableNames: unknown): Database {
@@ -72,8 +73,11 @@ export async function checkDbAndTables(
   const isUserTableOk = await tableChecker.checkUserTable(tableNames.users);
   consola.success(`Table "${tableNames.users}" exists and has a valid schema`);
 
-  const isSessionTableOk = await tableChecker.checkSessionTable(tableNames.sessions);
+  const isSessionTableOk = await tableChecker.checkSessionTable(tableNames.sessions, tableNames.users);
   consola.success(`Table "${tableNames.sessions}" exists and has a valid schema`);
+
+  const isOauthTableOk = await tableChecker.checkOauthAccountTable("oauth_account", tableNames.users);
+  consola.success(`Table "${tableNames.oauthAccounts}" exists and has a valid schema`);
 
   return database;
 }

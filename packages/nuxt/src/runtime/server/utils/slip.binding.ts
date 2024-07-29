@@ -1,7 +1,7 @@
 // import type { H3Event } from "h3";
 import { SlipAuthCore } from "@slip/core";
 import type { SlipModuleOptions } from "../../types";
-import { useRuntimeConfig, useDatabase } from "#imports"
+import { useRuntimeConfig, useDatabase } from "#imports";
 
 let instance: SlipAuthCore;
 

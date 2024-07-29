@@ -55,7 +55,7 @@ export async function checkDbAndTables(
   _database: Database,
   connectorType: supportedConnectors,
   tableNames: tableNames,
-): Promise<Database> {
+): Promise<boolean> {
   const database = checkDatabaseValidity(_database, tableNames);
 
   let tableChecker: SqliteTableChecker;
@@ -79,5 +79,5 @@ export async function checkDbAndTables(
   const isOauthTableOk = await tableChecker.checkOauthAccountTable("oauth_account", tableNames.users);
   consola.success(`Table "${tableNames.oauthAccounts}" exists and has a valid schema`);
 
-  return database;
+  return isUserTableOk && isSessionTableOk && isOauthTableOk;
 }

@@ -9,7 +9,7 @@ export function useSlipAuth() {
   const config = useRuntimeConfig().slipAuth as SlipModuleOptions;
 
   if (!instance) {
-    instance = new SlipAuthCore(useDatabase(), config.dialect, config.tableNames);
+    instance = new SlipAuthCore(useDatabase(), config.tableNames);
   }
 
   return instance;

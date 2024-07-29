@@ -5,7 +5,11 @@ export default oauth.githubEventHandler({
   async onSuccess(event, { user, tokens }) {
     const auth = useSlipAuth();
 
-    auth.registerUser(user.id, user.email)
+    auth.registerUserIfMissingInDb({
+      email: user.email,
+      providerId: "github",
+      providerUserId: user.id,
+    })
 
     await setUserSession(event, {
       user: {

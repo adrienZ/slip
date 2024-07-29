@@ -1,50 +1,69 @@
 import { checkDbAndTables, type tableNames } from "@slip/database";
-// import { hash } from "@node-rs/argon2";
+import { randomUUID } from "uncrypto";
 
 export type { tableNames }
 export { supportedConnectors } from "@slip/database"
 
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 
+
+interface ICreateOrLoginParams {
+  providerId: string
+  providerUserId: string,
+  // because our slip is based on unique emails
+  email: string
+}
+
 export class SlipAuthCore {
   #db: checkDbAndTablesParameters[0]
   #tableNames: tableNames
-  // #PASSWORD_SALT = "SLIP_SRKWkJH.}!JgT0;6MgaN?R=bTCKg*:_"
 
   constructor(
-    providedDatase: checkDbAndTablesParameters[0],
-    dialect: checkDbAndTablesParameters[1],
+    providedDatabase: checkDbAndTablesParameters[0],
     tableNames: tableNames
   ) {
-    checkDbAndTables(providedDatase, dialect, tableNames);
-
-    this.#db = providedDatase;
+    this.#db = providedDatabase;
     this.#tableNames = tableNames;
   }
 
+  #createUserId() {
+    return randomUUID();
+  }
 
-  // private hasPassword(password: string) {
-  //   return hash(this.PASSWORD_SALT + password);
-  // }
-
-  async registerUser(id: string, email: string) {
-    const insterted = await  this.#db.prepare(`INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${id}', '${email}')`).run()
-    const users = await this.#db.prepare(`SELECT * FROM ${this.#tableNames.users} WHERE id = '${id}'`).all();
-    return users[0];
+  public async checkDbAndTables(dialect: checkDbAndTablesParameters[1],) {
+    return checkDbAndTables(this.#db, dialect, this.#tableNames);
   }
 
 
-  async loginUser(email: string) {
-    const rows = await this.#db.prepare(`SELECT * FROM ${this.#tableNames.users} WHERE email = '${email}'`).all()
-    const user = rows.at(1);
+  /**
+   * Registers a user in the database only if they are missing.
+   * @param {ICreateOrLoginParams} params - The parameters for creating or logging in a user.
+   * @returns {Promise<boolean>} Returns true if the user was registered, otherwise false (login or insert error).
+   * @throws {Error} - Throws an error if email or user ID is missing when creating a user.
+   */
+  public async registerUserIfMissingInDb(params: ICreateOrLoginParams): Promise<boolean> {
+    const existingUser = await this.#db.prepare(`SELECT id FROM ${this.#tableNames.users} WHERE email = '${params.email}'`).get();
 
-    if (!user) {
-			return createError({
-				statusCode: 401,
-				statusMessage: "Invalid username or password",
-			});
-		}
+    if (!existingUser) {
+      const userId = this.#createUserId();
+      const { success: userInsertSuccess } = await this.#db.prepare(`INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${userId}', '${params.email}')`).run()
+      const { success: oauthInsertSuccess } = await this.#db.prepare(`INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`).run()
+  
+      return oauthInsertSuccess && userInsertSuccess
+    }
 
-    return user;
+    const existingAccount = await this.#db.prepare(`SELECT * from ${this.#tableNames.oauthAccounts} WHERE provider_id = '${params.providerId}' AND provider_user_id = '${params.providerUserId}'`).get();
+
+    if (existingUser && existingAccount?.provider_id !== params.providerId ) {
+      throw new Error(`user already have an account with provider ${existingAccount.provider_id})`)
+    }
+
+    if (existingAccount) {
+      return false
+      // LET nuxt-auth-utils handle the login
+    }
+
+    throw new Error("could not find oauth user")
+
   }
 }

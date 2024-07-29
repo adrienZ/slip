@@ -50,11 +50,13 @@ export class SlipAuthCore {
 
     if (!existingUser) {
       const userId = this.#createUserId();
+
       const { success: userInsertSuccess } = await this.#db
         .prepare(
           `INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${userId}', '${params.email}')`,
         )
         .run();
+
       const { success: oauthInsertSuccess } = await this.#db
         .prepare(
           `INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`,
@@ -70,9 +72,7 @@ export class SlipAuthCore {
       .get();
 
     if (existingUser && existingAccount?.provider_id !== params.providerId) {
-      throw new Error(
-        `user already have an account with provider ${existingAccount.provider_id})`,
-      );
+      throw new Error("user already have an account with another provider");
     }
 
     if (existingAccount) {

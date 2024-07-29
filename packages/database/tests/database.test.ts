@@ -13,7 +13,12 @@ describe("checkDatabaseValidity", () => {
 
   it("should throw an error when an invalid database is provided", () => {
     const invalidDatabase = {};
-    expect(() => checkDatabaseValidity(invalidDatabase, { users: "slip_users", sessions: "slip_sessions" })).toThrowError(
+    expect(() =>
+      checkDatabaseValidity(invalidDatabase, {
+        users: "slip_users",
+        sessions: "slip_sessions",
+      }),
+    ).toThrowError(
       "The provided database is not a valid db0 database, see https://github.com/unjs/db0",
     );
   });
@@ -26,13 +31,17 @@ describe("checkDatabaseValidity", () => {
   });
 
   it("should throw an error when tableNames are missing users table", () => {
-    expect(() => checkDatabaseValidity({}, { sessions: "slip_sessions"})).toThrowError(
+    expect(() =>
+      checkDatabaseValidity({}, { sessions: "slip_sessions" }),
+    ).toThrowError(
       "tableNames provided for SlipAuth are incorrect, { users: string, sessions: string }",
     );
   });
 
   it("should throw an error when tableNames are missing sessions table", () => {
-    expect(() => checkDatabaseValidity({}, { users: "users_sessions"})).toThrowError(
+    expect(() =>
+      checkDatabaseValidity({}, { users: "users_sessions" }),
+    ).toThrowError(
       "tableNames provided for SlipAuth are incorrect, { users: string, sessions: string }",
     );
   });
@@ -44,7 +53,9 @@ describe("checkDatabaseValidity", () => {
   });
 
   it("should throw an error when tableNames have an empty value for a valid key", () => {
-    expect(() => checkDatabaseValidity({}, { users: "users_sessions", sessions: "" })).toThrowError(
+    expect(() =>
+      checkDatabaseValidity({}, { users: "users_sessions", sessions: "" }),
+    ).toThrowError(
       "tableNames provided for SlipAuth are incorrect, { users: string, sessions: string }",
     );
   });
@@ -53,8 +64,13 @@ describe("checkDatabaseValidity", () => {
 describe("checkAndCreateDb", () => {
   it("should throw an error when unsupported connector are provided", async () => {
     const db = createDatabase(sqlite({}));
-    // @ts-expect-error
-    await expect(checkDbAndTables(db, "notsupported", { users: "slip_users", sessions: "slip_sessions" })).rejects.toThrowError(
+    await expect(
+      // @ts-expect-error
+      checkDbAndTables(db, "notsupported", {
+        users: "slip_users",
+        sessions: "slip_sessions",
+      }),
+    ).rejects.toThrowError(
       "Invalid enum value. Expected 'sqlite', received 'notsupported'",
     );
   });

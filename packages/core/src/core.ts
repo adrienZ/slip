@@ -48,7 +48,6 @@ export class SlipAuthCore {
       const userId = this.#createUserId();
       const { success: userInsertSuccess } = await this.#db.prepare(`INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${userId}', '${params.email}')`).run()
       const { success: oauthInsertSuccess } = await this.#db.prepare(`INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`).run()
-  
       return oauthInsertSuccess && userInsertSuccess
     }
 
@@ -60,10 +59,9 @@ export class SlipAuthCore {
 
     if (existingAccount) {
       return false
-      // LET nuxt-auth-utils handle the login
+      // nuxt-auth-utils handle the login
     }
 
     throw new Error("could not find oauth user")
-
   }
 }

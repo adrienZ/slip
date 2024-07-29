@@ -13,7 +13,7 @@ const sqliteTableInfoRowSchema = z.object({
 interface ColumnDefinition {
   name: string;
   type?: string;
-  pk?: boolean;
+  pk?: number;
   notnull?: boolean;
 }
 
@@ -32,8 +32,8 @@ const createTableSchema = (tableName: string, requiredColumns: ColumnDefinition[
       });
     }
     if (pk) {
-      schema = schema.refine(arr => arr.some(item => item.name === name && item.pk === 1), {
-        message: `${tableName} table must contain a column "${name}" as primary key`,
+      schema = schema.refine(arr => arr.some(item => item.name === name && item.pk === pk), {
+        message: `${tableName} table must contain a column "${name}" as primary key (index ${pk})`,
       });
     }
     if (notnull) {
@@ -47,19 +47,19 @@ const createTableSchema = (tableName: string, requiredColumns: ColumnDefinition[
 };
 
 const UserTableSchema = (usersTableName: string) => createTableSchema(usersTableName, [
-  { name: "id", type: "TEXT", pk: true, notnull: true },
+  { name: "id", type: "TEXT", pk: 1, notnull: true },
   { name: "email", type: "TEXT", notnull: true },
 ]);
 
 const SessionTableSchema = (sessionsTableName: string) => createTableSchema(sessionsTableName, [
-  { name: "id", type: "TEXT", pk: true, notnull: true },
+  { name: "id", type: "TEXT", pk: 1, notnull: true },
   { name: "expires_at", type: "INTEGER", notnull: true },
   { name: "user_id", type: "TEXT", notnull: true },
 ]);
 
 const OauthAccountTableSchema = (oauthAccountTableName: string) => createTableSchema(oauthAccountTableName, [
-  { name: "provider_id", type: "TEXT", notnull: true, pk: true },
-  { name: "provider_user_id", type: "TEXT", notnull: true },
+  { name: "provider_id", type: "TEXT", notnull: true, pk: 1 },
+  { name: "provider_user_id", type: "TEXT", notnull: true, pk: 2 },
   { name: "user_id", type: "TEXT", notnull: true },
 ]);
 
@@ -113,6 +113,7 @@ export class SqliteTableChecker extends TableChecker {
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
     const { success, error } = OauthAccountTableSchema(tableName).safeParse(tableInfo);
+    console.log(tableInfo);
 
     if (!success) {
       throw new Error(error.errors[0].message);
@@ -121,6 +122,8 @@ export class SqliteTableChecker extends TableChecker {
     const foreignKeys = (await this.dbClient
       .prepare(`PRAGMA foreign_key_list(${tableName})`)
       .all()) as Array<{ table?: string; from?: string; to?: string }>;
+
+      
 
     const userIdForeignKey = foreignKeys.find(
       (columnInfo) => columnInfo.from === "user_id",

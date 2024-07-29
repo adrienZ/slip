@@ -225,7 +225,7 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when oauth table does not have an provider_id field as primary key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT, "provider_user_id" TEXT, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(checkDbAndTables(db, "sqlite", { users: "slip_users", sessions: "slip_sessions", oauthAccounts: "slip_oauth_accounts" })).rejects.toThrowError(
           `oauth_account table must contain a column "provider_id" as primary key`,
         );

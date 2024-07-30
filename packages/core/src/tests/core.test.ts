@@ -1,7 +1,12 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../core";
+
+const date = new Date(1998, 11, 19);
+
+vi.useFakeTimers();
+vi.setSystemTime(date);
 
 const db = createDatabase(sqlite({}));
 const auth = new SlipAuthCore(
@@ -32,11 +37,35 @@ const defaultInsert = {
   providerUserId: "j3dçd9dx/2#",
 };
 
+const mocks = vi.hoisted(() => {
+  return {
+    uncryptoMockCounter: 0,
+  };
+});
+
+const mockedCreateSession = {
+  expires_at: 914626800000,
+  id: "randomUUID-2",
+  user_id: "randomUUID-1",
+};
+
 describe("SlipAuthCore", () => {
   describe("users", () => {
+    beforeEach(() => {
+      mocks.uncryptoMockCounter = 0;
+      vi.mock("uncrypto", () => {
+        function randomUUID() {
+          mocks.uncryptoMockCounter++;
+          return `randomUUID-${mocks.uncryptoMockCounter}`;
+        }
+
+        return { randomUUID };
+      });
+    });
+
     it("should insert when database has no users", async () => {
       const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-      expect(inserted).toBe(true);
+      expect(inserted).toStrictEqual(mockedCreateSession);
       expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(1);
@@ -44,7 +73,8 @@ describe("SlipAuthCore", () => {
 
     it("should insert when database has no users", async () => {
       const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-      expect(inserted).toBe(true);
+      expect(inserted).toStrictEqual(mockedCreateSession);
+
       expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(1);
@@ -57,7 +87,7 @@ describe("SlipAuthCore", () => {
         providerId: "discord",
         providerUserId: "jioazdjuadiadaogfoz",
       });
-      expect(inserted).toBe(true);
+      expect(inserted).toStrictEqual(mockedCreateSession);
       expect(inserted2).rejects.toThrowError(
         "user already have an account with another provider",
       );
@@ -70,8 +100,12 @@ describe("SlipAuthCore", () => {
         providerUserId: "azdjazoodncazd",
         providerId: defaultInsert.providerId,
       });
-      expect(inserted).toBe(true);
-      expect(inserted2).toBe(true);
+      expect(inserted).toStrictEqual(mockedCreateSession);
+      expect(inserted2).toStrictEqual({
+        expires_at: 914626800000,
+        id: "randomUUID-4",
+        user_id: "randomUUID-3",
+      });
       expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);

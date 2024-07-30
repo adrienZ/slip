@@ -3,7 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../core";
 
-const date = new Date(1998, 11, 19);
+const date = new Date(Date.UTC(1998, 11, 19));
 
 vi.useFakeTimers();
 vi.setSystemTime(date);
@@ -44,7 +44,7 @@ const mocks = vi.hoisted(() => {
 });
 
 const mockedCreateSession = {
-  expires_at: 914626800000,
+  expires_at: 914630400000,
   id: "randomUUID-2",
   user_id: "randomUUID-1",
 };
@@ -102,7 +102,7 @@ describe("SlipAuthCore", () => {
       });
       expect(inserted).toStrictEqual(mockedCreateSession);
       expect(inserted2).toStrictEqual({
-        expires_at: 914626800000,
+        expires_at: 914630400000,
         id: "randomUUID-4",
         user_id: "randomUUID-3",
       });

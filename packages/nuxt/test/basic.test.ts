@@ -35,8 +35,6 @@ describe("database", async () => {
 
   it("check users", async () => {
     const json = await $fetch("/auth/github");
-    console.log(json);
-    
     expect(json).toStrictEqual({
       cid: 0,
       dflt_value: null,

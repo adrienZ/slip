@@ -12,6 +12,7 @@ export default defineNuxtModule<ModuleOptions>({
   // Default configuration options of the Nuxt module
   defaults: {
     dialect: "sqlite",
+    sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
     tableNames: {
       sessions: "slip_auth_sessions",
       users: "slip_auth_users",
@@ -19,18 +20,27 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   async setup(options, nuxt) {
-    // setup
     const resolver = createResolver(import.meta.url);
-
     await installModule("nuxt-auth-utils");
 
-    // use private runtime config to expost options in nitro
+    // #region use private runtime config to expose options in nitro
     const runtimeConfig = nuxt.options.runtimeConfig;
     runtimeConfig.slipAuth = options;
+    // nuxt-auth-utils compat
+    // @ts-expect-error nuxt-auth-utils typing is mising
+    runtimeConfig.slipAuth.sessionMaxAge = runtimeConfig.session?.maxAge ?? options.sessionMaxAge;
+    // #endregion
 
+    // #region make sure nitro database feature flag is turned on
     nuxt.hook("nitro:config", (nitroConfig) => {
-      nitroConfig.experimental.database = true;
+      nitroConfig.experimental = {
+        ...nitroConfig.experimental,
+        database: true,
+      };
     });
+    // #endregion
+
+    // module logic
     addServerScanDir(resolver.resolve("./runtime/server/"));
   },
 });

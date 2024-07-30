@@ -33,7 +33,7 @@ export function checkDatabaseValidity(
 
   if (!tableNames) {
     throw new Error(
-      "No tableNames provided for SlipAuth, { users: string, sessions: string }",
+      "No tableNames provided for SlipAuth: { users: string, sessions: string, oauthAccounts: string }",
     );
   }
 

@@ -346,7 +346,9 @@ describe("sqlite connector", () => {
             sessions: "slip_sessions",
             oauthAccounts: "slip_oauth_accounts",
           }),
-        ).rejects.toThrowError("slip_oauth_accounts table for SLIP does not exist");
+        ).rejects.toThrowError(
+          "slip_oauth_accounts table for SLIP does not exist",
+        );
       });
 
       it("should throw an error when oauth table does not have an provider_id field", async () => {

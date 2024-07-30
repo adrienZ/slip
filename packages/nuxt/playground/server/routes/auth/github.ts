@@ -1,11 +1,11 @@
-export default oauth.githubEventHandler({
+export default oauthGitHubEventHandler({
   config: {
     emailRequired: true,
   },
   async onSuccess(event, { user, tokens }) {
     const auth = useSlipAuth();
 
-    auth.registerUserIfMissingInDb({
+    const sessionFromDb = await auth.registerUserIfMissingInDb({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,
@@ -15,7 +15,8 @@ export default oauth.githubEventHandler({
       user: {
         githubId: user.id
       },
-      loggedInAt: Date.now(),
+      expires_at: sessionFromDb.expires_at,
+      id: sessionFromDb.id
     })
     return sendRedirect(event, '/?success=true')
   },

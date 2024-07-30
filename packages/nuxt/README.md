@@ -37,7 +37,6 @@ npx nuxi module add my-module
 
 That's it! You can now use My Module in your Nuxt app ✨
 
-
 ## Contribution
 
 <details>

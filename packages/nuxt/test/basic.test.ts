@@ -25,6 +25,7 @@ describe("database", async () => {
     expect(json).toBeInstanceOf(Object);
     expect(json.slipAuth).toStrictEqual({
       dialect: "sqlite",
+      sessionMaxAge: 604800,
       tableNames: {
         oauthAccounts: "slip_auth_oauth_accounts",
         sessions: "slip_auth_sessions",

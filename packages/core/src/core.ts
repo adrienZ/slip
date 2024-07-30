@@ -2,7 +2,7 @@ import { checkDbAndTables, type tableNames } from "@slip/database";
 import { randomUUID } from "uncrypto";
 
 export type { tableNames };
-export { supportedConnectors } from "@slip/database";
+export type { supportedConnectors } from "@slip/database";
 
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 
@@ -13,19 +13,54 @@ interface ICreateOrLoginParams {
   email: string;
 }
 
+interface ICreateSessionsParams {
+  userId: string;
+  expiresAt: number;
+}
+
+// #region TODO: use an ORM someday
+export interface SlipAuthSession {
+  id: string;
+  expires_at: number;
+}
+
+export interface SlipAuthUser {
+  id: string;
+}
+
+export interface SlipAuthOauthAccount {
+  provider_id: string;
+  provider_user_id: string;
+  user_id: string;
+}
+//#endregion
+
+interface ISlipAuthCoreOptions {
+  sessionMaxAge: number;
+}
+
 export class SlipAuthCore {
   #db: checkDbAndTablesParameters[0];
   #tableNames: tableNames;
 
+  #sessionMaxAge: number;
+
   constructor(
     providedDatabase: checkDbAndTablesParameters[0],
     tableNames: tableNames,
+    options: ISlipAuthCoreOptions,
   ) {
     this.#db = providedDatabase;
     this.#tableNames = tableNames;
+    // in seconds
+    this.#sessionMaxAge = options.sessionMaxAge * 1000;
   }
 
   #createUserId() {
+    return randomUUID();
+  }
+
+  #createSessionId() {
     return randomUUID();
   }
 
@@ -41,12 +76,12 @@ export class SlipAuthCore {
    */
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,
-  ): Promise<boolean> {
-    const existingUser = await this.#db
+  ): Promise<SlipAuthSession> {
+    const existingUser = (await this.#db
       .prepare(
         `SELECT id FROM ${this.#tableNames.users} WHERE email = '${params.email}'`,
       )
-      .get();
+      .get()) as SlipAuthUser;
 
     if (!existingUser) {
       const userId = this.#createUserId();
@@ -62,24 +97,60 @@ export class SlipAuthCore {
           `INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`,
         )
         .run();
-      return oauthInsertSuccess && userInsertSuccess;
+
+      const sessionFromRegistration = await this.insertSession({
+        userId,
+        expiresAt: Date.now() + this.#sessionMaxAge,
+      });
+
+      return sessionFromRegistration as SlipAuthSession;
     }
 
-    const existingAccount = await this.#db
+    const existingAccount = (await this.#db
       .prepare(
         `SELECT * from ${this.#tableNames.oauthAccounts} WHERE provider_id = '${params.providerId}' AND provider_user_id = '${params.providerUserId}'`,
       )
-      .get();
+      .get()) as SlipAuthOauthAccount;
 
     if (existingUser && existingAccount?.provider_id !== params.providerId) {
       throw new Error("user already have an account with another provider");
     }
 
     if (existingAccount) {
-      return false;
-      // nuxt-auth-utils handle the login
+      const sessionFromRegistration = await this.insertSession({
+        userId: existingUser.id,
+        expiresAt: Date.now() + this.#sessionMaxAge,
+      });
+      return sessionFromRegistration as SlipAuthSession;
     }
 
     throw new Error("could not find oauth user");
+  }
+
+  public async insertSession({ userId, expiresAt }: ICreateSessionsParams) {
+    const sessionId = this.#createSessionId();
+    const { success } = await this.#db
+      .prepare(
+        `INSERT INTO ${this.#tableNames.sessions} (id, expires_at, user_id) VALUES ('${sessionId}', '${expiresAt}', '${userId}')`,
+      )
+      .run();
+
+    const session = this.#db
+      .prepare(
+        `SELECT * from ${this.#tableNames.sessions} WHERE id = '${sessionId}'`,
+      )
+      .get();
+
+    return session;
+  }
+
+  public async deleteSession(sessionId: string) {
+    const { success } = await this.#db
+      .prepare(
+        `DELETE from ${this.#tableNames.sessions} WHERE id = '${sessionId}' LIMIT 1`,
+      )
+      .run();
+
+    return success;
   }
 }

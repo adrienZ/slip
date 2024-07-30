@@ -1,6 +1,6 @@
 {
-  "name": "my-module",
-  "version": "1.0.0",
+  "name": "@adrienZ/slip-auth-nuxt",
+  "version": "0.0.1",
   "description": "My new Nuxt module",
   "repository": "your-org/my-module",
   "license": "MIT",
@@ -39,17 +39,17 @@
     "@nuxt/eslint-config": "^0.3.13",
     "@nuxt/module-builder": "^0.8.1",
     "@nuxt/schema": "^3.12.4",
-    "@nuxt/test-utils": "^3.13.1",
-    "@types/node": "^20.14.11",
+    "@nuxt/test-utils": "^3.14.0",
+    "@types/node": "^20.14.13",
     "changelogen": "^0.5.5",
-    "eslint": "^9.7.0",
+    "eslint": "^9.8.0",
     "nuxt": "^3.12.4",
-    "nuxt-auth-utils": "^0.2.1",
+    "nuxt-auth-utils": "^0.3.2",
     "typescript": "latest",
-    "vitest": "^2.0.3",
-    "vue-tsc": "^2.0.26"
+    "vitest": "^2.0.4",
+    "vue-tsc": "^2.0.29"
   },
   "peerDependencies": {
-    "nuxt-auth-utils": "^0.2.1"
+    "nuxt-auth-utils": "^0.3.2"
   }
 }

@@ -26,7 +26,7 @@ describe("checkDatabaseValidity", () => {
   it("should throw an error when tableNames are missing", () => {
     // @ts-expect-error
     expect(() => checkDatabaseValidity({})).toThrowError(
-      "No tableNames provided for SlipAuth, { users: string, sessions: string }",
+      "No tableNames provided for SlipAuth: { users: string, sessions: string, oauthAccounts: string }",
     );
   });
 

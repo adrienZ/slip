@@ -4,11 +4,17 @@ import { createDatabase } from "db0";
 import { SlipAuthCore } from "../core";
 
 const db = createDatabase(sqlite({}));
-const auth = new SlipAuthCore(db, {
-  users: "slip_users",
-  sessions: "slip_sessions",
-  oauthAccounts: "slip_oauth_accounts",
-});
+const auth = new SlipAuthCore(
+  db,
+  {
+    users: "slip_users",
+    sessions: "slip_sessions",
+    oauthAccounts: "slip_oauth_accounts",
+  },
+  {
+    sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
+  },
+);
 
 beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
@@ -27,46 +33,48 @@ const defaultInsert = {
 };
 
 describe("SlipAuthCore", () => {
-  it("should insert when database has no users", async () => {
-    const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-    expect(inserted).toBe(true);
-    expect(db.prepare("SELECT * from slip_users").all()).resolves.toHaveLength(
-      1,
-    );
-  });
-
-  it("should insert when database has no users", async () => {
-    const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-    expect(inserted).toBe(true);
-    expect(db.prepare("SELECT * from slip_users").all()).resolves.toHaveLength(
-      1,
-    );
-  });
-
-  it("should throw an error when registering a user with an email in the database and a different provider", async () => {
-    const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-    const inserted2 = auth.registerUserIfMissingInDb({
-      email: defaultInsert.email,
-      providerId: "discord",
-      providerUserId: "jioazdjuadiadaogfoz",
+  describe("users", () => {
+    it("should insert when database has no users", async () => {
+      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      expect(inserted).toBe(true);
+      expect(
+        db.prepare("SELECT * from slip_users").all(),
+      ).resolves.toHaveLength(1);
     });
-    expect(inserted).toBe(true);
-    expect(inserted2).rejects.toThrowError(
-      "user already have an account with another provider",
-    );
-  });
 
-  it("should insert twice when database users have different emails", async () => {
-    const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-    const inserted2 = await auth.registerUserIfMissingInDb({
-      email: "email2@test.com",
-      providerUserId: "azdjazoodncazd",
-      providerId: defaultInsert.providerId,
+    it("should insert when database has no users", async () => {
+      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      expect(inserted).toBe(true);
+      expect(
+        db.prepare("SELECT * from slip_users").all(),
+      ).resolves.toHaveLength(1);
     });
-    expect(inserted).toBe(true);
-    expect(inserted2).toBe(true);
-    expect(db.prepare("SELECT * from slip_users").all()).resolves.toHaveLength(
-      2,
-    );
+
+    it("should throw an error when registering a user with an email in the database and a different provider", async () => {
+      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      const inserted2 = auth.registerUserIfMissingInDb({
+        email: defaultInsert.email,
+        providerId: "discord",
+        providerUserId: "jioazdjuadiadaogfoz",
+      });
+      expect(inserted).toBe(true);
+      expect(inserted2).rejects.toThrowError(
+        "user already have an account with another provider",
+      );
+    });
+
+    it("should insert twice when database users have different emails", async () => {
+      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      const inserted2 = await auth.registerUserIfMissingInDb({
+        email: "email2@test.com",
+        providerUserId: "azdjazoodncazd",
+        providerId: defaultInsert.providerId,
+      });
+      expect(inserted).toBe(true);
+      expect(inserted2).toBe(true);
+      expect(
+        db.prepare("SELECT * from slip_users").all(),
+      ).resolves.toHaveLength(2);
+    });
   });
 });

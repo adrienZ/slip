@@ -8,7 +8,7 @@ const db = createDatabase(sqlite({}));
 beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_users`;
   await db.sql`DROP TABLE IF EXISTS slip_sessions`;
-  await db.sql`DROP TABLE IF EXISTS oauth_account`;
+  await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
 });
 
 describe("sqlite connector", () => {
@@ -327,7 +327,7 @@ describe("sqlite connector", () => {
     });
   });
 
-  describe("oauth_account table", () => {
+  describe("slip_oauth_accounts table", () => {
     const validUsersTableSetup = () =>
       db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
     const validSessionsTableSetup = () =>
@@ -346,11 +346,11 @@ describe("sqlite connector", () => {
             sessions: "slip_sessions",
             oauthAccounts: "slip_oauth_accounts",
           }),
-        ).rejects.toThrowError("oauth_account table for SLIP does not exist");
+        ).rejects.toThrowError("slip_oauth_accounts table for SLIP does not exist");
       });
 
       it("should throw an error when oauth table does not have an provider_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("notid" TEXT)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("notid" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -358,12 +358,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'oauth_account table must contain a column with name "provider_id"',
+          'slip_oauth_accounts table must contain a column with name "provider_id"',
         );
       });
 
       it("should throw an error when oauth table does not have an provider_id field as primary key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -371,12 +371,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_id" as primary key`,
+          `slip_oauth_accounts table must contain a column "provider_id" as primary key`,
         );
       });
 
       it("should throw an error when oauth table does not have an provider_id field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" INTEGER PRIMARY KEY)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" INTEGER PRIMARY KEY)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -384,12 +384,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_id" with type "TEXT"`,
+          `slip_oauth_accounts table must contain a column "provider_id" with type "TEXT"`,
         );
       });
 
       it("should throw an error when oauth table does not have a not nullable provider_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT PRIMARY KEY)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT PRIMARY KEY)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -397,14 +397,14 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_id" not nullable`,
+          `slip_oauth_accounts table must contain a column "provider_id" not nullable`,
         );
       });
     });
 
     describe("provider_user_id field", () => {
       it("should throw an error when oauth table does not have an provider_user_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL PRIMARY KEY)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL PRIMARY KEY)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -412,12 +412,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'oauth_account table must contain a column with name "provider_user_id"',
+          'slip_oauth_accounts table must contain a column with name "provider_user_id"',
         );
       });
 
       it("should throw an error when oauth table does not have an provider_user_id field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL PRIMARY KEY, "provider_user_id" INTEGER)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL PRIMARY KEY, "provider_user_id" INTEGER)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -425,12 +425,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_user_id" with type "TEXT"`,
+          `slip_oauth_accounts table must contain a column "provider_user_id" with type "TEXT"`,
         );
       });
 
       it("should throw an error when oauth table does not have an provider_user_id field as primary key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT, PRIMARY KEY (provider_id))`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT, PRIMARY KEY (provider_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -438,12 +438,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_user_id" as primary key`,
+          `slip_oauth_accounts table must contain a column "provider_user_id" as primary key`,
         );
       });
 
       it("should throw an error when oauth table does not have a not nullable provider_user_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT, PRIMARY KEY (provider_id, provider_user_id))`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -451,14 +451,14 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "provider_user_id" not nullable`,
+          `slip_oauth_accounts table must contain a column "provider_user_id" not nullable`,
         );
       });
     });
 
     describe("user_id field", () => {
-      it("should throw an error when oauth_account table does not have a user_id foreign key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, PRIMARY KEY (provider_id, provider_user_id))`;
+      it("should throw an error when slip_oauth_accounts table does not have a user_id foreign key", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -466,12 +466,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table should have a foreign key "user_id"`,
+          `slip_oauth_accounts table should have a foreign key "user_id"`,
         );
       });
 
-      it("should throw an error when oauth_account table does not have an user_id field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" BLOB, PRIMARY KEY (provider_id, provider_user_id))`;
+      it("should throw an error when slip_oauth_accounts table does not have an user_id field with type of text", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" BLOB, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -479,12 +479,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "user_id" with type "TEXT"`,
+          `slip_oauth_accounts table must contain a column "user_id" with type "TEXT"`,
         );
       });
 
-      it("should throw an error when oauth_account table does not have an not nullable user_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT, PRIMARY KEY (provider_id, provider_user_id))`;
+      it("should throw an error when slip_oauth_accounts table does not have an not nullable user_id field", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -492,12 +492,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table must contain a column "user_id" not nullable`,
+          `slip_oauth_accounts table must contain a column "user_id" not nullable`,
         );
       });
 
-      it("should throw an error when oauth_account table does not have a user_id foreign key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, PRIMARY KEY (provider_id, provider_user_id))`;
+      it("should throw an error when slip_oauth_accounts table does not have a user_id foreign key", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -505,13 +505,13 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `oauth_account table should have a foreign key "user_id"`,
+          `slip_oauth_accounts table should have a foreign key "user_id"`,
         );
       });
 
-      it("should throw an error when oauth_account table does not have a user_id foreign key to user table", async () => {
+      it("should throw an error when slip_oauth_accounts table does not have a user_id foreign key to user table", async () => {
         await db.sql`CREATE TABLE IF NOT EXISTS othertable ("id" TEXT)`;
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES othertable(id), PRIMARY KEY (provider_id, provider_user_id))`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES othertable(id), PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -519,12 +519,12 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in oauth_account table should target "id" column from the "slip_users" table`,
+          `foreign key "user_id" in slip_oauth_accounts table should target "id" column from the "slip_users" table`,
         );
       });
 
-      it('should throw an error when oauth_account table does not have a user_id foreign key to user table "id" column', async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS oauth_account ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES slip_users(email), PRIMARY KEY (provider_id, provider_user_id))`;
+      it('should throw an error when slip_oauth_accounts table does not have a user_id foreign key to user table "id" column', async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES slip_users(email), PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -532,7 +532,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in oauth_account table should target "id" column from the "slip_users" table`,
+          `foreign key "user_id" in slip_oauth_accounts table should target "id" column from the "slip_users" table`,
         );
       });
     });

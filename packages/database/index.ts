@@ -3,7 +3,7 @@ import z from "zod";
 import consola from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
 
-type supportedConnectors = Extract<ConnectorName, "sqlite">;
+export type supportedConnectors = Extract<ConnectorName, "sqlite">;
 const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];
 
 const DatabaseSchema = z.object({
@@ -12,16 +12,41 @@ const DatabaseSchema = z.object({
   sql: z.function(),
 });
 
-export function checkDatabaseValidity(db: unknown): Database {
+const TableNamesSchema = z.object({
+  users: z.string().min(1),
+  sessions: z.string().min(1),
+});
+
+export interface tableNames {
+  users: string;
+  sessions: string;
+  oauthAccounts: string;
+}
+
+export function checkDatabaseValidity(
+  db: unknown,
+  tableNames: unknown,
+): Database {
   if (!db) {
     throw new Error("No database to check, please provide one");
   }
 
-  const {
-    data: validatedDatabase,
-    success: databaseValidity,
-    error,
-  } = DatabaseSchema.safeParse(db);
+  if (!tableNames) {
+    throw new Error(
+      "No tableNames provided for SlipAuth, { users: string, sessions: string }",
+    );
+  }
+
+  const { success: tableNamesSuccess } = TableNamesSchema.safeParse(tableNames);
+
+  if (!tableNamesSuccess) {
+    throw new Error(
+      "tableNames provided for SlipAuth are incorrect, { users: string, sessions: string }",
+    );
+  }
+
+  const { data: validatedDatabase, success: databaseValidity } =
+    DatabaseSchema.safeParse(db);
   if (!databaseValidity) {
     throw new Error(
       `The provided database is not a valid db0 database, see https://github.com/unjs/db0`,
@@ -34,8 +59,9 @@ export function checkDatabaseValidity(db: unknown): Database {
 export async function checkDbAndTables(
   _database: Database,
   connectorType: supportedConnectors,
-): Promise<Database> {
-  const database = checkDatabaseValidity(_database);
+  tableNames: tableNames,
+): Promise<boolean> {
+  const database = checkDatabaseValidity(_database, tableNames);
 
   let tableChecker: SqliteTableChecker;
 
@@ -49,11 +75,24 @@ export async function checkDbAndTables(
       );
   }
 
-  const isUserTableOk = await tableChecker.checkUserTable("users");
-  consola.success(`Table "users" exists and has a valid schema`);
+  const isUserTableOk = await tableChecker.checkUserTable(tableNames.users);
+  consola.success(`Table "${tableNames.users}" exists and has a valid schema`);
 
-  const isSessionTableOk = await tableChecker.checkSessionTable("sessions");
-  consola.success(`Table "sessions" exists and has a valid schema`);
+  const isSessionTableOk = await tableChecker.checkSessionTable(
+    tableNames.sessions,
+    tableNames.users,
+  );
+  consola.success(
+    `Table "${tableNames.sessions}" exists and has a valid schema`,
+  );
 
-  return database;
+  const isOauthTableOk = await tableChecker.checkOauthAccountTable(
+    tableNames.oauthAccounts,
+    tableNames.users,
+  );
+  consola.success(
+    `Table "${tableNames.oauthAccounts}" exists and has a valid schema`,
+  );
+
+  return isUserTableOk && isSessionTableOk && isOauthTableOk;
 }

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "vitest run",
-    "dev": "vitest watch",
+    "test": "vitest run --no-cache",
+    "test:watch": "vitest watch",
     "format": "biome format --write "
   },
   "keywords": [],

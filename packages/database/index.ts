@@ -87,7 +87,7 @@ export async function checkDbAndTables(
   );
 
   const isOauthTableOk = await tableChecker.checkOauthAccountTable(
-    "oauth_account",
+    tableNames.oauthAccounts,
     tableNames.users,
   );
   consola.success(

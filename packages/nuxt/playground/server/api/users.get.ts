@@ -3,4 +3,4 @@ export default defineEventHandler(async () => {
   const users = await db.sql`SELECT * from slip_auth_users`;
 
   return users;
-})
+});

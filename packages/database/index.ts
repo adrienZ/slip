@@ -1,7 +1,9 @@
 import type { ConnectorName, Database } from "db0";
 import z from "zod";
-import consola from "consola";
+import { createConsola } from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
+
+const logger = createConsola().withTag("SlipAuth")
 
 export type supportedConnectors = Extract<ConnectorName, "sqlite">;
 const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];
@@ -76,13 +78,13 @@ export async function checkDbAndTables(
   }
 
   const isUserTableOk = await tableChecker.checkUserTable(tableNames.users);
-  consola.success(`Table "${tableNames.users}" exists and has a valid schema`);
+  logger.success(`Table "${tableNames.users}" exists and has a valid schema`);
 
   const isSessionTableOk = await tableChecker.checkSessionTable(
     tableNames.sessions,
     tableNames.users,
   );
-  consola.success(
+  logger.success(
     `Table "${tableNames.sessions}" exists and has a valid schema`,
   );
 
@@ -90,7 +92,7 @@ export async function checkDbAndTables(
     tableNames.oauthAccounts,
     tableNames.users,
   );
-  consola.success(
+  logger.success(
     `Table "${tableNames.oauthAccounts}" exists and has a valid schema`,
   );
 

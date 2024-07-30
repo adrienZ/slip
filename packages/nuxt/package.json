@@ -1,6 +1,6 @@
 {
-  "name": "@adri_zag/slip-auth-nuxt",
-  "version": "0.0.4",
+  "name": "nuxt-slip-auth",
+  "version": "0.0.1",
   "description": "Oauth database module to pair with nuxt-auth-utils",
   "repository": "https://github.com/adrienZ/slip",
   "license": "MIT",

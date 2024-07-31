@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm --recursive dev",
-    "test": "pnpm --recursive test",
-    "format": "pnpm --recursive format",
-    "release": "pnpm --recursive release"
+    "dev": "pnpm --recursive --stream dev",
+    "test": "pnpm --recursive --stream test",
+    "format": "pnpm --recursive --stream format",
+    "release": "pnpm --recursive --stream release"
   },
   "keywords": [],
   "author": "",

@@ -6,18 +6,23 @@
   "scripts": {
     "format": "biome format --write",
     "test": "vitest run",
+    "build": "tsup src/core.ts --dts",
     "release": "pnpm run format && pnpm run test && pnpm publish && git push --follow-tags"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "slip-auth-database": "workspace:*",
     "db0": "^0.1.4",
+    "slip-auth-database": "workspace:*",
     "uncrypto": "^0.1.3"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "tsup": "^8.2.3",
     "vitest": "^2.0.4"
+  },
+  "publishConfig": {
+    "main": "dist/core.js"
   }
 }

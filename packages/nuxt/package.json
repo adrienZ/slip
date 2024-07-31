@@ -1,6 +1,6 @@
 {
   "name": "nuxt-slip-auth",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Oauth database module to pair with nuxt-auth-utils",
   "repository": "https://github.com/adrienZ/slip",
   "license": "MIT",

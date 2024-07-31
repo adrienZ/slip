@@ -1,13 +1,13 @@
 {
   "name": "slip-auth-core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "src/core.ts",
   "scripts": {
     "format": "biome format --write",
     "test": "vitest run",
     "build": "tsup src/core.ts --dts",
-    "release": "pnpm run format && pnpm run test && pnpm publish && git push --follow-tags"
+    "release": "pnpm run format && pnpm run test && pnpm run build && pnpm publish && git push --follow-tags"
   },
   "keywords": [],
   "author": "",

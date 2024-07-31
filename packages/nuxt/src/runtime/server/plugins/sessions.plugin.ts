@@ -1,4 +1,4 @@
-import type { SlipAuthSession } from "@slip/core";
+import type { SlipAuthSession } from "slip-auth-core";
 import { useSlipAuth } from "../utils/useSlipAuth";
 
 export default defineNitroPlugin(() => {

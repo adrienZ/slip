@@ -1,7 +1,7 @@
 ---
+"nuxt-slip-auth": minor
 "slip-auth-database": patch
 "slip-auth-core": patch
-"@adriZ/slip-auth-nuxt": patch
 ---
 
-init
+messing with npm

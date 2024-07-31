@@ -1,17 +1,18 @@
 {
-  "name": "@slip/core",
+  "name": "slip-auth-core",
   "version": "0.0.1",
   "description": "",
   "main": "src/core.ts",
   "scripts": {
     "format": "biome format --write",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release": "pnpm run format && pnpm run test && pnpm publish && git push --follow-tags"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@slip/database": "workspace:*",
+    "slip-auth-database": "workspace:*",
     "db0": "^0.1.4",
     "uncrypto": "^0.1.3"
   },

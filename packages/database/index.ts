@@ -3,7 +3,7 @@ import z from "zod";
 import { createConsola } from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
 
-const logger = createConsola().withTag("SlipAuth")
+const logger = createConsola().withTag("SlipAuth");
 
 export type supportedConnectors = Extract<ConnectorName, "sqlite">;
 const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];

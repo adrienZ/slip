@@ -1,4 +1,4 @@
-# @slip/core
+# slip-auth-core
 
 > Slip auth core logic
 

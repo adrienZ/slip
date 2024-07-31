@@ -14,7 +14,7 @@ importers:
 
   packages/core:
     dependencies:
-      '@slip/database':
+      'slip-auth-database':
         specifier: workspace:*
         version: link:../database
       db0:
@@ -70,7 +70,7 @@ importers:
       '@nuxt/kit':
         specifier: ^3.12.4
         version: 3.12.4(magicast@0.3.4)(rollup@3.29.4)
-      '@slip/core':
+      'slip-auth-core':
         specifier: workspace:^
         version: link:../core
       zod:

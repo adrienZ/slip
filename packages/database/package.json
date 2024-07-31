@@ -1,12 +1,13 @@
 {
-  "name": "@slip/database",
+  "name": "slip-auth-database",
   "version": "0.0.1",
   "description": "",
   "main": "index.ts",
   "scripts": {
     "test": "vitest run --no-cache",
     "test:watch": "vitest watch",
-    "format": "biome format --write "
+    "format": "biome format --write",
+    "release": "pnpm run format && pnpm run test && pnpm publish && git push --follow-tags"
   },
   "keywords": [],
   "author": "",

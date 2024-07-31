@@ -1,8 +1,8 @@
-import { checkDbAndTables, type tableNames } from "@slip/database";
+import { checkDbAndTables, type tableNames } from "slip-auth-database";
 import { randomUUID } from "uncrypto";
 
 export type { tableNames };
-export type { supportedConnectors } from "@slip/database";
+export type { supportedConnectors } from "slip-auth-database";
 
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 

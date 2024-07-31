@@ -1,4 +1,4 @@
-import { SlipAuthCore } from "@slip/core";
+import { SlipAuthCore } from "slip-auth-core";
 import {
   useRuntimeConfig,
   // @ts-expect-error useDatabase is not enabled by default

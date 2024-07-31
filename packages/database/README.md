@@ -1,4 +1,4 @@
-# @slip/database
+# slip-auth-database
 
 > A package to ensure your database schema is compatible with SlipAuth
 

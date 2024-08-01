@@ -1,20 +1,17 @@
 {
   "name": "slip-auth-core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "type": "module",
-  "main": "src/core.ts",
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "import": "./dist/core.mjs",
-        "require": "./dist/core.mjs"
-      }
-    },
-    "main": "./dist/core.mjs",
-    "types": "./dist/core.d.ts",
-    "files": ["dist"]
+  "exports": {
+    ".": {
+      "import": "./dist/core.mjs",
+      "require": "./dist/core.mjs"
+    }
   },
+  "main": "./dist/core.mjs",
+  "types": "./dist/core.d.ts",
+  "files": ["dist"],
   "scripts": {
     "format": "biome format --write",
     "test": "vitest run",

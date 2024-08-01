@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "packageManager": "pnpm@9.0.5",
   "scripts": {
     "dev": "pnpm --recursive --stream dev",
     "test": "pnpm --recursive --stream test",

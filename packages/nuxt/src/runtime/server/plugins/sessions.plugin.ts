@@ -1,11 +1,11 @@
 import type { SlipAuthSession } from "slip-auth-core";
 import { useSlipAuth } from "../utils/useSlipAuth";
-import { defineNitroPlugin } from "#imports";
+// @ts-expect-error sessionHooks is globally injected by nuxt-auth-utils
+import { defineNitroPlugin, sessionHooks } from "#imports";
 
 export default defineNitroPlugin(() => {
   const auth = useSlipAuth();
 
-  // @ts-expect-error sessionHooks is globally injected by nuxt-auth-utils
   const sessionHookNuxtAuth = sessionHooks;
 
   if (typeof sessionHookNuxtAuth !== "undefined") {

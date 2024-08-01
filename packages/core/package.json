@@ -1,12 +1,24 @@
 {
   "name": "slip-auth-core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
+  "type": "module",
   "main": "src/core.ts",
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/core.mjs",
+        "require": "./dist/core.mjs"
+      }
+    },
+    "main": "./dist/core.mjs",
+    "types": "./dist/core.d.ts",
+    "files": ["dist"]
+  },
   "scripts": {
     "format": "biome format --write",
     "test": "vitest run",
-    "build": "tsup src/core.ts --dts",
+    "build": "unbuild",
     "release": "pnpm run format && pnpm run test && pnpm run build && pnpm publish && git push --follow-tags"
   },
   "keywords": [],
@@ -19,10 +31,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "tsup": "^8.2.3",
+    "unbuild": "^2.0.0",
     "vitest": "^2.0.4"
-  },
-  "publishConfig": {
-    "main": "dist/core.js"
   }
 }

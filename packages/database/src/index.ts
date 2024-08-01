@@ -1,7 +1,7 @@
 import type { ConnectorName, Database } from "db0";
 import z from "zod";
 import { createConsola } from "consola";
-import { SqliteTableChecker } from "./lib/sqlite-table-checker";
+import { SqliteTableChecker } from "./sqlite-table-checker";
 
 const logger = createConsola().withTag("SlipAuth");
 

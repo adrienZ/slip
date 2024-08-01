@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
-import { checkDatabaseValidity, checkDbAndTables } from "../index";
+import { checkDatabaseValidity, checkDbAndTables } from "../src/index";
 import { createDatabase } from "db0";
 
 describe("checkDatabaseValidity", () => {

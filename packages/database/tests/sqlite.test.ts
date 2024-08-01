@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
-import { checkDbAndTables } from "../index";
+import { checkDbAndTables } from "../src/index";
 import { createDatabase } from "db0";
 
 const db = createDatabase(sqlite({}));

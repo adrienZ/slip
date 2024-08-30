@@ -2,7 +2,7 @@
   "name": "@adrienZ/slip-auth-nuxt",
   "version": "0.0.6",
   "description": "My new Nuxt module",
-  "repository": "your-org/my-module",
+  "repository": "adrienZ/slip",
   "license": "MIT",
   "type": "module",
   "exports": {

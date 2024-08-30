@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../core";
@@ -8,7 +8,9 @@ const date = new Date(Date.UTC(1998, 11, 19));
 vi.useFakeTimers();
 vi.setSystemTime(date);
 
-const db = createDatabase(sqlite({}));
+const db = createDatabase(sqlite({
+  name: "core.test",
+}));
 const auth = new SlipAuthCore(
   db,
   {

@@ -31,7 +31,6 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.12.4",
-    "@slip/core": "workspace:^",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -41,6 +40,7 @@
     "@nuxt/schema": "^3.12.4",
     "@nuxt/test-utils": "^3.14.0",
     "@types/node": "^20.14.13",
+    "better-sqlite3": "^11.2.1",
     "changelogen": "^0.5.5",
     "eslint": "^9.8.0",
     "nuxt": "^3.12.4",

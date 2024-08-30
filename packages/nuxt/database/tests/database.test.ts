@@ -63,9 +63,11 @@ describe("checkDatabaseValidity", () => {
 
 describe("checkAndCreateDb", () => {
   it("should throw an error when unsupported connector are provided", async () => {
-    const db = createDatabase(sqlite({}));
+    const db = createDatabase(sqlite({
+      name: "database.test",
+    }));
     await expect(
-      // @ts-expect-error
+      // @ts-expect-error testing unsupported
       checkDbAndTables(db, "notsupported", {
         users: "slip_users",
         sessions: "slip_sessions",

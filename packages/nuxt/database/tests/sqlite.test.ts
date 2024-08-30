@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
-import { checkDbAndTables } from "../index";
 import { createDatabase } from "db0";
+import { checkDbAndTables } from "../index";
 
-const db = createDatabase(sqlite({}));
+const db = createDatabase(sqlite({
+  name: "sqlite.test",
+}));
 
 beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_users`;
@@ -15,7 +17,6 @@ describe("sqlite connector", () => {
   describe("users table", () => {
     describe("id field", () => {
       it("should throw an error when users table does not exist in database", async () => {
-        const db = createDatabase(sqlite({}));
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -26,7 +27,6 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when users table does not have an id field", async () => {
-        const db = createDatabase(sqlite({}));
         await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("notid" TEXT PRIMARY KEY)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -40,7 +40,6 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when users table does not have an id field as primary key", async () => {
-        const db = createDatabase(sqlite({}));
         await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -54,7 +53,6 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when users table does not have an id field with type of text", async () => {
-        const db = createDatabase(sqlite({}));
         await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" INTEGER PRIMARY KEY)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -68,7 +66,6 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when users table does not have a not nullable id field", async () => {
-        const db = createDatabase(sqlite({}));
         await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT PRIMARY KEY, "email" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {

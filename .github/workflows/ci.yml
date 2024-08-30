@@ -39,5 +39,5 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-      - name: Test
-        run: npm run test
+    - name: Test
+      run: npm run test

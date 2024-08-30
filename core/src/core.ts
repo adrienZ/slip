@@ -1,5 +1,6 @@
 import { randomUUID } from "uncrypto";
 import { checkDbAndTables, type tableNames } from "../../database";
+import type { sessionsTable, usersTable, oAuthAccountsTable } from "../../database/lib/schema";
 
 export type { tableNames };
 export type { supportedConnectors } from "../../database";
@@ -18,17 +19,18 @@ interface ICreateSessionsParams {
   expiresAt: number
 }
 
-// #region TODO: use an ORM someday
-export interface SlipAuthSession {
-  id: string
-  expires_at: number
+type SessionsTableSelect = typeof sessionsTable.$inferSelect;
+export interface SlipAuthSession extends SessionsTableSelect {
+
 }
 
-export interface SlipAuthUser {
+type UsersTableSelect = typeof usersTable.$inferSelect;
+export interface SlipAuthUser extends UsersTableSelect {
   id: string
 }
 
-export interface SlipAuthOauthAccount {
+type OAuthAccountsTableSelect = typeof oAuthAccountsTable.$inferSelect;
+export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
   provider_id: string
   provider_user_id: string
   user_id: string

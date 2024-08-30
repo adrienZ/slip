@@ -17,6 +17,9 @@ importers:
       '@nuxt/kit':
         specifier: ^3.12.4
         version: 3.12.4(magicast@0.3.4)(rollup@4.19.1)
+      db0:
+        specifier: ^0.1.4
+        version: 0.1.4(better-sqlite3@11.2.1)
       zod:
         specifier: ^3.23.8
         version: 3.23.8

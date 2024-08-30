@@ -31,11 +31,11 @@ const validateTableSchema = (
   const primaryKeysColumnsNames = drizzleTableInfos.primaryKeys.at(0)?.columns.map(col => col.name);
 
   for (const { name, columnType, primary, notNull } of drizzleTableInfos.columns) {
-    schema.refine(arr => arr.some(item => item.name === name), {
+    schema = schema.refine(arr => arr.some(item => item.name === name), {
       message: `${tableName} table must contain a column with name "${name}"`,
     });
     if (columnType) {
-      schema.refine(
+      schema = schema.refine(
         arr => arr.some(item => item.name === name && item.type === getSQLiteColumType(columnType)),
         {
           message: `${tableName} table must contain a column "${name}" with type "${getSQLiteColumType(columnType)}"`,
@@ -44,7 +44,7 @@ const validateTableSchema = (
     }
 
     if (primary || primaryKeysColumnsNames?.includes(name)) {
-      schema.refine(
+      schema = schema.refine(
         arr =>
           arr.some(
             item =>
@@ -56,7 +56,7 @@ const validateTableSchema = (
       );
     }
     if (notNull) {
-      schema.refine(
+      schema = schema.refine(
         arr => arr.some(item => item.name === name && item.notnull === 1),
         {
           message: `${tableName} table must contain a column "${name}" not nullable`,

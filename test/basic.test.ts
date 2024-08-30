@@ -20,7 +20,7 @@ describe("database", async () => {
   });
 
   it("module config is passed in runtime config", async () => {
-    const json = await $fetch("/api/runtime-config");
+    const json = await $fetch("/api/runtime-config") as { slipAuth: unknown };
 
     expect(json).toBeInstanceOf(Object);
     expect(json.slipAuth).toStrictEqual({

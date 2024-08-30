@@ -7,7 +7,8 @@
     "dev": "pnpm --recursive dev",
     "lint": "pnpm --recursive lint",
     "test": "pnpm --recursive test",
-    "format": "pnpm --recursive format"
+    "format": "pnpm --recursive format",
+    "dev:prepare": "pnpm --recursive dev:prepare"
   },
   "keywords": [],
   "author": "",

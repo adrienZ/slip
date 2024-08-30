@@ -26,14 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup  # Ensure this job runs after the setup job
     steps:
-      - uses: actions/checkout@v4
-      - run: corepack enable
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-      - name: Install dependencies
-        run: npx nypm@latest i
       - name: Lint
         run: npm run lint
 

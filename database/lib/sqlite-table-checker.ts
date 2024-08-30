@@ -87,7 +87,6 @@ export class SqliteTableChecker extends TableChecker {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-    console.log(tableInfo);
 
     const { success, error } = UserTableSchema(tableName).safeParse(tableInfo);
 

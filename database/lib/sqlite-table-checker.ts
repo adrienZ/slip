@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { type PrimaryKey, getTableConfig, type SQLiteColumn } from "drizzle-orm/sqlite-core";
 import { TableChecker } from "./table-checker";
+import { usersTable, oAuthAccountsTable, sessionsTable } from "./schema";
 
 const sqliteTableInfoRowSchema = z.object({
   cid: z.number(),
@@ -10,35 +12,39 @@ const sqliteTableInfoRowSchema = z.object({
   pk: z.number(),
 });
 
-interface ColumnDefinition {
-  name: string
-  type?: string
-  pk?: boolean
-  notnull?: boolean
+const sqliteDrizzleColumnTypeMapping = {
+  SQLiteText: "TEXT",
+  SQLiteInteger: "INTEGER",
+};
+function getSQLiteColumType(drizzleColumnType: string) {
+  return sqliteDrizzleColumnTypeMapping[drizzleColumnType as keyof typeof sqliteDrizzleColumnTypeMapping] || drizzleColumnType;
 }
 
-const createTableSchema = (
+const validateTableSchema = (
   tableName: string,
-  requiredColumns: ColumnDefinition[],
+  drizzleTableInfos: { columns: SQLiteColumn[], primaryKeys: PrimaryKey[] },
 ) => {
   let schema = z
     .array(sqliteTableInfoRowSchema)
     .min(1, `${tableName} table for SLIP does not exist`);
 
-  requiredColumns.forEach(({ name, type, pk, notnull }) => {
-    schema = schema.refine(arr => arr.some(item => item.name === name), {
+  const primaryKeysColumnsNames = drizzleTableInfos.primaryKeys.at(0)?.columns.map(col => col.name);
+
+  for (const { name, columnType, primary, notNull } of drizzleTableInfos.columns) {
+    schema.refine(arr => arr.some(item => item.name === name), {
       message: `${tableName} table must contain a column with name "${name}"`,
     });
-    if (type) {
-      schema = schema.refine(
-        arr => arr.some(item => item.name === name && item.type === type),
+    if (columnType) {
+      schema.refine(
+        arr => arr.some(item => item.name === name && item.type === getSQLiteColumType(columnType)),
         {
-          message: `${tableName} table must contain a column "${name}" with type "${type}"`,
+          message: `${tableName} table must contain a column "${name}" with type "${getSQLiteColumType(columnType)}"`,
         },
       );
     }
-    if (pk) {
-      schema = schema.refine(
+
+    if (primary || primaryKeysColumnsNames?.includes(name)) {
+      schema.refine(
         arr =>
           arr.some(
             item =>
@@ -49,41 +55,30 @@ const createTableSchema = (
         },
       );
     }
-    if (notnull) {
-      schema = schema.refine(
+    if (notNull) {
+      schema.refine(
         arr => arr.some(item => item.name === name && item.notnull === 1),
         {
           message: `${tableName} table must contain a column "${name}" not nullable`,
         },
       );
     }
-  });
+  };
 
   return schema;
 };
 
 const UserTableSchema = (usersTableName: string) =>
-  createTableSchema(usersTableName, [
-    { name: "id", type: "TEXT", pk: true, notnull: true },
-    { name: "email", type: "TEXT", notnull: true },
-  ]);
+  validateTableSchema(usersTableName, getTableConfig(usersTable));
 
 const SessionTableSchema = (sessionsTableName: string) =>
-  createTableSchema(sessionsTableName, [
-    { name: "id", type: "TEXT", pk: true, notnull: true },
-    { name: "expires_at", type: "INTEGER", notnull: true },
-    { name: "user_id", type: "TEXT", notnull: true },
-  ]);
+  validateTableSchema(sessionsTableName, getTableConfig(sessionsTable));
 
 const OauthAccountTableSchema = (oauthAccountTableName: string) =>
-  createTableSchema(oauthAccountTableName, [
-    { name: "provider_id", type: "TEXT", notnull: true, pk: true },
-    { name: "provider_user_id", type: "TEXT", notnull: true, pk: true },
-    { name: "user_id", type: "TEXT", notnull: true },
-  ]);
+  validateTableSchema(oauthAccountTableName, getTableConfig(oAuthAccountsTable));
 
 export class SqliteTableChecker extends TableChecker {
-  async checkUserTable(tableName: string) {
+  override async checkUserTable(tableName: string) {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
@@ -97,7 +92,7 @@ export class SqliteTableChecker extends TableChecker {
     return success;
   }
 
-  async checkSessionTable(tableName: string, usersTableName: string) {
+  override async checkSessionTable(tableName: string, usersTableName: string) {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
@@ -132,7 +127,7 @@ export class SqliteTableChecker extends TableChecker {
     return success;
   }
 
-  async checkOauthAccountTable(tableName: string, usersTableName: string) {
+  override async checkOauthAccountTable(tableName: string, usersTableName: string) {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();

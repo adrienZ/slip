@@ -7,18 +7,18 @@ export class TableChecker {
     this.dbClient = dbClient;
   }
 
-  async checkUserTable(tableName: string): Promise<boolean> {
+  async checkUserTable(_tableName: string): Promise<boolean> {
     throw new Error("checkUserTable not implemented");
   }
 
   async checkSessionTable(
-    tableName: string,
-    usersTableName: string,
+    _tableName: string,
+    _usersTableName: string,
   ): Promise<boolean> {
     throw new Error("checkSessionTable not implemented");
   }
 
-  async checkOauthAccountTable(tableName: string, usersTableName: string) {
+  async checkOauthAccountTable(_tableName: string, _usersTableName: string) {
     throw new Error("checkOauthAccountTable not implemented");
   }
 }

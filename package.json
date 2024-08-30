@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "pnpm --recursive dev",
+    "lint": "pnpm --recursive lint",
     "test": "pnpm --recursive test",
     "format": "pnpm --recursive format"
   },

@@ -18,9 +18,9 @@ const TableNamesSchema = z.object({
 });
 
 export interface tableNames {
-  users: string;
-  sessions: string;
-  oauthAccounts: string;
+  users: string
+  sessions: string
+  oauthAccounts: string
 }
 
 export function checkDatabaseValidity(
@@ -45,11 +45,11 @@ export function checkDatabaseValidity(
     );
   }
 
-  const { data: validatedDatabase, success: databaseValidity } =
-    DatabaseSchema.safeParse(db);
+  const { data: validatedDatabase, success: databaseValidity }
+    = DatabaseSchema.safeParse(db);
   if (!databaseValidity) {
     throw new Error(
-      `The provided database is not a valid db0 database, see https://github.com/unjs/db0`,
+      "The provided database is not a valid db0 database, see https://github.com/unjs/db0",
     );
   }
 
@@ -71,7 +71,7 @@ export async function checkDbAndTables(
       break;
     default:
       throw new Error(
-        `Invalid enum value. Expected ${CONNECTOR_NAME.map((name) => `'${name}'`).join(` | `)}, received '${connectorType}'`,
+        `Invalid enum value. Expected ${CONNECTOR_NAME.map(name => `'${name}'`).join(" | ")}, received '${connectorType}'`,
       );
   }
 

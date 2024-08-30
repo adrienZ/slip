@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import App from "../../../playground/app.vue"
+import App from "../../../playground/app.vue";
 </script>

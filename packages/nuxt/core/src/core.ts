@@ -1,5 +1,5 @@
-import { checkDbAndTables, type tableNames } from "../../database";
 import { randomUUID } from "uncrypto";
+import { checkDbAndTables, type tableNames } from "../../database";
 
 export type { tableNames };
 export type { supportedConnectors } from "../../database";
@@ -7,36 +7,36 @@ export type { supportedConnectors } from "../../database";
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 
 interface ICreateOrLoginParams {
-  providerId: string;
-  providerUserId: string;
+  providerId: string
+  providerUserId: string
   // because our slip is based on unique emails
-  email: string;
+  email: string
 }
 
 interface ICreateSessionsParams {
-  userId: string;
-  expiresAt: number;
+  userId: string
+  expiresAt: number
 }
 
 // #region TODO: use an ORM someday
 export interface SlipAuthSession {
-  id: string;
-  expires_at: number;
+  id: string
+  expires_at: number
 }
 
 export interface SlipAuthUser {
-  id: string;
+  id: string
 }
 
 export interface SlipAuthOauthAccount {
-  provider_id: string;
-  provider_user_id: string;
-  user_id: string;
+  provider_id: string
+  provider_user_id: string
+  user_id: string
 }
-//#endregion
+// #endregion
 
 interface ISlipAuthCoreOptions {
-  sessionMaxAge: number;
+  sessionMaxAge: number
 }
 
 export class SlipAuthCore {
@@ -86,13 +86,13 @@ export class SlipAuthCore {
     if (!existingUser) {
       const userId = this.#createUserId();
 
-      const { success: userInsertSuccess } = await this.#db
+      await this.#db
         .prepare(
           `INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${userId}', '${params.email}')`,
         )
         .run();
 
-      const { success: oauthInsertSuccess } = await this.#db
+      const { success: _oauthInsertSuccess } = await this.#db
         .prepare(
           `INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`,
         )
@@ -129,7 +129,7 @@ export class SlipAuthCore {
 
   public async insertSession({ userId, expiresAt }: ICreateSessionsParams) {
     const sessionId = this.#createSessionId();
-    const { success } = await this.#db
+    await this.#db
       .prepare(
         `INSERT INTO ${this.#tableNames.sessions} (id, expires_at, user_id) VALUES ('${sessionId}', '${expiresAt}', '${userId}')`,
       )

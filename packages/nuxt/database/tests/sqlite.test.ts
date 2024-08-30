@@ -35,7 +35,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_users table must contain a column with name "id"',
+          "slip_users table must contain a column with name \"id\"",
         );
       });
 
@@ -48,7 +48,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_users table must contain a column "id" as primary key`,
+          "slip_users table must contain a column \"id\" as primary key",
         );
       });
 
@@ -61,7 +61,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_users table must contain a column "id" with type "TEXT"`,
+          "slip_users table must contain a column \"id\" with type \"TEXT\"",
         );
       });
 
@@ -74,7 +74,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_users table must contain a column "id" not nullable`,
+          "slip_users table must contain a column \"id\" not nullable",
         );
       });
     });
@@ -89,7 +89,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_users table must contain a column with name "email"',
+          "slip_users table must contain a column with name \"email\"",
         );
       });
 
@@ -102,7 +102,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_users table must contain a column "email" with type "TEXT"`,
+          "slip_users table must contain a column \"email\" with type \"TEXT\"",
         );
       });
 
@@ -115,7 +115,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_users table must contain a column "email" not nullable`,
+          "slip_users table must contain a column \"email\" not nullable",
         );
       });
     });
@@ -149,7 +149,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_sessions table must contain a column with name "id"',
+          "slip_sessions table must contain a column with name \"id\"",
         );
       });
 
@@ -162,7 +162,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "id" as primary key`,
+          "slip_sessions table must contain a column \"id\" as primary key",
         );
       });
 
@@ -175,7 +175,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "id" with type "TEXT"`,
+          "slip_sessions table must contain a column \"id\" with type \"TEXT\"",
         );
       });
 
@@ -188,7 +188,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "id" not nullable`,
+          "slip_sessions table must contain a column \"id\" not nullable",
         );
       });
     });
@@ -203,7 +203,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_sessions table must contain a column with name "expires_at"',
+          "slip_sessions table must contain a column with name \"expires_at\"",
         );
       });
 
@@ -216,7 +216,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "expires_at" with type "INTEGER"`,
+          "slip_sessions table must contain a column \"expires_at\" with type \"INTEGER\"",
         );
       });
 
@@ -229,7 +229,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "expires_at" not nullable`,
+          "slip_sessions table must contain a column \"expires_at\" not nullable",
         );
       });
     });
@@ -251,7 +251,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table should have a foreign key "user_id"`,
+          "slip_sessions table should have a foreign key \"user_id\"",
         );
       });
 
@@ -264,7 +264,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "user_id" with type "TEXT"`,
+          "slip_sessions table must contain a column \"user_id\" with type \"TEXT\"",
         );
       });
 
@@ -278,7 +278,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table must contain a column "user_id" not nullable`,
+          "slip_sessions table must contain a column \"user_id\" not nullable",
         );
       });
 
@@ -291,7 +291,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_sessions table should have a foreign key "user_id"`,
+          "slip_sessions table should have a foreign key \"user_id\"",
         );
       });
 
@@ -305,11 +305,11 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in slip_sessions table should target "id" column from the "slip_users" table`,
+          "foreign key \"user_id\" in slip_sessions table should target \"id\" column from the \"slip_users\" table",
         );
       });
 
-      it('should throw an error when sessions table does not have a user_id foreign key to user table "id" column', async () => {
+      it("should throw an error when sessions table does not have a user_id foreign key to user table \"id\" column", async () => {
         await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES slip_users(email))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -318,7 +318,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in slip_sessions table should target "id" column from the "slip_users" table`,
+          "foreign key \"user_id\" in slip_sessions table should target \"id\" column from the \"slip_users\" table",
         );
       });
     });
@@ -357,7 +357,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_oauth_accounts table must contain a column with name "provider_id"',
+          "slip_oauth_accounts table must contain a column with name \"provider_id\"",
         );
       });
 
@@ -370,7 +370,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_id" as primary key`,
+          "slip_oauth_accounts table must contain a column \"provider_id\" as primary key",
         );
       });
 
@@ -383,7 +383,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_id" with type "TEXT"`,
+          "slip_oauth_accounts table must contain a column \"provider_id\" with type \"TEXT\"",
         );
       });
 
@@ -396,7 +396,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_id" not nullable`,
+          "slip_oauth_accounts table must contain a column \"provider_id\" not nullable",
         );
       });
     });
@@ -411,7 +411,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          'slip_oauth_accounts table must contain a column with name "provider_user_id"',
+          "slip_oauth_accounts table must contain a column with name \"provider_user_id\"",
         );
       });
 
@@ -424,7 +424,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_user_id" with type "TEXT"`,
+          "slip_oauth_accounts table must contain a column \"provider_user_id\" with type \"TEXT\"",
         );
       });
 
@@ -437,7 +437,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_user_id" as primary key`,
+          "slip_oauth_accounts table must contain a column \"provider_user_id\" as primary key",
         );
       });
 
@@ -450,7 +450,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "provider_user_id" not nullable`,
+          "slip_oauth_accounts table must contain a column \"provider_user_id\" not nullable",
         );
       });
     });
@@ -465,7 +465,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table should have a foreign key "user_id"`,
+          "slip_oauth_accounts table should have a foreign key \"user_id\"",
         );
       });
 
@@ -478,7 +478,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "user_id" with type "TEXT"`,
+          "slip_oauth_accounts table must contain a column \"user_id\" with type \"TEXT\"",
         );
       });
 
@@ -491,7 +491,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table must contain a column "user_id" not nullable`,
+          "slip_oauth_accounts table must contain a column \"user_id\" not nullable",
         );
       });
 
@@ -504,7 +504,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `slip_oauth_accounts table should have a foreign key "user_id"`,
+          "slip_oauth_accounts table should have a foreign key \"user_id\"",
         );
       });
 
@@ -518,11 +518,11 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in slip_oauth_accounts table should target "id" column from the "slip_users" table`,
+          "foreign key \"user_id\" in slip_oauth_accounts table should target \"id\" column from the \"slip_users\" table",
         );
       });
 
-      it('should throw an error when slip_oauth_accounts table does not have a user_id foreign key to user table "id" column', async () => {
+      it("should throw an error when slip_oauth_accounts table does not have a user_id foreign key to user table \"id\" column", async () => {
         await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES slip_users(email), PRIMARY KEY (provider_id, provider_user_id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -531,7 +531,7 @@ describe("sqlite connector", () => {
             oauthAccounts: "slip_oauth_accounts",
           }),
         ).rejects.toThrowError(
-          `foreign key "user_id" in slip_oauth_accounts table should target "id" column from the "slip_users" table`,
+          "foreign key \"user_id\" in slip_oauth_accounts table should target \"id\" column from the \"slip_users\" table",
         );
       });
     });

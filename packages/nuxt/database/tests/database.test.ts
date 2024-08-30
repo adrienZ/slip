@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
-import { checkDatabaseValidity, checkDbAndTables } from "../index";
 import { createDatabase } from "db0";
+import { checkDatabaseValidity, checkDbAndTables } from "../index";
 
 describe("checkDatabaseValidity", () => {
   it("should throw an error when no arguments are provided", () => {
-    // @ts-expect-error
+    // @ts-expect-error testing no db
     expect(() => checkDatabaseValidity()).toThrow(
       "No database to check, please provide one",
     );
@@ -24,7 +24,7 @@ describe("checkDatabaseValidity", () => {
   });
 
   it("should throw an error when tableNames are missing", () => {
-    // @ts-expect-error
+    // @ts-expect-error testing no table names
     expect(() => checkDatabaseValidity({})).toThrowError(
       "No tableNames provided for SlipAuth: { users: string, sessions: string, oauthAccounts: string }",
     );

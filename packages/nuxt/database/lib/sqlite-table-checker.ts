@@ -11,10 +11,10 @@ const sqliteTableInfoRowSchema = z.object({
 });
 
 interface ColumnDefinition {
-  name: string;
-  type?: string;
-  pk?: boolean;
-  notnull?: boolean;
+  name: string
+  type?: string
+  pk?: boolean
+  notnull?: boolean
 }
 
 const createTableSchema = (
@@ -26,12 +26,12 @@ const createTableSchema = (
     .min(1, `${tableName} table for SLIP does not exist`);
 
   requiredColumns.forEach(({ name, type, pk, notnull }) => {
-    schema = schema.refine((arr) => arr.some((item) => item.name === name), {
+    schema = schema.refine(arr => arr.some(item => item.name === name), {
       message: `${tableName} table must contain a column with name "${name}"`,
     });
     if (type) {
       schema = schema.refine(
-        (arr) => arr.some((item) => item.name === name && item.type === type),
+        arr => arr.some(item => item.name === name && item.type === type),
         {
           message: `${tableName} table must contain a column "${name}" with type "${type}"`,
         },
@@ -39,9 +39,9 @@ const createTableSchema = (
     }
     if (pk) {
       schema = schema.refine(
-        (arr) =>
+        arr =>
           arr.some(
-            (item) =>
+            item =>
               item.name === name && typeof item.pk === "number" && item.pk > 0,
           ),
         {
@@ -51,7 +51,7 @@ const createTableSchema = (
     }
     if (notnull) {
       schema = schema.refine(
-        (arr) => arr.some((item) => item.name === name && item.notnull === 1),
+        arr => arr.some(item => item.name === name && item.notnull === 1),
         {
           message: `${tableName} table must contain a column "${name}" not nullable`,
         },
@@ -87,8 +87,8 @@ export class SqliteTableChecker extends TableChecker {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-  console.log(tableInfo);
-  
+    console.log(tableInfo);
+
     const { success, error } = UserTableSchema(tableName).safeParse(tableInfo);
 
     if (!success) {
@@ -102,8 +102,8 @@ export class SqliteTableChecker extends TableChecker {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-    const { success, error } =
-      SessionTableSchema(tableName).safeParse(tableInfo);
+    const { success, error }
+      = SessionTableSchema(tableName).safeParse(tableInfo);
 
     if (!success) {
       throw new Error(error.errors[0].message);
@@ -111,10 +111,10 @@ export class SqliteTableChecker extends TableChecker {
 
     const foreignKeys = (await this.dbClient
       .prepare(`PRAGMA foreign_key_list(${tableName})`)
-      .all()) as Array<{ table?: string; from?: string; to?: string }>;
+      .all()) as Array<{ table?: string, from?: string, to?: string }>;
 
     const userIdForeignKey = foreignKeys.find(
-      (columnInfo) => columnInfo.from === "user_id",
+      columnInfo => columnInfo.from === "user_id",
     );
 
     if (!userIdForeignKey) {
@@ -122,8 +122,8 @@ export class SqliteTableChecker extends TableChecker {
     }
 
     if (
-      userIdForeignKey.table !== usersTableName ||
-      userIdForeignKey.to !== "id"
+      userIdForeignKey.table !== usersTableName
+      || userIdForeignKey.to !== "id"
     ) {
       throw new Error(
         `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,
@@ -137,8 +137,8 @@ export class SqliteTableChecker extends TableChecker {
     const tableInfo = await this.dbClient
       .prepare(`PRAGMA table_info(${tableName})`)
       .all();
-    const { success, error } =
-      OauthAccountTableSchema(tableName).safeParse(tableInfo);
+    const { success, error }
+      = OauthAccountTableSchema(tableName).safeParse(tableInfo);
 
     if (!success) {
       throw new Error(error.errors[0].message);
@@ -146,10 +146,10 @@ export class SqliteTableChecker extends TableChecker {
 
     const foreignKeys = (await this.dbClient
       .prepare(`PRAGMA foreign_key_list(${tableName})`)
-      .all()) as Array<{ table?: string; from?: string; to?: string }>;
+      .all()) as Array<{ table?: string, from?: string, to?: string }>;
 
     const userIdForeignKey = foreignKeys.find(
-      (columnInfo) => columnInfo.from === "user_id",
+      columnInfo => columnInfo.from === "user_id",
     );
 
     if (!userIdForeignKey) {
@@ -157,8 +157,8 @@ export class SqliteTableChecker extends TableChecker {
     }
 
     if (
-      userIdForeignKey.table !== usersTableName ||
-      userIdForeignKey.to !== "id"
+      userIdForeignKey.table !== usersTableName
+      || userIdForeignKey.to !== "id"
     ) {
       throw new Error(
         `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,

@@ -1,6 +1,10 @@
 # Changelog
 
 
+## v0.0.7
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.0.6...v0.0.7)
+
 ## v0.0.6
 
 [compare changes](https://github.com/your-org/my-module/compare/v0.0.1...v0.0.6)

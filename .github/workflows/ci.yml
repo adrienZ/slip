@@ -36,8 +36,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  test:
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    - name: Test
-      run: npm run test
+    test:
+      timeout-minutes: 10
+      runs-on: ubuntu-latest
+      - name: Test
+        run: npm run test

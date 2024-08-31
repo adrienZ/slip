@@ -3,7 +3,7 @@ import type { tableNames } from "..";
 
 export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.users, {
   id: text("id").primaryKey().notNull(),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
 });
 
 export const getSessionsTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.users, {

@@ -22,7 +22,6 @@ const sqliteDrizzleColumnTypeMapping = {
 function getSQLiteColumType(drizzleColumnType: string) {
   return sqliteDrizzleColumnTypeMapping[drizzleColumnType as keyof typeof sqliteDrizzleColumnTypeMapping] || drizzleColumnType;
 }
-// #endregion
 
 function createSQLiteTableExistSchema(tableName: string) {
   return z
@@ -36,6 +35,7 @@ const findColumnInSQLiteTableInfo = <T extends { name: string }>(source: T[], co
 const findColumnInSQLiteTableForeignKeys = <T extends { from: string }>(source: T[], columnName: string) => {
   return source.find(columnFromSQLite => columnFromSQLite.from === columnName);
 };
+// #endregion
 
 async function validateDabaseWithSchema(db: Database, tableName: string, drizzleTableInfos: { columns: SQLiteColumn[], primaryKeys: PrimaryKey[], foreignKeys: ForeignKey[] }): Promise<string | null> {
   const maybeTableInfo = await db.prepare(`PRAGMA table_info(${tableName})`).all();
@@ -64,6 +64,22 @@ async function validateDabaseWithSchema(db: Database, tableName: string, drizzle
 
     if (columnFromSchema.notNull && correspondingColumn.notnull !== 1) {
       return `${tableName} table must contain a column "${columnFromSchema.name}" not nullable`;
+    }
+
+    const indexesInTableSQLite = (await db
+      .prepare(`PRAGMA INDEX_LIST(${tableName})`)
+      .all()) as Array<{ name: string, origin: string, unique: number }>;
+
+    const uniqueIndexesSQLite = await Promise.all(indexesInTableSQLite.filter((indexData) => {
+      return indexData.origin === "u" && indexData.unique === 1;
+    }).map((uniqueIndex) => {
+      return db
+        .prepare(`PRAGMA index_info(${uniqueIndex.name})`)
+        .all() as Promise<Array<{ name: string }>>;
+    }));
+
+    if (columnFromSchema.isUnique && uniqueIndexesSQLite.find(uniqueIndex => columnFromSchema.name === uniqueIndex.at(0)?.name) === undefined) {
+      return `${tableName} table must contain a column "${columnFromSchema.name}" unique`;
     }
   }
 

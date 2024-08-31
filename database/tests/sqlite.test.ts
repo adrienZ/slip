@@ -118,12 +118,25 @@ describe("sqlite connector", () => {
           "slip_users table must contain a column \"email\" not nullable",
         );
       });
+
+      it("should throw an error when users table does not have a unique email field", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
+        await expect(
+          checkDbAndTables(db, "sqlite", {
+            users: "slip_users",
+            sessions: "slip_sessions",
+            oauthAccounts: "slip_oauth_accounts",
+          }),
+        ).rejects.toThrowError(
+          "slip_users table must contain a column \"email\" unique",
+        );
+      });
     });
   });
 
   describe("sessions table", () => {
     const validUsersTableSetup = () =>
-      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
+      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE)`;
 
     beforeEach(async () => {
       await validUsersTableSetup();
@@ -326,7 +339,7 @@ describe("sqlite connector", () => {
 
   describe("slip_oauth_accounts table", () => {
     const validUsersTableSetup = () =>
-      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
+      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE)`;
     const validSessionsTableSetup = () =>
       db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
 

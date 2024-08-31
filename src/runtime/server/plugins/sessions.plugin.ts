@@ -1,6 +1,5 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
 import type { SlipAuthSession } from "../../core/core";
-// @ts-expect-error yolo the DX is not great
 import { defineNitroPlugin, sessionHooks } from "#imports";
 
 export default defineNitroPlugin(() => {

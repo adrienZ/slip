@@ -27,7 +27,7 @@ export default defineNuxtModule<ModuleOptions>({
     const runtimeConfig = nuxt.options.runtimeConfig;
     runtimeConfig.slipAuth = options;
     // nuxt-auth-utils compat
-    // @ts-expect-error nuxt-auth-utils typing is mising
+    // @ts-expect-error TODO: nuxt-auth-utils typing is mising
     runtimeConfig.slipAuth.sessionMaxAge = runtimeConfig.session?.maxAge ?? options.sessionMaxAge;
     // #endregion
 

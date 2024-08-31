@@ -12,8 +12,9 @@ declare module "nuxt/schema" {
   }
 }
 
-// @ts-expect-error #auth-utils is an alias from nuxt-auth-utils
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore #auth-utils is an alias from nuxt-auth-utils
 declare module "#auth-utils" {
 
-  interface UserSession extends SlipAuthSession {}
+  interface UserSession extends Pick<SlipAuthSession, "id" | "expires_at"> {}
 }

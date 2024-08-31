@@ -41,6 +41,6 @@ export default defineNuxtModule<ModuleOptions>({
     // #endregion
 
     // module logic
-    addServerScanDir(resolver.resolve("./runtime/server/"));
+    addServerScanDir(resolver.resolve("./runtime/server"));
   },
 });

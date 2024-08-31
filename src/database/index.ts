@@ -1,7 +1,7 @@
 import type { ConnectorName, Database } from "db0";
-import z from "zod";
-import consola from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
+import consola from "consola";
+import z from "zod";
 
 export type supportedConnectors = Extract<ConnectorName, "sqlite">;
 const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];

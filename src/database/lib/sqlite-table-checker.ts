@@ -1,9 +1,9 @@
-import { z } from "zod";
 import { type PrimaryKey, getTableConfig, type SQLiteColumn, type ForeignKey } from "drizzle-orm/sqlite-core";
 import { getTableName } from "drizzle-orm";
 import type { Database } from "db0";
 import { TableChecker } from "./table-checker";
 import { getUsersTableSchema, getOAuthAccountsTableSchema, getSessionsTableSchema } from "./schema";
+import { z } from "zod";
 
 // #region HELPERS
 const sqliteTableInfoRowSchema = z.object({

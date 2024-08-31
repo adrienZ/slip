@@ -1,5 +1,6 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
 import type { SlipAuthSession } from "../../core/core";
+import { defineNitroPlugin } from "#imports";
 
 export default defineNitroPlugin(() => {
   const auth = useSlipAuth();

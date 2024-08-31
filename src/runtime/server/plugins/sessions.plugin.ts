@@ -1,7 +1,6 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
 import type { SlipAuthSession } from "../../core/core";
 
-// @ts-expect-error TODO: typecheck is failing here for no reason
 export default defineNitroPlugin(() => {
   const auth = useSlipAuth();
 

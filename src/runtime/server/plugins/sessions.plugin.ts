@@ -1,16 +1,14 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
 import type { SlipAuthSession } from "../../core/core";
 // @ts-expect-error yolo the DX is not great
-import { defineNitroPlugin } from "#imports";
+import { defineNitroPlugin, sessionHooks } from "#imports";
 
 export default defineNitroPlugin(() => {
   const auth = useSlipAuth();
 
-  // @ts-expect-error sessionHooks is globally injected by nuxt-auth-utils
-  const sessionHookNuxtAuth = sessionHooks;
-
-  if (typeof sessionHookNuxtAuth !== "undefined") {
-    sessionHookNuxtAuth.hook("clear", async (session: SlipAuthSession) => {
+  if (typeof sessionHooks !== "undefined") {
+    // @ts-expect-error for now leave me alone
+    sessionHooks.hook("clear", async (session: SlipAuthSession) => {
       auth.deleteSession(session.id);
     });
   }

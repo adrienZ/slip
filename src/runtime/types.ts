@@ -1,4 +1,4 @@
-import type { SlipAuthSession, supportedConnectors, tableNames } from "@/src/core/src/core";
+import type { SlipAuthSession, supportedConnectors, tableNames } from "../core/core";
 
 export interface SlipModuleOptions {
   dialect: supportedConnectors

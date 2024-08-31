@@ -1,9 +1,9 @@
+import { checkDbAndTables, type tableNames } from "../database";
+import type { getSessionsTableSchema, getUsersTableSchema, getOAuthAccountsTableSchema } from "../database/lib/schema";
 import { randomUUID } from "uncrypto";
-import { checkDbAndTables, type tableNames } from "@/src/database";
-import type { getSessionsTableSchema, getUsersTableSchema, getOAuthAccountsTableSchema } from "@/src/database/lib/schema";
 
 export type { tableNames };
-export type { supportedConnectors } from "@/src/database";
+export type { supportedConnectors } from "../database";
 
 type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 

@@ -1,5 +1,5 @@
-import { checkDbAndTables, type tableNames } from "../database";
 import { randomUUID } from "uncrypto";
+import { checkDbAndTables, type tableNames } from "../database";
 import type { getSessionsTableSchema, getUsersTableSchema, getOAuthAccountsTableSchema } from "../database/lib/schema";
 
 export type { tableNames };

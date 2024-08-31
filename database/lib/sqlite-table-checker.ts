@@ -1,8 +1,11 @@
 import { z } from "zod";
-import { type PrimaryKey, getTableConfig, type SQLiteColumn } from "drizzle-orm/sqlite-core";
+import { type PrimaryKey, getTableConfig, type SQLiteColumn, type ForeignKey } from "drizzle-orm/sqlite-core";
+import { getTableName } from "drizzle-orm";
+import type { Database } from "db0";
 import { TableChecker } from "./table-checker";
-import { usersTable, oAuthAccountsTable, sessionsTable } from "./schema";
+import { getUsersTableSchema, getOAuthAccountsTableSchema, getSessionsTableSchema } from "./schema";
 
+// #region HELPERS
 const sqliteTableInfoRowSchema = z.object({
   cid: z.number(),
   name: z.string(),
@@ -19,146 +22,105 @@ const sqliteDrizzleColumnTypeMapping = {
 function getSQLiteColumType(drizzleColumnType: string) {
   return sqliteDrizzleColumnTypeMapping[drizzleColumnType as keyof typeof sqliteDrizzleColumnTypeMapping] || drizzleColumnType;
 }
+// #endregion
 
-const validateTableSchema = (
-  tableName: string,
-  drizzleTableInfos: { columns: SQLiteColumn[], primaryKeys: PrimaryKey[] },
-) => {
-  let schema = z
+function createSQLiteTableExistSchema(tableName: string) {
+  return z
     .array(sqliteTableInfoRowSchema)
     .min(1, `${tableName} table for SLIP does not exist`);
+}
 
-  const primaryKeysColumnsNames = drizzleTableInfos.primaryKeys.at(0)?.columns.map(col => col.name);
-
-  for (const { name, columnType, primary, notNull } of drizzleTableInfos.columns) {
-    schema = schema.refine(arr => arr.some(item => item.name === name), {
-      message: `${tableName} table must contain a column with name "${name}"`,
-    });
-    if (columnType) {
-      schema = schema.refine(
-        arr => arr.some(item => item.name === name && item.type === getSQLiteColumType(columnType)),
-        {
-          message: `${tableName} table must contain a column "${name}" with type "${getSQLiteColumType(columnType)}"`,
-        },
-      );
-    }
-
-    if (primary || primaryKeysColumnsNames?.includes(name)) {
-      schema = schema.refine(
-        arr =>
-          arr.some(
-            item =>
-              item.name === name && typeof item.pk === "number" && item.pk > 0,
-          ),
-        {
-          message: `${tableName} table must contain a column "${name}" as primary key`,
-        },
-      );
-    }
-    if (notNull) {
-      schema = schema.refine(
-        arr => arr.some(item => item.name === name && item.notnull === 1),
-        {
-          message: `${tableName} table must contain a column "${name}" not nullable`,
-        },
-      );
-    }
-  };
-
-  return schema;
+const findColumnInSQLiteTableInfo = <T extends { name: string }>(source: T[], columnName: string) => {
+  return source.find(columnFromSQLite => columnFromSQLite.name === columnName);
+};
+const findColumnInSQLiteTableForeignKeys = <T extends { from: string }>(source: T[], columnName: string) => {
+  return source.find(columnFromSQLite => columnFromSQLite.from === columnName);
 };
 
-const UserTableSchema = (usersTableName: string) =>
-  validateTableSchema(usersTableName, getTableConfig(usersTable));
+async function validateDabaseWithSchema(db: Database, tableName: string, drizzleTableInfos: { columns: SQLiteColumn[], primaryKeys: PrimaryKey[], foreignKeys: ForeignKey[] }): Promise<string | null> {
+  const maybeTableInfo = await db.prepare(`PRAGMA table_info(${tableName})`).all();
+  const { success, error, data: tableInfo } = createSQLiteTableExistSchema(tableName).safeParse(maybeTableInfo);
 
-const SessionTableSchema = (sessionsTableName: string) =>
-  validateTableSchema(sessionsTableName, getTableConfig(sessionsTable));
+  if (!success) {
+    throw new Error(error.errors[0].message);
+  };
 
-const OauthAccountTableSchema = (oauthAccountTableName: string) =>
-  validateTableSchema(oauthAccountTableName, getTableConfig(oAuthAccountsTable));
+  // Check if all columns from schema exist in SQLite table
+  for (const columnFromSchema of drizzleTableInfos.columns) {
+    const correspondingColumn = findColumnInSQLiteTableInfo(tableInfo, columnFromSchema.name);
+
+    if (!correspondingColumn) {
+      return `${tableName} table must contain a column with name "${columnFromSchema.name}"`;
+    }
+
+    if (correspondingColumn.type !== getSQLiteColumType(columnFromSchema.columnType)) {
+      return `${tableName} table must contain a column "${columnFromSchema.name}" with type "${getSQLiteColumType(columnFromSchema.columnType)}"`;
+    }
+
+    const primaryKeysColumnsNames = drizzleTableInfos.primaryKeys.at(0)?.columns.map(col => col.name);
+    if ((columnFromSchema.primary || primaryKeysColumnsNames?.includes(columnFromSchema.name)) && correspondingColumn.pk < 1) {
+      return `${tableName} table must contain a column "${columnFromSchema.name}" as primary key`;
+    }
+
+    if (columnFromSchema.notNull && correspondingColumn.notnull !== 1) {
+      return `${tableName} table must contain a column "${columnFromSchema.name}" not nullable`;
+    }
+  }
+
+  const foreignKeysTable = drizzleTableInfos.foreignKeys;
+  const foreignKeysSQLite = (await db
+    .prepare(`PRAGMA foreign_key_list(${tableName})`)
+    .all()) as Array<{ table: string, from: string, to: string, name: string }>;
+
+  for (const foreignKeyData of foreignKeysTable) {
+    const reference = foreignKeyData.reference();
+
+    for (const foreignKeyColumn of reference.columns) {
+      const fcorrespondingColumn = findColumnInSQLiteTableForeignKeys(foreignKeysSQLite, foreignKeyColumn.name);
+
+      if (!fcorrespondingColumn) {
+        return `${tableName} table should have a foreign key "${foreignKeyColumn.name}"`;
+      }
+
+      const targetTableName = getTableName(reference.foreignTable);
+      const targetColumnName = reference.foreignColumns[0].name;
+      if (fcorrespondingColumn.table !== targetTableName || fcorrespondingColumn.to !== targetColumnName) {
+        return `foreign key "${fcorrespondingColumn.from}" in ${tableName} table should target "${targetColumnName}" column from the "${targetTableName}" table`;
+      }
+    }
+  }
+
+  return null;
+}
 
 export class SqliteTableChecker extends TableChecker {
-  override async checkUserTable(tableName: string) {
-    const tableInfo = await this.dbClient
-      .prepare(`PRAGMA table_info(${tableName})`)
-      .all();
+  override async checkUserTable() {
+    const error = await validateDabaseWithSchema(this.dbClient, this.tableNames.users, getTableConfig(getUsersTableSchema(this.tableNames)));
 
-    const { success, error } = UserTableSchema(tableName).safeParse(tableInfo);
-
-    if (!success) {
-      throw new Error(error.errors[0].message);
+    if (error) {
+      throw new Error(error);
     }
 
-    return success;
+    return true;
   }
 
-  override async checkSessionTable(tableName: string, usersTableName: string) {
-    const tableInfo = await this.dbClient
-      .prepare(`PRAGMA table_info(${tableName})`)
-      .all();
-    const { success, error }
-      = SessionTableSchema(tableName).safeParse(tableInfo);
+  override async checkSessionTable() {
+    const error = await validateDabaseWithSchema(this.dbClient, this.tableNames.sessions, getTableConfig(getSessionsTableSchema(this.tableNames)));
 
-    if (!success) {
-      throw new Error(error.errors[0].message);
+    if (error) {
+      throw new Error(error);
     }
 
-    const foreignKeys = (await this.dbClient
-      .prepare(`PRAGMA foreign_key_list(${tableName})`)
-      .all()) as Array<{ table?: string, from?: string, to?: string }>;
-
-    const userIdForeignKey = foreignKeys.find(
-      columnInfo => columnInfo.from === "user_id",
-    );
-
-    if (!userIdForeignKey) {
-      throw new Error(`${tableName} table should have a foreign key "user_id"`);
-    }
-
-    if (
-      userIdForeignKey.table !== usersTableName
-      || userIdForeignKey.to !== "id"
-    ) {
-      throw new Error(
-        `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,
-      );
-    }
-
-    return success;
+    return true;
   }
 
-  override async checkOauthAccountTable(tableName: string, usersTableName: string) {
-    const tableInfo = await this.dbClient
-      .prepare(`PRAGMA table_info(${tableName})`)
-      .all();
-    const { success, error }
-      = OauthAccountTableSchema(tableName).safeParse(tableInfo);
+  override async checkOauthAccountTable() {
+    const error = await validateDabaseWithSchema(this.dbClient, this.tableNames.oauthAccounts, getTableConfig(getOAuthAccountsTableSchema(this.tableNames)));
 
-    if (!success) {
-      throw new Error(error.errors[0].message);
+    if (error) {
+      throw new Error(error);
     }
 
-    const foreignKeys = (await this.dbClient
-      .prepare(`PRAGMA foreign_key_list(${tableName})`)
-      .all()) as Array<{ table?: string, from?: string, to?: string }>;
-
-    const userIdForeignKey = foreignKeys.find(
-      columnInfo => columnInfo.from === "user_id",
-    );
-
-    if (!userIdForeignKey) {
-      throw new Error(`${tableName} table should have a foreign key "user_id"`);
-    }
-
-    if (
-      userIdForeignKey.table !== usersTableName
-      || userIdForeignKey.to !== "id"
-    ) {
-      throw new Error(
-        `foreign key "user_id" in ${tableName} table should target "id" column from the "${usersTableName}" table`,
-      );
-    }
-
-    return success;
+    return true;
   }
 }

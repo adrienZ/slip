@@ -1,6 +1,6 @@
 import { randomUUID } from "uncrypto";
 import { checkDbAndTables, type tableNames } from "../../database";
-import type { sessionsTable, usersTable, oAuthAccountsTable } from "../../database/lib/schema";
+import type { getSessionsTableSchema, getUsersTableSchema, getOAuthAccountsTableSchema } from "../../database/lib/schema";
 
 export type { tableNames };
 export type { supportedConnectors } from "../../database";
@@ -19,17 +19,17 @@ interface ICreateSessionsParams {
   expiresAt: number
 }
 
-type SessionsTableSelect = typeof sessionsTable.$inferSelect;
+type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];
 export interface SlipAuthSession extends SessionsTableSelect {
 
 }
 
-type UsersTableSelect = typeof usersTable.$inferSelect;
+type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
 export interface SlipAuthUser extends UsersTableSelect {
   id: string
 }
 
-type OAuthAccountsTableSelect = typeof oAuthAccountsTable.$inferSelect;
+type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
 export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
   provider_id: string
   provider_user_id: string

@@ -1,24 +1,24 @@
 import type { Database } from "db0";
+import type { tableNames } from "..";
 
 export class TableChecker {
   dbClient: Database;
+  tableNames: tableNames;
 
-  constructor(dbClient: Database) {
+  constructor(dbClient: Database, tableNames: tableNames) {
     this.dbClient = dbClient;
+    this.tableNames = tableNames;
   }
 
-  async checkUserTable(_tableName: string): Promise<boolean> {
+  async checkUserTable(): Promise<boolean> {
     throw new Error("checkUserTable not implemented");
   }
 
-  async checkSessionTable(
-    _tableName: string,
-    _usersTableName: string,
-  ): Promise<boolean> {
+  async checkSessionTable(): Promise<boolean> {
     throw new Error("checkSessionTable not implemented");
   }
 
-  async checkOauthAccountTable(_tableName: string, _usersTableName: string): Promise<boolean> {
+  async checkOauthAccountTable(): Promise<boolean> {
     throw new Error("checkOauthAccountTable not implemented");
   }
 }

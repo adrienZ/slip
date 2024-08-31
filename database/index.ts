@@ -67,7 +67,7 @@ export async function checkDbAndTables(
 
   switch (connectorType) {
     case "sqlite":
-      tableChecker = new SqliteTableChecker(database);
+      tableChecker = new SqliteTableChecker(database, tableNames);
       break;
     default:
       throw new Error(
@@ -75,21 +75,15 @@ export async function checkDbAndTables(
       );
   }
 
-  const isUserTableOk = await tableChecker.checkUserTable(tableNames.users);
+  const isUserTableOk = await tableChecker.checkUserTable();
   consola.success(`Table "${tableNames.users}" exists and has a valid schema`);
 
-  const isSessionTableOk = await tableChecker.checkSessionTable(
-    tableNames.sessions,
-    tableNames.users,
-  );
+  const isSessionTableOk = await tableChecker.checkSessionTable();
   consola.success(
     `Table "${tableNames.sessions}" exists and has a valid schema`,
   );
 
-  const isOauthTableOk = await tableChecker.checkOauthAccountTable(
-    tableNames.oauthAccounts,
-    tableNames.users,
-  );
+  const isOauthTableOk = await tableChecker.checkOauthAccountTable();
   consola.success(
     `Table "${tableNames.oauthAccounts}" exists and has a valid schema`,
   );

@@ -1,5 +1,6 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
 import type { SlipAuthSession } from "../../core/core";
+// @ts-expect-error yolo
 import { defineNitroPlugin } from "#imports";
 
 export default defineNitroPlugin(() => {

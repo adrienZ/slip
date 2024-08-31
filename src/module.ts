@@ -1,4 +1,4 @@
-import { defineNuxtModule, createResolver, installModule, addServerScanDir, addServerPlugin } from "@nuxt/kit";
+import { defineNuxtModule, createResolver, installModule, addServerScanDir } from "@nuxt/kit";
 import type { SlipModuleOptions } from "./runtime/types";
 
 // Module options TypeScript interface definition

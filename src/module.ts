@@ -42,6 +42,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     // module logic
     addServerScanDir(resolver.resolve("./runtime/server"));
-    addServerPlugin(resolver.resolve("./runtime/server/plugins/sessions.plugin.ts"));
+    addServerPlugin(resolver.resolve("./runtime/server/plugin/sessions.plugin.ts"));
   },
 });

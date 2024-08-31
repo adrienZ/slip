@@ -67,7 +67,7 @@ describe("checkAndCreateDb", () => {
       name: "database.test",
     }));
     await expect(
-      // @ts-expect-error testing unsupported
+      // @ts-expect-error testing unsupported connector
       checkDbAndTables(db, "notsupported", {
         users: "slip_users",
         sessions: "slip_sessions",

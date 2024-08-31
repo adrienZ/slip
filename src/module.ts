@@ -42,6 +42,14 @@ export default defineNuxtModule<ModuleOptions>({
 
     // module logic
     addServerScanDir(resolver.resolve("./runtime/server"));
-    addServerPlugin(resolver.resolve("./runtime/server/plugins/sessions.plugin"));
+
+    // https://github.com/nuxt/nuxt/discussions/16780#discussioncomment-3723152
+    nuxt.hook("nitro:config", (nitro) => {
+      // ensure `nitro.plugins` is initialized
+      nitro.plugins = nitro.plugins || [];
+
+      // add your custom plugin
+      nitro.plugins.push(resolver.resolve("runtime/server/plugins/sessions.plugin"));
+    });
   },
 });

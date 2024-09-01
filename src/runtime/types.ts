@@ -1,4 +1,4 @@
-import type { SlipAuthSession, supportedConnectors, tableNames } from "./core/core";
+import type { SlipAuthSession, SlipAuthUser, supportedConnectors, tableNames } from "./core/core";
 
 export interface SlipModuleOptions {
   /**
@@ -27,4 +27,5 @@ declare module "nuxt/schema" {
 declare module "#auth-utils" {
 
   interface UserSession extends Pick<SlipAuthSession, "id" | "expires_at"> {}
+  interface User extends Pick<SlipAuthUser, "id"> {}
 }

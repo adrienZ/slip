@@ -355,9 +355,65 @@ describe("sqlite connector", () => {
       });
     });
 
+    describe("ip field", () => {
+      it("should throw an error when sessions table does not have an ip field", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL)`;
+        await expect(
+          checkDbAndTables(db, "sqlite", {
+            users: "slip_users",
+            sessions: "slip_sessions",
+            oauthAccounts: "slip_oauth_accounts",
+          }),
+        ).rejects.toThrowError(
+          "slip_sessions table must contain a column with name \"ip\"",
+        );
+      });
+
+      it("should throw an error when sessions table does not have an ip field with type of text", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "ip" INTEGER)`;
+        await expect(
+          checkDbAndTables(db, "sqlite", {
+            users: "slip_users",
+            sessions: "slip_sessions",
+            oauthAccounts: "slip_oauth_accounts",
+          }),
+        ).rejects.toThrowError(
+          "slip_sessions table must contain a column \"ip\" with type \"TEXT\"",
+        );
+      });
+    });
+
+    describe("ua field", () => {
+      it("should throw an error when sessions table does not have an ua field", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "ip" TEXT)`;
+        await expect(
+          checkDbAndTables(db, "sqlite", {
+            users: "slip_users",
+            sessions: "slip_sessions",
+            oauthAccounts: "slip_oauth_accounts",
+          }),
+        ).rejects.toThrowError(
+          "slip_sessions table must contain a column with name \"ua\"",
+        );
+      });
+
+      it("should throw an error when sessions table does not have an ua field with type of text", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "ip" TEXT, "ua" INTEGER)`;
+        await expect(
+          checkDbAndTables(db, "sqlite", {
+            users: "slip_users",
+            sessions: "slip_sessions",
+            oauthAccounts: "slip_oauth_accounts",
+          }),
+        ).rejects.toThrowError(
+          "slip_sessions table must contain a column \"ua\" with type \"TEXT\"",
+        );
+      });
+    });
+
     describe("user_id field", () => {
       it("should throw an error when sessions table does not have a user_id foreign key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -370,7 +426,7 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when sessions table does not have an user_id field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" BLOB)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "ip" TEXT, "ua" TEXT, "user_id" BLOB)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -383,7 +439,7 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when sessions table does not have an not nullable user_id field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "ip" TEXT, "ua" TEXT, "user_id" TEXT)`;
 
         await expect(
           checkDbAndTables(db, "sqlite", {
@@ -397,7 +453,7 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when sessions table does not have a user_id foreign key", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT)`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -411,7 +467,7 @@ describe("sqlite connector", () => {
 
       it("should throw an error when sessions table does not have a user_id foreign key to user table", async () => {
         await db.sql`CREATE TABLE IF NOT EXISTS othertable ("id" TEXT)`;
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES othertable(id))`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES othertable(id))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -424,7 +480,7 @@ describe("sqlite connector", () => {
       });
 
       it("should throw an error when sessions table does not have a user_id foreign key to user table \"id\" column", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(email))`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES slip_users(email))`;
         await expect(
           checkDbAndTables(db, "sqlite", {
             users: "slip_users",
@@ -442,7 +498,7 @@ describe("sqlite connector", () => {
     const validUsersTableSetup = () =>
       db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
     const validSessionsTableSetup = () =>
-      db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
+      db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
 
     beforeEach(async () => {
       await validUsersTableSetup();

@@ -5,21 +5,20 @@ export default oauthGitHubEventHandler({
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
 
-    // const ua = getRequestHeader(event, "User-Agent");
-    // const ip = getRequestIP(event, { xForwardedFor: true }) ?? null;
-
-    const sessionFromDb = await auth.registerUserIfMissingInDb({
+    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,
+      ua: getRequestHeader(event, "User-Agent"),
+      ip: getRequestIP(event),
     });
 
     await setUserSession(event, {
-      user: {
-        githubId: user.id,
-      },
       expires_at: sessionFromDb.expires_at,
       id: sessionFromDb.id,
+      user: {
+        id: userId,
+      },
     });
     return sendRedirect(event, "/?success=true");
   },

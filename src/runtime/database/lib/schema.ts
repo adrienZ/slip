@@ -16,6 +16,8 @@ export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(table
 export const getSessionsTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.sessions, {
   id: text("id").primaryKey().notNull(),
   expires_at: integer("expires_at").notNull(),
+  ip: text("ip"),
+  ua: text("ua"),
   user_id: text("user_id")
     .references(() => getUsersTableSchema(tableNames).id)
     .notNull(),

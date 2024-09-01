@@ -29,7 +29,7 @@ beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_users`;
 
   await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
-  await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
+  await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
   await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (provider_id, provider_user_id), FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
 });
 
@@ -49,6 +49,8 @@ const mockedCreateSession = {
   expires_at: 914630400000,
   id: "randomUUID-2",
   user_id: "randomUUID-1",
+  ip: null,
+  ua: null,
 };
 
 describe("SlipAuthCore", () => {
@@ -66,7 +68,7 @@ describe("SlipAuthCore", () => {
     });
 
     it("should insert when database has no users", async () => {
-      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
       expect(
         db.prepare("SELECT * from slip_users").all(),
@@ -74,7 +76,7 @@ describe("SlipAuthCore", () => {
     });
 
     it("should insert when database has no users", async () => {
-      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
 
       expect(
@@ -83,7 +85,7 @@ describe("SlipAuthCore", () => {
     });
 
     it("should throw an error when registering a user with an email in the database and a different provider", async () => {
-      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
+      const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
       const inserted2 = auth.registerUserIfMissingInDb({
         email: defaultInsert.email,
         providerId: "discord",
@@ -96,8 +98,8 @@ describe("SlipAuthCore", () => {
     });
 
     it("should insert twice when database users have different emails", async () => {
-      const inserted = await auth.registerUserIfMissingInDb(defaultInsert);
-      const inserted2 = await auth.registerUserIfMissingInDb({
+      const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
+      const [__, inserted2] = await auth.registerUserIfMissingInDb({
         email: "email2@test.com",
         providerUserId: "azdjazoodncazd",
         providerId: defaultInsert.providerId,

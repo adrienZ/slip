@@ -15,11 +15,15 @@ interface ICreateOrLoginParams {
   providerUserId: string
   // because our slip is based on unique emails
   email: string
+  ip?: string
+  ua?: string
 }
 
 interface ICreateSessionsParams {
   userId: string
   expiresAt: number
+  ip?: string
+  ua?: string
 }
 
 type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];
@@ -28,9 +32,7 @@ export interface SlipAuthSession extends Pick<SessionsTableSelect, "id" | "expir
 }
 
 type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
-export interface SlipAuthUser extends UsersTableSelect {
-  id: string
-}
+export interface SlipAuthUser extends Pick<UsersTableSelect, "id"> {}
 
 type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
 export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
@@ -90,6 +92,10 @@ export class SlipAuthCore {
     return randomUUID();
   }
 
+  getOrm() {
+    return this.#orm;
+  }
+
   public async checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
     return checkDbAndTables(this.#db, dialect, this.#tableNames);
   }
@@ -102,7 +108,7 @@ export class SlipAuthCore {
    */
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,
-  ): Promise<SlipAuthSession> {
+  ): Promise<[ string, SlipAuthSession]> {
     const existingUser = (await this.#orm.select({
       id: this.schemas.users.id,
     })
@@ -129,9 +135,11 @@ export class SlipAuthCore {
       const sessionFromRegistration = (await this.insertSession({
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
+        ip: params.ip,
+        ua: params.ua,
       })).at(0);
 
-      return sessionFromRegistration as SlipAuthSession;
+      return [userId, sessionFromRegistration as SlipAuthSession];
     }
 
     const existingAccount = (await this.#orm.select().from(this.schemas.oauthAccounts)
@@ -148,21 +156,25 @@ export class SlipAuthCore {
       const sessionFromRegistration = await this.insertSession({
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
+        ua: params.ua,
+        ip: params.ip,
       });
       const { id, expires_at } = sessionFromRegistration[0];
-      return { id, expires_at };
+      return [existingUser.id, { id, expires_at }];
     }
 
     throw new Error("could not find oauth user");
   }
 
-  public async insertSession({ userId, expiresAt }: ICreateSessionsParams) {
+  public async insertSession({ userId, expiresAt, ip, ua }: ICreateSessionsParams) {
     const sessionId = this.#createSessionId();
     await this.#orm.insert(this.schemas.sessions)
       .values({
         id: sessionId,
         expires_at: expiresAt,
         user_id: userId,
+        ip,
+        ua,
       }).run();
 
     const session = await this.#orm.select().from(this.schemas.sessions).where(

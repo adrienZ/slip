@@ -6,8 +6,8 @@ export interface ModuleOptions extends SlipModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: "slip",
-    configKey: "slip",
+    name: "nuxt-slip-auth",
+    configKey: "slipAuth",
   },
   // Default configuration options of the Nuxt module
   defaults: {

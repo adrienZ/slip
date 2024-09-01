@@ -1,6 +1,9 @@
 import { randomUUID } from "uncrypto";
 import { checkDbAndTables, type tableNames } from "../database";
-import type { getSessionsTableSchema, getUsersTableSchema, getOAuthAccountsTableSchema } from "../database/lib/schema";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
+import type { SQLiteTable } from "drizzle-orm/sqlite-core";
+import { eq, and } from "drizzle-orm";
+import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
 
 export type { tableNames };
 export type { supportedConnectors } from "../database";
@@ -40,12 +43,26 @@ export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
 interface ISlipAuthCoreOptions {
   sessionMaxAge: number
 }
+// #region schemas typings
+const fakeTableNames: tableNames = {
+  users: "fakeUsers",
+  sessions: "fakeSessions",
+  oauthAccounts: "fakeOauthAccounts",
+};
+
+const schemasMockValue = {
+  users: getUsersTableSchema(fakeTableNames),
+  sessions: getSessionsTableSchema(fakeTableNames),
+  oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
+} satisfies Record<keyof tableNames, SQLiteTable>;
+// #endregion
 
 export class SlipAuthCore {
   #db: checkDbAndTablesParameters[0];
+  #orm: ReturnType<typeof drizzleIntegration>;
   #tableNames: tableNames;
-
   #sessionMaxAge: number;
+  schemas: typeof schemasMockValue;
 
   constructor(
     providedDatabase: checkDbAndTablesParameters[0],
@@ -53,9 +70,16 @@ export class SlipAuthCore {
     options: ISlipAuthCoreOptions,
   ) {
     this.#db = providedDatabase;
+    this.#orm = drizzleIntegration(this.#db);
     this.#tableNames = tableNames;
     // in seconds
     this.#sessionMaxAge = options.sessionMaxAge * 1000;
+
+    this.schemas = {
+      users: getUsersTableSchema(tableNames),
+      sessions: getSessionsTableSchema(tableNames),
+      oauthAccounts: getOAuthAccountsTableSchema(tableNames),
+    };
   }
 
   #createUserId() {
@@ -79,40 +103,42 @@ export class SlipAuthCore {
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,
   ): Promise<SlipAuthSession> {
-    const existingUser = (await this.#db
-      .prepare(
-        `SELECT id FROM ${this.#tableNames.users} WHERE email = '${params.email}'`,
-      )
-      .get()) as SlipAuthUser;
+    const existingUser = (await this.#orm.select({
+      id: this.schemas.users.id,
+    })
+      .from(this.schemas.users)
+      .where(eq(this.schemas.users.email, params.email)))
+      .at(0);
 
     if (!existingUser) {
       const userId = this.#createUserId();
 
-      await this.#db
-        .prepare(
-          `INSERT INTO ${this.#tableNames.users} (id, email) VALUES ('${userId}', '${params.email}')`,
-        )
-        .run();
+      await this.#orm.insert(this.schemas.users)
+        .values({
+          id: userId,
+          email: params.email,
+        }).run();
 
-      const { success: _oauthInsertSuccess } = await this.#db
-        .prepare(
-          `INSERT INTO ${this.#tableNames.oauthAccounts} (provider_id, provider_user_id, user_id) VALUES ('${params.providerId}', '${params.providerUserId}', '${userId}')`,
-        )
-        .run();
+      const { success: _oauthInsertSuccess } = await this.#orm.insert(this.schemas.oauthAccounts)
+        .values({
+          provider_id: params.providerId,
+          provider_user_id: params.providerUserId,
+          user_id: userId,
+        }).run();
 
-      const sessionFromRegistration = await this.insertSession({
+      const sessionFromRegistration = (await this.insertSession({
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
-      });
+      })).at(0);
 
       return sessionFromRegistration as SlipAuthSession;
     }
 
-    const existingAccount = (await this.#db
-      .prepare(
-        `SELECT * from ${this.#tableNames.oauthAccounts} WHERE provider_id = '${params.providerId}' AND provider_user_id = '${params.providerUserId}'`,
-      )
-      .get()) as SlipAuthOauthAccount;
+    const existingAccount = (await this.#orm.select().from(this.schemas.oauthAccounts)
+      .where(and(
+        eq(this.schemas.oauthAccounts.provider_id, params.providerId),
+        eq(this.schemas.oauthAccounts.provider_user_id, params.providerUserId),
+      ))).at(0);
 
     if (existingUser && existingAccount?.provider_id !== params.providerId) {
       throw new Error("user already have an account with another provider");
@@ -131,19 +157,29 @@ export class SlipAuthCore {
 
   public async insertSession({ userId, expiresAt }: ICreateSessionsParams) {
     const sessionId = this.#createSessionId();
-    await this.#db
-      .prepare(
-        `INSERT INTO ${this.#tableNames.sessions} (id, expires_at, user_id) VALUES ('${sessionId}', '${expiresAt}', '${userId}')`,
-      )
-      .run();
+    await this.#orm.insert(this.schemas.sessions)
+      .values({
+        id: sessionId,
+        expires_at: expiresAt,
+        user_id: userId,
+      }).run();
 
-    const session = this.#db
-      .prepare(
-        `SELECT * from ${this.#tableNames.sessions} WHERE id = '${sessionId}'`,
-      )
-      .get();
+    const session = await this.#orm.select().from(this.schemas.sessions).where(
+      eq(this.schemas.sessions.id, sessionId),
+    );
 
     return session;
+  }
+
+  public getSession(sessionId: string) {
+    const query = this.#orm
+      .select()
+      .from(this.schemas.sessions)
+      .where(
+        eq(this.schemas.sessions.id, sessionId),
+      );
+
+    return query.then(res => res.at(0));
   }
 
   public async deleteSession(sessionId: string) {

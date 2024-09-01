@@ -18,6 +18,7 @@ const sqliteTableInfoRowSchema = z.object({
 const sqliteDrizzleColumnTypeMapping = {
   SQLiteText: "TEXT",
   SQLiteInteger: "INTEGER",
+  SQLiteTimestamp: "TIMESTAMP",
 };
 function getSQLiteColumType(drizzleColumnType: string) {
   return sqliteDrizzleColumnTypeMapping[drizzleColumnType as keyof typeof sqliteDrizzleColumnTypeMapping] || drizzleColumnType;
@@ -80,6 +81,13 @@ async function validateDabaseWithSchema(db: Database, tableName: string, drizzle
 
     if (columnFromSchema.isUnique && uniqueIndexesSQLite.find(uniqueIndex => columnFromSchema.name === uniqueIndex.at(0)?.name) === undefined) {
       return `${tableName} table must contain a column "${columnFromSchema.name}" unique`;
+    }
+
+    const defaultData = columnFromSchema.default ? columnFromSchema.default as { queryChunks?: Array<{ value?: string[] }> } : null;
+    const defaultValue = defaultData?.queryChunks?.at(0)?.value?.at(0);
+
+    if (Boolean(columnFromSchema.hasDefault && defaultValue) && (!correspondingColumn.dflt_value || correspondingColumn.dflt_value !== defaultValue)) {
+      return `${tableName} table must contain a column with name "${columnFromSchema.name}" with default value of ${defaultValue}`;
     }
   }
 

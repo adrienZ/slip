@@ -149,7 +149,8 @@ export class SlipAuthCore {
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
       });
-      return sessionFromRegistration as SlipAuthSession;
+      const { id, expires_at } = sessionFromRegistration[0];
+      return { id, expires_at };
     }
 
     throw new Error("could not find oauth user");

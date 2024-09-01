@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.22
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.21...v0.1.22)
+
+### 🚀 Enhancements
+
+- **sessions:** Add ip and user agent (ua) when login ([2868765](https://github.com/adrienZ/slip/commit/2868765))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.21
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.20...v0.1.21)

@@ -20,9 +20,10 @@ describe("database", async () => {
   });
 
   it("module config is passed in runtime config", async () => {
-    const json = await $fetch("/api/runtime-config") as { slipAuth: unknown };
+    const json = await $fetch("/api/runtime-config");
 
     expect(json).toBeInstanceOf(Object);
+    // @ts-expect-error its only testing
     expect(json.slipAuth).toStrictEqual({
       dialect: "sqlite",
       sessionMaxAge: 604800,

@@ -1,0 +1,8 @@
+{
+  "installDependencies": false,
+  "startCommand": "cd .stackblitz && pnpm i && pnpm dev",
+  "env": {
+    "NODE_ENV": "development",
+    "NUXT_SESSION_PASSWORD": "7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#"
+  }
+}

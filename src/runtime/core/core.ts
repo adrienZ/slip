@@ -105,6 +105,9 @@ export class SlipAuthCore {
    * @param {ICreateOrLoginParams} params - The parameters for creating or logging in a user.
    * @returns {Promise<boolean>} Returns true if the user was registered, otherwise false (login or insert error).
    * @throws {Error} - Throws an error if email or user ID is missing when creating a user.
+   *
+   * {@link https://v2.lucia-auth.com/guidebook/oauth-account-linking/}
+   * {@link https://thecopenhagenbook.com/oauth#account-linking}
    */
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,

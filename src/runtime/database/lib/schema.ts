@@ -24,6 +24,7 @@ export const getSessionsTableSchema = (tableNames: tableNames) => sqliteTable(ta
   ...datesColumns,
 });
 
+// https://lucia-auth.com/guides/oauth/multiple-providers
 export const getOAuthAccountsTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.oauthAccounts, {
   provider_id: text("provider_id").notNull(),
   provider_user_id: text("provider_user_id").notNull(),

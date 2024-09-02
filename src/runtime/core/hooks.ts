@@ -1,22 +1,17 @@
-import { createHooks } from "hookable";
-import type { SlipAuthSession, SlipAuthUser } from "./types";
+import { createHooks, type Hookable, type HookKeys } from "hookable";
+import type { SlipAuthSession, SlipAuthUser, SlipAuthOAuthAccount } from "./types";
 
-export interface ISlipAuthHooks {
-  /**
-   * aka register
-   */
+interface ISlipAuthHooksMap {
   "users:create": (user: SlipAuthUser) => void
-  /**
-   * aka login
-   */
   "sessions:create": (session: SlipAuthSession) => void
-  /**
-   * aka logout or expiration
-   */
+  // TODO: add tests
+  "oAuthAccount:create": (oAuthAccount: SlipAuthOAuthAccount) => void
   // TODO: add tests
   "sessions:delete": (session: SlipAuthSession) => void
 }
 
-export function createSlipHooks() {
-  return createHooks<ISlipAuthHooks>();
+export type ISlipAuthHooks = Hookable<ISlipAuthHooksMap, HookKeys<ISlipAuthHooksMap>>;
+
+export function createSlipHooks(): ISlipAuthHooks {
+  return createHooks<ISlipAuthHooksMap>();
 }

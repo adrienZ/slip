@@ -1,25 +1,12 @@
 import { generateRandomString, alphabet } from "oslo/crypto";
 import { checkDbAndTables, type tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
-import type { SQLiteTable } from "drizzle-orm/sqlite-core";
-import { eq, and } from "drizzle-orm";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateSessionsParams, ISlipAuthCoreOptions, SlipAuthSession } from "./types";
+import type { checkDbAndTablesParameters, ICreateOrLoginParams, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthSession } from "./types";
 import { createSlipHooks } from "./hooks";
-
-// #region schemas typings
-const fakeTableNames: tableNames = {
-  users: "fakeUsers",
-  sessions: "fakeSessions",
-  oauthAccounts: "fakeOauthAccounts",
-};
-
-const schemasMockValue = {
-  users: getUsersTableSchema(fakeTableNames),
-  sessions: getSessionsTableSchema(fakeTableNames),
-  oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
-} satisfies Record<keyof tableNames, SQLiteTable>;
-// #endregion
+import { UsersRepository } from "./repositories/UsersRepository";
+import { SessionsRepository } from "./repositories/SessionsRepository";
+import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
 
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
@@ -28,7 +15,13 @@ export class SlipAuthCore {
   #orm: ReturnType<typeof drizzleIntegration>;
   #tableNames: tableNames;
   #sessionMaxAge: number;
-  schemas: typeof schemasMockValue;
+  #repos: {
+    users: UsersRepository
+    sessions: SessionsRepository
+    oAuthAccounts: OAuthAccountsRepository
+  };
+
+  schemas: SchemasMockValue;
 
   hooks = createSlipHooks();
 
@@ -47,6 +40,12 @@ export class SlipAuthCore {
       users: getUsersTableSchema(tableNames),
       sessions: getSessionsTableSchema(tableNames),
       oauthAccounts: getOAuthAccountsTableSchema(tableNames),
+    };
+
+    this.#repos = {
+      users: new UsersRepository(this.#orm, this.schemas, this.hooks, "users"),
+      sessions: new SessionsRepository(this.#orm, this.schemas, this.hooks, "sessions"),
+      oAuthAccounts: new OAuthAccountsRepository(this.#orm, this.schemas, this.hooks, "oauthAccounts"),
     };
   }
 
@@ -76,105 +75,59 @@ export class SlipAuthCore {
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,
   ): Promise<[ string, SlipAuthSession]> {
-    const existingUser = (await this.#orm.select({
-      id: this.schemas.users.id,
-    })
-      .from(this.schemas.users)
-      .where(eq(this.schemas.users.email, params.email)))
-      .at(0);
+    const existingUser = await this.#repos.users.findByEmail(params.email);
 
     if (!existingUser) {
       const userId = this.createRandomUserId();
 
-      await this.#orm.insert(this.schemas.users)
-        .values({
-          id: userId,
-          email: params.email,
-        }).run();
+      await this.#repos.users.insert(userId, params.email);
 
-      const createdUser = (await this.#orm.select().from(this.schemas.users).where(eq(this.schemas.users.id, userId)))[0];
+      const _insertedOAuthAccount = await this.#repos.oAuthAccounts.insert(params.email, {
+        provider_id: params.providerId,
+        provider_user_id: params.providerUserId,
+        user_id: userId,
+      });
 
-      const { success: _oauthInsertSuccess } = await this.#orm.insert(this.schemas.oauthAccounts)
-        .values({
-          provider_id: params.providerId,
-          provider_user_id: params.providerUserId,
-          user_id: userId,
-        }).run();
-
-      const sessionFromRegistration = (await this.insertSession({
+      const sessionFromRegistrationId = this.createRandomSessionId();
+      const sessionFromRegistration = await this.#repos.sessions.insert(sessionFromRegistrationId, {
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ip: params.ip,
         ua: params.ua,
-      })).at(0);
+      });
 
-      this.hooks.callHookParallel("users:create", createdUser);
-      this.hooks.callHookParallel("sessions:create", sessionFromRegistration as SlipAuthSession);
       return [userId, sessionFromRegistration as SlipAuthSession];
     }
 
-    const existingAccount = (await this.#orm.select().from(this.schemas.oauthAccounts)
-      .where(and(
-        eq(this.schemas.oauthAccounts.provider_id, params.providerId),
-        eq(this.schemas.oauthAccounts.provider_user_id, params.providerUserId),
-      ))).at(0);
+    const existingAccount = await this.#repos.oAuthAccounts.findByProviderData(
+      params.providerId, params.providerUserId,
+    );
 
     if (existingUser && existingAccount?.provider_id !== params.providerId) {
       throw new Error("user already have an account with another provider");
     }
 
     if (existingAccount) {
-      const sessionFromRegistration = await this.insertSession({
+      const sessionFromLoginId = this.createRandomSessionId();
+      const sessionFromLogin = await this.#repos.sessions.insert(sessionFromLoginId, {
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ua: params.ua,
         ip: params.ip,
       });
-      const { id, expires_at } = sessionFromRegistration[0];
+      const { id, expires_at } = sessionFromLogin;
 
-      this.hooks.callHookParallel("sessions:create", sessionFromRegistration[0]);
       return [existingUser.id, { id, expires_at }];
     }
 
     throw new Error("could not find oauth user");
   }
 
-  public async insertSession({ userId, expiresAt, ip, ua }: ICreateSessionsParams) {
-    const sessionId = this.createRandomSessionId();
-    await this.#orm.insert(this.schemas.sessions)
-      .values({
-        id: sessionId,
-        expires_at: expiresAt,
-        user_id: userId,
-        ip,
-        ua,
-      }).run();
-
-    const session = await this.#orm.select().from(this.schemas.sessions).where(
-      eq(this.schemas.sessions.id, sessionId),
-    );
-
-    return session;
-  }
-
   public getSession(sessionId: string) {
-    const query = this.#orm
-      .select()
-      .from(this.schemas.sessions)
-      .where(
-        eq(this.schemas.sessions.id, sessionId),
-      );
-
-    return query.then(res => res.at(0));
+    return this.#repos.sessions.findById(sessionId);
   }
 
   public async deleteSession(sessionId: string) {
-    const { success } = await this.#db
-      .prepare(
-        `DELETE from ${this.#tableNames.sessions} WHERE id = '${sessionId}' LIMIT 1`,
-      )
-      .run();
-
-    return success;
+    return this.#repos.sessions.deleteById(sessionId);
   }
 }

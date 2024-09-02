@@ -1,5 +1,6 @@
+import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 import type { checkDbAndTables, tableNames } from "../database";
-import type { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 
 export type { tableNames };
 export type { supportedConnectors } from "../database";
@@ -28,9 +29,10 @@ export interface SlipAuthSession extends Pick<SessionsTableSelect, "id" | "expir
 }
 
 type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
-export interface SlipAuthUser extends Pick<UsersTableSelect, "id"> {}
+export interface SlipAuthUser extends UsersTableSelect {}
 
 export type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
+export interface SlipAuthOAuthAccount extends OAuthAccountsTableSelect {}
 
 export interface ISlipAuthCoreOptions {
   /**
@@ -38,3 +40,18 @@ export interface ISlipAuthCoreOptions {
    */
   sessionMaxAge: number
 }
+
+// #region schemas typings
+const fakeTableNames: tableNames = {
+  users: "fakeUsers",
+  sessions: "fakeSessions",
+  oauthAccounts: "fakeOauthAccounts",
+};
+
+const schemasMockValue = {
+  users: getUsersTableSchema(fakeTableNames),
+  sessions: getSessionsTableSchema(fakeTableNames),
+  oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
+} satisfies Record<keyof tableNames, SQLiteTable>;
+export type SchemasMockValue = typeof schemasMockValue;
+// #endregion

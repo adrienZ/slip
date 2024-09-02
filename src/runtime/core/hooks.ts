@@ -1,7 +1,7 @@
 import { createHooks } from "hookable";
 import type { SlipAuthSession, SlipAuthUser } from "./types";
 
-interface ISlipAuthHooks {
+export interface ISlipAuthHooks {
   /**
    * aka register
    */

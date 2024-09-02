@@ -115,4 +115,63 @@ describe("SlipAuthCore", () => {
       ).resolves.toHaveLength(2);
     });
   });
+
+  describe("hooks", () => {
+    it("should hook \"users:create\" and \"sessions:create\" when registering a new user", async () => {
+      vi.useRealTimers();
+
+      const userCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(reject, 1000);
+        auth.hooks.hookOnce("users:create", (user) => {
+          resolve(user);
+        });
+      });
+
+      const sessionCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(reject, 1000);
+        auth.hooks.hookOnce("sessions:create", (user) => {
+          resolve(user);
+        });
+      });
+
+      const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
+
+      expect(await userCreatedHookPromise).toMatchObject({
+        email: defaultInsert.email,
+        id: "randomUUID-5",
+      });
+
+      expect(await sessionCreatedHookPromise).toBe(inserted);
+    });
+
+    it("should only hook \"sessions:create\" and not \"users:create\" when registering a new user", async () => {
+      vi.useRealTimers();
+
+      // register
+      const [_, registerSession] = await auth.registerUserIfMissingInDb(defaultInsert);
+      // logout
+      auth.deleteSession(registerSession.id);
+
+      const userCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(reject, 2000);
+        auth.hooks.hookOnce("users:create", (user) => {
+          resolve(user);
+        });
+      });
+
+      const sessionCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(reject, 2000);
+        auth.hooks.hookOnce("sessions:create", (user) => {
+          resolve(user);
+        });
+      });
+
+      // login
+      const [__, loginSession] = await auth.registerUserIfMissingInDb(defaultInsert);
+
+      expect(userCreatedHookPromise).rejects.exist;
+
+      expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
+    });
+  });
 });

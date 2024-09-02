@@ -33,5 +33,8 @@ export interface SlipAuthUser extends Pick<UsersTableSelect, "id"> {}
 export type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
 
 export interface ISlipAuthCoreOptions {
+  /**
+   * {@link https://github.com/unjs/h3/blob/c04c458810e34eb15c1647e1369e7d7ef19f567d/src/utils/session.ts#L24}
+   */
   sessionMaxAge: number
 }

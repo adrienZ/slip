@@ -25,7 +25,9 @@ describe("database", async () => {
     expect(json).toBeInstanceOf(Object);
     // @ts-expect-error its only testing
     expect(json.slipAuth).toStrictEqual({
-      dialect: "sqlite",
+      database: {
+        dialect: "sqlite",
+      },
       sessionMaxAge: 604800,
       tableNames: {
         oauthAccounts: "slip_auth_oauth_accounts",

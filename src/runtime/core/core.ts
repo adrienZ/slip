@@ -1,18 +1,11 @@
-import { randomUUID } from "uncrypto";
+import { generateRandomString, alphabet } from "oslo/crypto";
 import { checkDbAndTables, type tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 import { eq, and } from "drizzle-orm";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateSessionsParams, ISlipAuthCoreOptions, OAuthAccountsTableSelect, SlipAuthSession } from "./types";
+import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateSessionsParams, ISlipAuthCoreOptions, SlipAuthSession } from "./types";
 import { createSlipHooks } from "./hooks";
-
-export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
-  provider_id: string
-  provider_user_id: string
-  user_id: string
-}
-// #endregion
 
 // #region schemas typings
 const fakeTableNames: tableNames = {
@@ -27,6 +20,8 @@ const schemasMockValue = {
   oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
 } satisfies Record<keyof tableNames, SQLiteTable>;
 // #endregion
+
+const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
 export class SlipAuthCore {
   #db: checkDbAndTablesParameters[0];
@@ -55,12 +50,14 @@ export class SlipAuthCore {
     };
   }
 
-  #createUserId() {
-    return randomUUID();
+  // public to allow override
+  public createRandomUserId() {
+    return defaultIdGenerationMethod();
   }
 
-  #createSessionId() {
-    return randomUUID();
+  // public to allow override
+  public createRandomSessionId() {
+    return defaultIdGenerationMethod();
   }
 
   public async checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
@@ -87,7 +84,7 @@ export class SlipAuthCore {
       .at(0);
 
     if (!existingUser) {
-      const userId = this.#createUserId();
+      const userId = this.createRandomUserId();
 
       await this.#orm.insert(this.schemas.users)
         .values({
@@ -143,7 +140,7 @@ export class SlipAuthCore {
   }
 
   public async insertSession({ userId, expiresAt, ip, ua }: ICreateSessionsParams) {
-    const sessionId = this.#createSessionId();
+    const sessionId = this.createRandomSessionId();
     await this.#orm.insert(this.schemas.sessions)
       .values({
         id: sessionId,

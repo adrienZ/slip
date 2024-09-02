@@ -11,17 +11,6 @@ vi.setSystemTime(date);
 const db = createDatabase(sqlite({
   name: "core.test",
 }));
-const auth = new SlipAuthCore(
-  db,
-  {
-    users: "slip_users",
-    sessions: "slip_sessions",
-    oauthAccounts: "slip_oauth_accounts",
-  },
-  {
-    sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
-  },
-);
 
 beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
@@ -41,32 +30,50 @@ const defaultInsert = {
 
 const mocks = vi.hoisted(() => {
   return {
-    uncryptoMockCounter: 0,
+    userCreatedCount: 0,
+    sessionCreatedCount: 0,
   };
 });
 
 const mockedCreateSession = {
   expires_at: 914630400000,
-  id: "randomUUID-2",
-  user_id: "randomUUID-1",
+  id: "session-id-1",
+  user_id: "user-id-1",
   ip: null,
   ua: null,
 };
 
+let auth: SlipAuthCore;
+
 describe("SlipAuthCore", () => {
+  beforeEach(() => {
+    mocks.userCreatedCount = 0;
+    mocks.sessionCreatedCount = 0;
+
+    auth = new SlipAuthCore(
+      db,
+      {
+        users: "slip_users",
+        sessions: "slip_sessions",
+        oauthAccounts: "slip_oauth_accounts",
+      },
+      {
+        sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
+      },
+    );
+
+    auth.createRandomUserId = () => {
+      mocks.userCreatedCount++;
+      return `user-id-${mocks.userCreatedCount}`;
+    };
+
+    auth.createRandomSessionId = () => {
+      mocks.sessionCreatedCount++;
+      return `session-id-${mocks.sessionCreatedCount}`;
+    };
+  });
+
   describe("users", () => {
-    beforeEach(() => {
-      mocks.uncryptoMockCounter = 0;
-      vi.mock("uncrypto", () => {
-        function randomUUID() {
-          mocks.uncryptoMockCounter++;
-          return `randomUUID-${mocks.uncryptoMockCounter}`;
-        }
-
-        return { randomUUID };
-      });
-    });
-
     it("should insert when database has no users", async () => {
       const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
@@ -107,8 +114,8 @@ describe("SlipAuthCore", () => {
       expect(inserted).toMatchObject(mockedCreateSession);
       expect(inserted2).toMatchObject({
         expires_at: 914630400000,
-        id: "randomUUID-4",
-        user_id: "randomUUID-3",
+        id: "session-id-2",
+        user_id: "user-id-2",
       });
       expect(
         db.prepare("SELECT * from slip_users").all(),
@@ -138,7 +145,7 @@ describe("SlipAuthCore", () => {
 
       expect(await userCreatedHookPromise).toMatchObject({
         email: defaultInsert.email,
-        id: "randomUUID-5",
+        id: "user-id-1",
       });
 
       expect(await sessionCreatedHookPromise).toBe(inserted);

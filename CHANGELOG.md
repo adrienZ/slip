@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.25
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.23...v0.1.25)
+
+### 🏡 Chore
+
+- **release:** V0.1.23 ([9144d6c](https://github.com/adrienZ/slip/commit/9144d6c))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.23
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.23...v0.1.23)

@@ -2,11 +2,12 @@ import { createHooks, type Hookable, type HookKeys } from "hookable";
 import type { SlipAuthSession, SlipAuthUser, SlipAuthOAuthAccount } from "./types";
 
 interface ISlipAuthHooksMap {
+  // users
   "users:create": (user: SlipAuthUser) => void
-  "sessions:create": (session: SlipAuthSession) => void
-  // TODO: add tests
+  // oAuthAccounts
   "oAuthAccount:create": (oAuthAccount: SlipAuthOAuthAccount) => void
-  // TODO: add tests
+  // sessions
+  "sessions:create": (session: SlipAuthSession) => void
   "sessions:delete": (session: SlipAuthSession) => void
 }
 

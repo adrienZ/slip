@@ -20,7 +20,8 @@ export class OAuthAccountsRepository extends TableRepository<"oauthAccounts"> {
 
   async findByProviderData(providerId: string, providerUserId: string): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
-      .select().from(this.table)
+      .select()
+      .from(this.table)
       .where(
         and(
           eq(this.table.provider_id, providerId),

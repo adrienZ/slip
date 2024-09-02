@@ -1,12 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../core";
 
 const date = new Date(Date.UTC(1998, 11, 19));
-
-vi.useFakeTimers();
-vi.setSystemTime(date);
 
 const db = createDatabase(sqlite({
   name: "core.test",
@@ -25,7 +22,7 @@ beforeEach(async () => {
 const defaultInsert = {
   email: "email@test.com",
   providerId: "github",
-  providerUserId: "j3dçd9dx/2#",
+  providerUserId: "github:user:id",
 };
 
 const mocks = vi.hoisted(() => {
@@ -74,6 +71,11 @@ describe("SlipAuthCore", () => {
   });
 
   describe("users", () => {
+    beforeAll(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(date);
+    });
+
     it("should insert when database has no users", async () => {
       const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
@@ -121,64 +123,120 @@ describe("SlipAuthCore", () => {
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);
     });
+
+    it("should throw when trying to delete an non existant session", async () => {
+      const [_, session] = await auth.registerUserIfMissingInDb(defaultInsert);
+
+      await auth.deleteSession(session.id);
+
+      const notASession = await auth.getSession(session.id);
+
+      expect(notASession).toBe(undefined);
+    });
+
+    it("should throw when trying to delete an non existant session", async () => {
+      await auth.registerUserIfMissingInDb(defaultInsert);
+
+      const deletion = auth.deleteSession("notInDB");
+      expect(deletion).rejects.toThrowError(
+        "Unable to delete session with id notInDB",
+      );
+    });
   });
 
   describe("hooks", () => {
-    it("should hook \"users:create\" and \"sessions:create\" when registering a new user", async () => {
+    beforeAll(() => {
       vi.useRealTimers();
+    });
 
+    it("should trigger hooks when registering a new user", async () => {
       const userCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(reject, 1000);
+        setTimeout(() => reject("TIMEOUT"), 1000);
         auth.hooks.hookOnce("users:create", (user) => {
           resolve(user);
         });
       });
 
       const sessionCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(reject, 1000);
-        auth.hooks.hookOnce("sessions:create", (user) => {
-          resolve(user);
+        setTimeout(() => reject("TIMEOUT"), 1000);
+        auth.hooks.hookOnce("sessions:create", (session) => {
+          resolve(session);
+        });
+      });
+
+      const oAuthAccountCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject("TIMEOUT"), 1000);
+        auth.hooks.hookOnce("oAuthAccount:create", (account) => {
+          resolve(account);
         });
       });
 
       const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
 
-      expect(await userCreatedHookPromise).toMatchObject({
+      expect(userCreatedHookPromise).resolves.toMatchObject({
         email: defaultInsert.email,
         id: "user-id-1",
       });
 
-      expect(await sessionCreatedHookPromise).toBe(inserted);
+      expect(oAuthAccountCreatedHookPromise).resolves.toMatchObject({
+        provider_id: defaultInsert.providerId,
+        provider_user_id: defaultInsert.providerUserId,
+        user_id: "user-id-1",
+      });
+
+      expect(sessionCreatedHookPromise).resolves.toBe(inserted);
     });
 
-    it("should only hook \"sessions:create\" and not \"users:create\" when registering a new user", async () => {
-      vi.useRealTimers();
-
+    it("should only hook \"sessions:create\" when login an existing user", async () => {
       // register
       const [_, registerSession] = await auth.registerUserIfMissingInDb(defaultInsert);
       // logout
       auth.deleteSession(registerSession.id);
 
       const userCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(reject, 2000);
+        setTimeout(() => reject("TIMEOUT"), 2000);
         auth.hooks.hookOnce("users:create", (user) => {
           resolve(user);
         });
       });
 
       const sessionCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(reject, 2000);
-        auth.hooks.hookOnce("sessions:create", (user) => {
-          resolve(user);
+        setTimeout(() => reject("TIMEOUT"), 2000);
+        auth.hooks.hookOnce("sessions:create", (session) => {
+          resolve(session);
+        });
+      });
+
+      const oAuthAccountCreatedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject("TIMEOUT"), 1000);
+        auth.hooks.hookOnce("oAuthAccount:create", (account) => {
+          resolve(account);
         });
       });
 
       // login
       const [__, loginSession] = await auth.registerUserIfMissingInDb(defaultInsert);
 
-      expect(userCreatedHookPromise).rejects.exist;
+      expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
+      expect(oAuthAccountCreatedHookPromise).rejects.toBe("TIMEOUT");
 
       expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
+    });
+
+    it("should only hook \"sessions:delete\" on logout", async () => {
+      const sessionDeletedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject("TIMEOUT"), 2000);
+        auth.hooks.hookOnce("sessions:delete", (session) => {
+          resolve(session);
+        });
+      });
+
+      // register
+      const [_, registerSession] = await auth.registerUserIfMissingInDb(defaultInsert);
+      // logout
+      auth.deleteSession(registerSession.id);
+
+      expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
   });
 });

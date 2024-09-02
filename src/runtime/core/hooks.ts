@@ -13,6 +13,7 @@ interface ISlipAuthHooks {
   /**
    * aka logout or expiration
    */
+  // TODO: add tests
   "sessions:delete": (session: SlipAuthSession) => void
 }
 

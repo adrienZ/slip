@@ -4,37 +4,9 @@ import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchem
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 import { eq, and } from "drizzle-orm";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
+import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateSessionsParams, ISlipAuthCoreOptions, OAuthAccountsTableSelect, SlipAuthSession } from "./types";
+import { createSlipHooks } from "./hooks";
 
-export type { tableNames };
-export type { supportedConnectors } from "../database";
-
-type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
-
-interface ICreateOrLoginParams {
-  providerId: string
-  providerUserId: string
-  // because our slip is based on unique emails
-  email: string
-  ip?: string
-  ua?: string
-}
-
-interface ICreateSessionsParams {
-  userId: string
-  expiresAt: number
-  ip?: string
-  ua?: string
-}
-
-type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];
-export interface SlipAuthSession extends Pick<SessionsTableSelect, "id" | "expires_at"> {
-
-}
-
-type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
-export interface SlipAuthUser extends Pick<UsersTableSelect, "id"> {}
-
-type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
 export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
   provider_id: string
   provider_user_id: string
@@ -42,9 +14,6 @@ export interface SlipAuthOauthAccount extends OAuthAccountsTableSelect {
 }
 // #endregion
 
-interface ISlipAuthCoreOptions {
-  sessionMaxAge: number
-}
 // #region schemas typings
 const fakeTableNames: tableNames = {
   users: "fakeUsers",
@@ -65,6 +34,8 @@ export class SlipAuthCore {
   #tableNames: tableNames;
   #sessionMaxAge: number;
   schemas: typeof schemasMockValue;
+
+  hooks = createSlipHooks();
 
   constructor(
     providedDatabase: checkDbAndTablesParameters[0],
@@ -90,10 +61,6 @@ export class SlipAuthCore {
 
   #createSessionId() {
     return randomUUID();
-  }
-
-  getOrm() {
-    return this.#orm;
   }
 
   public async checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
@@ -128,6 +95,8 @@ export class SlipAuthCore {
           email: params.email,
         }).run();
 
+      const createdUser = (await this.#orm.select().from(this.schemas.users).where(eq(this.schemas.users.id, userId)))[0];
+
       const { success: _oauthInsertSuccess } = await this.#orm.insert(this.schemas.oauthAccounts)
         .values({
           provider_id: params.providerId,
@@ -142,6 +111,8 @@ export class SlipAuthCore {
         ua: params.ua,
       })).at(0);
 
+      this.hooks.callHookParallel("users:create", createdUser);
+      this.hooks.callHookParallel("sessions:create", sessionFromRegistration as SlipAuthSession);
       return [userId, sessionFromRegistration as SlipAuthSession];
     }
 
@@ -163,6 +134,8 @@ export class SlipAuthCore {
         ip: params.ip,
       });
       const { id, expires_at } = sessionFromRegistration[0];
+
+      this.hooks.callHookParallel("sessions:create", sessionFromRegistration[0]);
       return [existingUser.id, { id, expires_at }];
     }
 

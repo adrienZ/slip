@@ -115,4 +115,24 @@ describe("SlipAuthCore", () => {
       ).resolves.toHaveLength(2);
     });
   });
+
+  it("should hook \"users:create\" and \"sessions:create\" when database registering a new user", async () => {
+    const userCreatedHookPromise = new Promise((resolve, reject) => {
+      setTimeout(() => reject, 1000);
+      auth.hooks.hookOnce("users:create", (user) => {
+        resolve(user);
+      });
+    });
+    const sessionCreatedHookPromise = new Promise((resolve, reject) => {
+      setTimeout(() => reject, 1000);
+      auth.hooks.hookOnce("sessions:create", (user) => {
+        resolve(user);
+      });
+    });
+
+    const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
+
+    expect(userCreatedHookPromise).resolves.toBe("inserted");
+    expect(sessionCreatedHookPromise).resolves.toBe(inserted);
+  });
 });

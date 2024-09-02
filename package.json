@@ -46,6 +46,7 @@
     "better-sqlite3": "^11.2.1",
     "changelogen": "^0.5.5",
     "eslint": "^9.9.1",
+    "hookable": "^5.5.3",
     "nuxt": "^3.13.0",
     "nuxt-auth-utils": "^0.3.5",
     "typescript": "latest",

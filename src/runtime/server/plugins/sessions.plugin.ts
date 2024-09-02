@@ -1,5 +1,5 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
-import type { SlipAuthSession } from "../../core/core";
+import type { SlipAuthSession } from "../../core/types";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore yolo the DX is not great
 import { defineNitroPlugin, createError, sessionHooks } from "#imports";

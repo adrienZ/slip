@@ -11,7 +11,9 @@ export default defineNuxtModule<ModuleOptions>({
   },
   // Default configuration options of the Nuxt module
   defaults: {
-    dialect: "sqlite",
+    database: {
+      dialect: "sqlite",
+    },
     sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
     tableNames: {
       sessions: "slip_auth_sessions",
@@ -27,6 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
     const runtimeConfig = nuxt.options.runtimeConfig;
     runtimeConfig.slipAuth = options;
     // nuxt-auth-utils compat
+    // TODO: also update nuxt-auth-utils sessionMax age according to our module options
     // @ts-expect-error TODO: nuxt-auth-utils typing is mising
     runtimeConfig.slipAuth.sessionMaxAge = runtimeConfig.session?.maxAge ?? options.sessionMaxAge;
     // #endregion

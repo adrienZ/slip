@@ -1,19 +1,21 @@
-import type { SlipAuthSession, SlipAuthUser, supportedConnectors, tableNames } from "./core/types";
+import type { SlipAuthSession, SlipAuthUser, supportedConnectors, tableNames, ISlipAuthCoreOptions } from "./core/types";
 
-export interface SlipModuleOptions {
+export interface SlipModuleOptions extends ISlipAuthCoreOptions {
   /**
-   * {@link https://db0.unjs.io/connectors}
+   * db0 related options
    */
-  dialect: supportedConnectors
+  database: {
+    /**
+     * {@link https://db0.unjs.io/connectors}
+     */
+    dialect: supportedConnectors
+    /**
+     * {@link https://nitro.unjs.io/guide/database#configuration}
+     */
+    nitroDatabaseName?: string
+  }
+
   tableNames: tableNames
-  /**
-   * {@link https://github.com/unjs/h3/blob/c04c458810e34eb15c1647e1369e7d7ef19f567d/src/utils/session.ts#L24}
-   */
-  sessionMaxAge: number
-  /**
-   * {@link https://nitro.unjs.io/guide/database#configuration}
-   */
-  nitroDatabaseName?: string
 }
 
 declare module "nuxt/schema" {

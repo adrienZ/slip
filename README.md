@@ -19,6 +19,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
+[![Codecov][codecov-src]][codecov-href]
 
 Plug and play authentication module for Nuxt
 
@@ -87,3 +88,6 @@ That's it! You can now use My Module in your Nuxt app ✨
 
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
 [nuxt-href]: https://nuxt.com
+
+[codecov-src]:https://codecov.io/gh/adrienZ/slip/graph/badge.svg?token=GMTZW7C5S7
+[codecov-href]: https://codecov.io/gh/adrienZ/slip

@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Install Bun
+      - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: npx nypm@latest i && cd playground && npx nypm@latest i
       - name: Playground prepare
@@ -30,7 +32,7 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm run test:coverage
+        run: npm run test:ci
 
       - name: Coverage
         uses: codecov/codecov-action@v4

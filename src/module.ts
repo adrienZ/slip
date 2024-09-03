@@ -29,6 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
     // #region use private runtime config to expose options in nitro
     const runtimeConfig = nuxt.options.runtimeConfig;
     runtimeConfig.slipAuth = options;
+    runtimeConfig.slipAuthIpInfoToken = "";
     // update session maxAge runtime config from nuxt-auth-utils
     const overridenSessionConfig: Partial<SessionConfig> = {
       maxAge: options.sessionMaxAge,

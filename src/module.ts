@@ -48,7 +48,7 @@ export default defineNuxtModule<ModuleOptions>({
       nitroConfig.scheduledTasks = {
         ...nitroConfig.scheduledTasks,
         // @daily https://crontab.guru/#00_00_*_*_*
-        "* * * * *": ["slip:db:expired-sessions"],
+        "00 00 * * *": ["slip:db:expired-sessions"],
       };
     });
 

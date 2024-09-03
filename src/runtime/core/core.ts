@@ -11,11 +11,11 @@ import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository"
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
 export class SlipAuthCore {
-  #db: checkDbAndTablesParameters[0];
-  #orm: ReturnType<typeof drizzleIntegration>;
-  #tableNames: tableNames;
-  #sessionMaxAge: number;
-  #repos: {
+  readonly #db: checkDbAndTablesParameters[0];
+  readonly #orm: ReturnType<typeof drizzleIntegration>;
+  readonly #tableNames: tableNames;
+  readonly #sessionMaxAge: number;
+  readonly #repos: {
     users: UsersRepository
     sessions: SessionsRepository
     oAuthAccounts: OAuthAccountsRepository
@@ -24,9 +24,8 @@ export class SlipAuthCore {
   #createRandomUserId: () => string;
   #createRandomSessionId: () => string;
 
-  schemas: SchemasMockValue;
-
-  hooks = createSlipHooks();
+  readonly schemas: SchemasMockValue;
+  readonly hooks = createSlipHooks();
 
   constructor(
     providedDatabase: checkDbAndTablesParameters[0],

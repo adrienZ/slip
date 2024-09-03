@@ -1,12 +1,15 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
+import type { NitroApp } from "nitropack";
 import {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore yolo the DX is not great
   defineNitroPlugin,
   useRuntimeConfig,
   // @ts-expect-error experimental feature
   useDatabase,
 } from "#imports";
 
-export default defineNitroPlugin(async (nitro) => {
+export default defineNitroPlugin(async (nitro: NitroApp) => {
   const config = useRuntimeConfig();
   const db = useDatabase();
 

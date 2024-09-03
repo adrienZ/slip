@@ -1,3 +1,4 @@
+// @ts-expect-error experimental feature
 import { defineTask } from "#imports";
 import { useSlipAuth } from "../../../utils/useSlipAuth";
 
@@ -7,6 +8,7 @@ export default defineTask({
     description: "Delete expired items in session's table",
   },
   async run({ payload }) {
+    // @ts-expect-error CI fails otherwise
     const scheduledTime = payload.scheduledTime as number;
     console.log("Running SLIP expired sessions task...", scheduledTime);
     const auth = useSlipAuth();

@@ -26,6 +26,7 @@
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
+    "test:coverage": "pnpm test -- --coverage",
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
@@ -44,6 +45,7 @@
     "@nuxt/schema": "^3.13.0",
     "@nuxt/test-utils": "^3.14.1",
     "@types/node": "^20.16.3",
+    "@vitest/coverage-v8": "^2.0.5",
     "better-sqlite3": "^11.2.1",
     "changelogen": "^0.5.5",
     "eslint": "^9.9.1",

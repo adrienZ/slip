@@ -59,15 +59,15 @@ describe("SlipAuthCore", () => {
       },
     );
 
-    auth.createRandomUserId = () => {
+    auth.setCreateRandomUserId(() => {
       mocks.userCreatedCount++;
       return `user-id-${mocks.userCreatedCount}`;
-    };
+    });
 
-    auth.createRandomSessionId = () => {
+    auth.setCreateRandomSessionId(() => {
       mocks.sessionCreatedCount++;
       return `session-id-${mocks.sessionCreatedCount}`;
-    };
+    });
   });
 
   describe("users", () => {

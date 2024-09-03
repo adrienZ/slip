@@ -21,6 +21,9 @@ export class SlipAuthCore {
     oAuthAccounts: OAuthAccountsRepository
   };
 
+  #createRandomUserId: () => string;
+  #createRandomSessionId: () => string;
+
   schemas: SchemasMockValue;
 
   hooks = createSlipHooks();
@@ -47,16 +50,9 @@ export class SlipAuthCore {
       sessions: new SessionsRepository(this.#orm, this.schemas, this.hooks, "sessions"),
       oAuthAccounts: new OAuthAccountsRepository(this.#orm, this.schemas, this.hooks, "oauthAccounts"),
     };
-  }
 
-  // public to allow override
-  public createRandomUserId() {
-    return defaultIdGenerationMethod();
-  }
-
-  // public to allow override
-  public createRandomSessionId() {
-    return defaultIdGenerationMethod();
+    this.#createRandomSessionId = defaultIdGenerationMethod;
+    this.#createRandomUserId = defaultIdGenerationMethod;
   }
 
   public async checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
@@ -78,7 +74,7 @@ export class SlipAuthCore {
     const existingUser = await this.#repos.users.findByEmail(params.email);
 
     if (!existingUser) {
-      const userId = this.createRandomUserId();
+      const userId = this.#createRandomUserId();
 
       await this.#repos.users.insert(userId, params.email);
 
@@ -88,7 +84,7 @@ export class SlipAuthCore {
         user_id: userId,
       });
 
-      const sessionFromRegistrationId = this.createRandomSessionId();
+      const sessionFromRegistrationId = this.#createRandomSessionId();
       const sessionFromRegistration = await this.#repos.sessions.insert(sessionFromRegistrationId, {
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
@@ -108,7 +104,7 @@ export class SlipAuthCore {
     }
 
     if (existingAccount) {
-      const sessionFromLoginId = this.createRandomSessionId();
+      const sessionFromLoginId = this.#createRandomSessionId();
       const sessionFromLogin = await this.#repos.sessions.insert(sessionFromLoginId, {
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
@@ -121,6 +117,14 @@ export class SlipAuthCore {
     }
 
     throw new Error("could not find oauth user");
+  }
+
+  public setCreateRandomUserId(fn: () => string) {
+    this.#createRandomUserId = fn;
+  }
+
+  public setCreateRandomSessionId(fn: () => string) {
+    this.#createRandomSessionId = fn;
   }
 
   public getSession(sessionId: string) {

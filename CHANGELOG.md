@@ -1,6 +1,27 @@
 # Changelog
 
 
+## v0.1.26
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.25...v0.1.26)
+
+### 🩹 Fixes
+
+- **setup:** Auto setup of database #6 ([#6](https://github.com/adrienZ/slip/issues/6))
+
+### 💅 Refactors
+
+- **core:** Use repository pattern for better hooks ([93c392d](https://github.com/adrienZ/slip/commit/93c392d))
+- **core:** Proper setter for random values method ([4784d3c](https://github.com/adrienZ/slip/commit/4784d3c))
+
+### 🏡 Chore
+
+- **release:** V0.1.25 ([70250cc](https://github.com/adrienZ/slip/commit/70250cc))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.25
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.23...v0.1.25)

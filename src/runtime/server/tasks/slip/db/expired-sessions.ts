@@ -2,7 +2,7 @@
 import { defineTask, type runTask } from "#imports";
 import { useSlipAuth } from "../../../utils/useSlipAuth";
 
-type FixedTaskEvent = Required<NonNullable<Parameters<typeof runTask>[1]>>
+type FixedTaskEvent = Required<NonNullable<Parameters<typeof runTask>[1]>>;
 
 export default defineTask({
   meta: {

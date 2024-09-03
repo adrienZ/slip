@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.29
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.28...v0.1.29)
+
+### 🩹 Fixes
+
+- **ipInfo:** Fix CI typings ([d416d7f](https://github.com/adrienZ/slip/commit/d416d7f))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.28
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.27...v0.1.28)

@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20
       - name: Install Bun
-      - uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: npx nypm@latest i && cd playground && npx nypm@latest i
       - name: Playground prepare

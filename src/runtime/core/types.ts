@@ -1,9 +1,12 @@
+import type { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 import type { checkDbAndTables, tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 
 export type { tableNames };
 export type { supportedConnectors } from "../database";
+
+export type DrizzleTransaction = Parameters<Parameters<ReturnType<typeof drizzleIntegration>["transaction"]>["0"]>[0];
 
 export type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 

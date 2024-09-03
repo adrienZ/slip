@@ -39,6 +39,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@libsql/client": "^0.10.0",
     "@nuxt/devtools": "^1.4.1",
     "@nuxt/eslint-config": "^0.3.13",
     "@nuxt/module-builder": "^0.8.3",

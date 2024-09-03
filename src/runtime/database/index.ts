@@ -3,8 +3,8 @@ import z from "zod";
 import consola from "consola";
 import { SqliteTableChecker } from "./lib/sqlite-table-checker";
 
-export type supportedConnectors = Extract<ConnectorName, "sqlite">;
-const CONNECTOR_NAME = ["sqlite"] as const satisfies supportedConnectors[];
+export type supportedConnectors = Extract<ConnectorName, "sqlite" | "libsql">;
+const CONNECTOR_NAME = ["sqlite", "libsql"] as const satisfies supportedConnectors[];
 
 const DatabaseSchema = z.object({
   exec: z.function(),
@@ -67,6 +67,9 @@ export async function checkDbAndTables(
 
   switch (connectorType) {
     case "sqlite":
+      tableChecker = new SqliteTableChecker(database, tableNames);
+      break;
+    case "libsql":
       tableChecker = new SqliteTableChecker(database, tableNames);
       break;
     default:

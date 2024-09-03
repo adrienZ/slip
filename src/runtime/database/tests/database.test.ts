@@ -73,7 +73,7 @@ describe("checkAndCreateDb", () => {
         sessions: "slip_sessions",
       }),
     ).rejects.toThrowError(
-      "Invalid enum value. Expected 'sqlite', received 'notsupported'",
+      "Invalid enum value. Expected 'sqlite' | 'libsql', received 'notsupported'",
     );
   });
 });

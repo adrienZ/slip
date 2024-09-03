@@ -15,7 +15,7 @@ export interface SlipModuleOptions extends ISlipAuthCoreOptions {
     /**
      * {@link https://nitro.unjs.io/guide/database#configuration}
      */
-    nitroDatabaseName?: string
+    nitroDatabaseName: string
   }
 
   tableNames: tableNames

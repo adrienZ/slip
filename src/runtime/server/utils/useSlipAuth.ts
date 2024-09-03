@@ -21,7 +21,7 @@ export function useSlipAuth() {
       sessionMaxAge: slipAuthConfig.sessionMaxAge,
     });
 
-    if (config.slipAuthIpInfoToken) {
+    if (config.slipAuthIpInfoToken && typeof config.slipAuthIpInfoToken === "string" && config.slipAuthIpInfoToken.length > 0) {
       setupIpInfoAddOn(instance, config.slipAuthIpInfoToken);
     }
   }

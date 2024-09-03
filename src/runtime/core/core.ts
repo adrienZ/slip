@@ -2,11 +2,12 @@ import { generateRandomString, alphabet } from "oslo/crypto";
 import { checkDbAndTables, type tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { checkDbAndTablesParameters, ICreateOrLoginParams, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthSession } from "./types";
+import type { checkDbAndTablesParameters, ICreateOrLoginParams, ISlipAuthCoreOptions, SchemasMockValue } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
 import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
+import type { SlipAuthPublicSession } from "../types";
 
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
@@ -69,7 +70,7 @@ export class SlipAuthCore {
    */
   public async registerUserIfMissingInDb(
     params: ICreateOrLoginParams,
-  ): Promise<[ string, SlipAuthSession]> {
+  ): Promise<[ string, SlipAuthPublicSession]> {
     const existingUser = await this.#repos.users.findByEmail(params.email);
 
     if (!existingUser) {
@@ -91,7 +92,7 @@ export class SlipAuthCore {
         ua: params.ua,
       });
 
-      return [userId, sessionFromRegistration as SlipAuthSession];
+      return [userId, sessionFromRegistration];
     }
 
     const existingAccount = await this.#repos.oAuthAccounts.findByProviderData(

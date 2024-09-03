@@ -131,7 +131,11 @@ export class SlipAuthCore {
     return this.#repos.sessions.findById(sessionId);
   }
 
-  public async deleteSession(sessionId: string) {
+  public deleteSession(sessionId: string) {
     return this.#repos.sessions.deleteById(sessionId);
+  }
+
+  public deleteExpiredSessions(timestamp: number) {
+    return this.#repos.sessions.deleteExpired(timestamp);
   }
 }

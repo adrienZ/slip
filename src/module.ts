@@ -37,14 +37,19 @@ export default defineNuxtModule<ModuleOptions>({
     });
     // #endregion
 
-    // #region make sure nitro database feature flag is turned on
     nuxt.hook("nitro:config", (nitroConfig) => {
       nitroConfig.experimental = {
         ...nitroConfig.experimental,
         database: true,
+        // needed for purging expired sessions
+        tasks: true,
+      };
+
+      nitroConfig.scheduledTasks = {
+        ...nitroConfig.scheduledTasks,
+        "* * * * *": ["slip:db:expired-sessions"],
       };
     });
-    // #endregion
 
     // module logic
     addServerScanDir(resolver.resolve("./runtime/server"));

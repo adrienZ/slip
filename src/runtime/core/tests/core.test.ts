@@ -92,6 +92,13 @@ describe("SlipAuthCore", () => {
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(1);
     });
+  });
+
+  describe("register", () => {
+    beforeAll(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(date);
+    });
 
     it("should throw an error when registering a user with an email in the database and a different provider", async () => {
       const [_, inserted] = await auth.registerUserIfMissingInDb(defaultInsert);
@@ -123,8 +130,15 @@ describe("SlipAuthCore", () => {
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);
     });
+  });
 
-    it("should throw when trying to delete an non existant session", async () => {
+  describe("sessions", () => {
+    beforeAll(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(date);
+    });
+
+    it("should delete an existant session", async () => {
       const [_, session] = await auth.registerUserIfMissingInDb(defaultInsert);
 
       await auth.deleteSession(session.id);
@@ -141,6 +155,20 @@ describe("SlipAuthCore", () => {
       expect(deletion).rejects.toThrowError(
         "Unable to delete session with id notInDB",
       );
+    });
+
+    it("should delete expired sessions", async () => {
+      await auth.registerUserIfMissingInDb(defaultInsert);
+
+      vi.useRealTimers();
+      await auth.registerUserIfMissingInDb({
+        ...defaultInsert,
+        email: "another-unique-email@test.com",
+        providerUserId: `another-${defaultInsert.providerUserId}`,
+      });
+
+      const deletions = await auth.deleteExpiredSessions(Date.now());
+      expect(deletions).toStrictEqual({ success: true, count: 1 });
     });
   });
 

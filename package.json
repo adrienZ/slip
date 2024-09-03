@@ -26,8 +26,9 @@
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
-    "test:coverage": "pnpm test -- --coverage --reporter=default --reporter=junit",
+    "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit && pnpm test:bun",
     "test:watch": "vitest watch",
+    "test:bun": "bun test ./src/runtime/database/tests/bun-sqlite.bun-test.ts",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
@@ -55,7 +56,8 @@
     "nuxt-auth-utils": "^0.3.5",
     "typescript": "latest",
     "vitest": "^2.0.5",
-    "vue-tsc": "^2.1.4"
+    "vue-tsc": "^2.1.4",
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "nuxt-auth-utils": "^0.3.2"

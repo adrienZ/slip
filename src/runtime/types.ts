@@ -1,4 +1,7 @@
 import type { SlipAuthSession, SlipAuthUser, supportedConnectors, tableNames, ISlipAuthCoreOptions } from "./core/types";
+import type { useSession } from "h3";
+
+export type SessionConfig = Parameters<typeof useSession>[1];
 
 export interface SlipModuleOptions extends ISlipAuthCoreOptions {
   /**

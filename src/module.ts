@@ -1,5 +1,5 @@
-import { defineNuxtModule, createResolver, installModule, addServerScanDir } from "@nuxt/kit";
-import type { SlipModuleOptions } from "./runtime/types";
+import { defineNuxtModule, createResolver, installModule, addServerScanDir, updateRuntimeConfig } from "@nuxt/kit";
+import type { SessionConfig, SlipModuleOptions } from "./runtime/types";
 
 // Module options TypeScript interface definition
 export interface ModuleOptions extends SlipModuleOptions {}
@@ -28,10 +28,13 @@ export default defineNuxtModule<ModuleOptions>({
     // #region use private runtime config to expose options in nitro
     const runtimeConfig = nuxt.options.runtimeConfig;
     runtimeConfig.slipAuth = options;
-    // nuxt-auth-utils compat
-    // TODO: also update nuxt-auth-utils sessionMax age according to our module options
-    // @ts-expect-error TODO: nuxt-auth-utils typing is mising
-    runtimeConfig.slipAuth.sessionMaxAge = runtimeConfig.session?.maxAge ?? options.sessionMaxAge;
+    // update session maxAge runtime config from nuxt-auth-utils
+    const overridenSessionConfig: Partial<SessionConfig> = {
+      maxAge: options.sessionMaxAge,
+    };
+    updateRuntimeConfig({
+      session: overridenSessionConfig,
+    });
     // #endregion
 
     // #region make sure nitro database feature flag is turned on

@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.27
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.26...v0.1.27)
+
+### 🚀 Enhancements
+
+- **playground:** Add drizzle studio ([479125e](https://github.com/adrienZ/slip/commit/479125e))
+- **nuxt:** Ip lookup "addons" #14 ([#14](https://github.com/adrienZ/slip/issues/14))
+
+### 🏡 Chore
+
+- **release:** V0.1.26 ([f295717](https://github.com/adrienZ/slip/commit/f295717))
+- **test:** Add coverage ([e113602](https://github.com/adrienZ/slip/commit/e113602))
+- **codecov:** Add tests report ([7494b6f](https://github.com/adrienZ/slip/commit/7494b6f))
+- **codecov:** Config ([110f03e](https://github.com/adrienZ/slip/commit/110f03e))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.26
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.25...v0.1.26)

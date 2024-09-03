@@ -1,9 +1,11 @@
 import { eq, and } from "drizzle-orm";
 import { TableRepository } from "./_repo";
+import type { DrizzleTransaction } from "../types";
 
 export class OAuthAccountsRepository extends TableRepository<"oauthAccounts"> {
-  async insert(email: string, values: typeof this.table.$inferInsert): Promise<typeof this.table.$inferSelect> {
-    await this._orm
+  async insert(email: string, values: typeof this.table.$inferInsert, trx?: DrizzleTransaction): Promise<typeof this.table.$inferSelect> {
+    const orm = trx || this._orm;
+    await orm
       .insert(this.table)
       .values(values)
       .run();

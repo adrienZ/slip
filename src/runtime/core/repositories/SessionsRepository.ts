@@ -1,10 +1,11 @@
 import { eq, sql } from "drizzle-orm";
 import { TableRepository } from "./_repo";
-import type { ICreateSessionsParams } from "../types";
+import type { ICreateSessionsParams, DrizzleTransaction } from "../types";
 
 export class SessionsRepository extends TableRepository<"sessions"> {
-  async insert(sessionId: string, { userId, expiresAt, ip, ua }: ICreateSessionsParams): Promise<typeof this.table.$inferSelect> {
-    await this._orm
+  async insert(sessionId: string, { userId, expiresAt, ip, ua }: ICreateSessionsParams, trx?: DrizzleTransaction): Promise<typeof this.table.$inferSelect> {
+    const orm = trx || this._orm;
+    await orm
       .insert(this.table)
       .values({
         id: sessionId,

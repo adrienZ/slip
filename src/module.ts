@@ -47,6 +47,7 @@ export default defineNuxtModule<ModuleOptions>({
 
       nitroConfig.scheduledTasks = {
         ...nitroConfig.scheduledTasks,
+        // @daily https://crontab.guru/#00_00_*_*_*
         "* * * * *": ["slip:db:expired-sessions"],
       };
     });
@@ -60,7 +61,8 @@ export default defineNuxtModule<ModuleOptions>({
       nitro.plugins = nitro.plugins || [];
 
       // add your custom plugin
-      nitro.plugins.push(resolver.resolve("runtime/server/plugins/sessions.plugin"));
+      // nitro.plugins.push(resolver.resolve("runtime/server/plugins/sessions.plugin"));
+      // nitro.plugins.push(resolver.resolve("runtime/server/plugins/auto-setup.plugin"));
     });
   },
 });

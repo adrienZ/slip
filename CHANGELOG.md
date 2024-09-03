@@ -1,6 +1,10 @@
 # Changelog
 
 
+## v0.1.28
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.27...v0.1.28)
+
 ## v0.1.27
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.26...v0.1.27)

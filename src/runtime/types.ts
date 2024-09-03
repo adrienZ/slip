@@ -27,10 +27,12 @@ declare module "nuxt/schema" {
   }
 }
 
+export interface SlipAuthPublicSession extends Pick<SlipAuthSession, "id" | "expires_at"> {}
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore #auth-utils is an alias from nuxt-auth-utils
 declare module "#auth-utils" {
 
-  interface UserSession extends Pick<SlipAuthSession, "id" | "expires_at"> {}
+  interface UserSession extends SlipAuthPublicSession {}
   interface User extends Pick<SlipAuthUser, "id"> {}
 }

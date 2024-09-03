@@ -24,7 +24,7 @@ export interface ICreateSessionsParams {
 }
 
 type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];
-export interface SlipAuthSession extends Pick<SessionsTableSelect, "id" | "expires_at"> {
+export interface SlipAuthSession extends SessionsTableSelect {
 
 }
 

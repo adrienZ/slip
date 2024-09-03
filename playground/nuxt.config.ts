@@ -4,8 +4,8 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-07-27",
   slipAuth: {
     database: {
-      nitroDatabaseName: "libsql",
-      dialect: "libsql",
+      nitroDatabaseName: "default",
+      dialect: "sqlite",
     },
   },
   nitro: {

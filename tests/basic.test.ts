@@ -27,6 +27,7 @@ describe("database", async () => {
     expect(json.slipAuth).toStrictEqual({
       database: {
         dialect: "sqlite",
+        nitroDatabaseName: "default",
       },
       sessionMaxAge: 604800,
       tableNames: {

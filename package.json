@@ -19,7 +19,7 @@
     "bin"
   ],
   "bin": {
-    "nuxt-slip-auth": "./bin/cli.ts"
+    "nuxt-slip-auth": "./bin/cli.js"
   },
   "scripts": {
     "postinstall": "nuxt prepare",

@@ -9,7 +9,6 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 # nuxt-slip-auth
 <p align="center">
-
   <img src="logo.webp" width="320">
 </p>
 
@@ -24,7 +23,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 Plug and play authentication module for Nuxt
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/nuxt-slip-auth?file=playground%2Fapp.vue) -->
+- [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue)
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 ## Features
@@ -43,6 +42,44 @@ npx nuxi module add nuxt-slip-auth
 ```
 
 That's it! You can now use My Module in your Nuxt app ✨
+
+## Usage
+
+Example: `~/server/routes/auth/github.get.ts`
+
+```ts
+export default oauthGitHubEventHandler({
+  config: {
+    emailRequired: true,
+  },
+  async onSuccess(event, { user }) {
+    const auth = useSlipAuth();
+
+    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
+      email: user.email,
+      providerId: "github",
+      providerUserId: user.id,
+      ua: getRequestHeader(event, "User-Agent"),
+      ip: getRequestIP(event),
+    });
+
+    await setUserSession(event, {
+      expires_at: sessionFromDb.expires_at,
+      id: sessionFromDb.id,
+      user: {
+        id: userId,
+      },
+    });
+    return sendRedirect(event, "/");
+  },
+  // Optional, will return a json error and 401 status code by default
+  onError(event, error) {
+    console.error("GitHub OAuth error:", error);
+    return sendRedirect(event, "/");
+  },
+});
+```
+
 
 ## Contribution
 
@@ -77,7 +114,7 @@ That's it! You can now use My Module in your Nuxt app ✨
 
 
 <!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/nuxt-slip-auth-module/latest.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-version-src]: https://img.shields.io/npm/v/nuxt-slip-auth/latest.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-version-href]: https://npmjs.com/package/nuxt-slip-auth
 
 [npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-slip-auth.svg?style=flat&colorA=020420&colorB=00DC82

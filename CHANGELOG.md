@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.31
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.30...v0.1.31)
+
+### 🩹 Fixes
+
+- **cli:** Fix executable ([6a7573f](https://github.com/adrienZ/slip/commit/6a7573f))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.30
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.29...v0.1.30)

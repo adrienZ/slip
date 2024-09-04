@@ -7,23 +7,26 @@ Find and replace all on all files (CMD+SHIFT+F):
 - Description: My new Nuxt module
 -->
 
-# nuxt-slip-auth
 <p align="center">
   <img src="logo.webp" width="320">
 </p>
+<br/>
+
+# nuxt-slip-auth 🩲
+> Plug and play authentication module for Nuxt
 
 ---
-
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 [![Codecov][codecov-src]][codecov-href]
+<!-- [![npm version][npm-version-src]][npm-version-href] -->
+<!-- [![npm downloads][npm-downloads-src]][npm-downloads-href] -->
+<!-- [![License][license-src]][license-href] -->
 
-Plug and play authentication module for Nuxt
+Slip (French word for "underwear", pronounced `/sleep/`)
+
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
-- [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue)
+<!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 ## Features
@@ -41,18 +44,28 @@ Install the module to your Nuxt application with one command:
 npx nuxi module add nuxt-slip-auth
 ```
 
-That's it! You can now use My Module in your Nuxt app ✨
+That's it! You can now use nuxt-slip-auth Module in your Nuxt app ✨
 
 ## Usage
 
 Create a Github OAuth app (or any provider) you want: [click here](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
 
+For a quick demo run the command:
 
-create a .env file
-
-````
-
+```bash
+npx nuxt-slip-auth demo
 ```
+<details>
+  <summary>Manuel steps</summary>
+
+  #### 1. Install better-sqlite3
+
+  By default, nuxt-auth-utils will use sqlite, so you'll need to run 
+  ```bash
+  npm install better-sqlite3
+  ```
+
+  #### 2. create an API oAuth handler
 
 
 Example: `~/server/routes/auth/github.get.ts`
@@ -89,6 +102,17 @@ export default oauthGitHubEventHandler({
   },
 });
 ```
+
+### 3. Create your .env file
+```toml[.env]
+NUXT_OAUTH_GITHUB_CLIENT_ID=""
+NUXT_OAUTH_GITHUB_CLIENT_SECRET=""
+NUXT_SLIP_AUTH_IP_INFO_TOKEN=""
+```
+
+</details>
+
+
 
 Example: `~/app.vue`
 

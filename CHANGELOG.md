@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.1.30
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.29...v0.1.30)
+
+### 🚀 Enhancements
+
+- **playground:** Enable localhost ip ([4a6f758](https://github.com/adrienZ/slip/commit/4a6f758))
+- **cli:** Init cli helper ([#26](https://github.com/adrienZ/slip/pull/26))
+
+### 📖 Documentation
+
+- **readme:** Add oauth example ([af9ba43](https://github.com/adrienZ/slip/commit/af9ba43))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.29
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.28...v0.1.29)

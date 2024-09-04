@@ -52,6 +52,8 @@
     "@vitest/coverage-v8": "^2.0.5",
     "better-sqlite3": "^11.2.1",
     "changelogen": "^0.5.5",
+    "citty": "^0.1.6",
+    "dotenv": "^16.4.5",
     "eslint": "^9.9.1",
     "hookable": "^5.5.3",
     "nuxt": "^3.13.0",

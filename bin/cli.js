@@ -1,12 +1,24 @@
+// @ts-check
+
 import { defineCommand, runMain } from "citty";
 import path from "node:path";
 import fs from "node:fs/promises";
 import dotenv from "dotenv";
 import consola from "consola";
 
-const mapToEnv = (map: Map<unknown, unknown>) => Array.from(map).map(([key, value]) => `${key}=${value}`).join("\n");
+/**
+ * Converts a Map to a string that can be written to an .env file.
+ * @param {Map<string, string>} map - The map of environment variables.
+ * @returns {string} - The formatted string for the .env file.
+ */
+const mapToEnv = map => Array.from(map).map(([key, value]) => `${key}=${value}`).join("\n");
 
-const createFile = async (filePath: string, content: string) => {
+/**
+ * Creates a file at the given path with the specified content. If the directory doesn't exist, it is created.
+ * @param {string} filePath - The path where the file will be created.
+ * @param {string} content - The content to write to the file.
+ */
+const createFile = async (filePath, content) => {
   try {
     // Get the directory path from the file path
     const dir = path.dirname(filePath);
@@ -29,6 +41,9 @@ const createFile = async (filePath: string, content: string) => {
   }
 };
 
+/**
+ * Main command definition using citty CLI framework.
+ */
 const main = defineCommand({
   meta: {
     name: "Slip Auth CLI",
@@ -40,13 +55,16 @@ const main = defineCommand({
       meta: {
         name: "demo",
       },
+      /**
+       * Main execution of the demo command.
+       */
       async run() {
         const envFilePath = path.resolve(process.cwd(), ".env");
 
         try {
           await fs.stat(envFilePath);
         }
-        catch (error) {
+        catch {
           await fs.writeFile(envFilePath, "", {
             encoding: "utf-8",
           });
@@ -60,30 +78,27 @@ const main = defineCommand({
         const parsedConfig = new Map(Object.entries(dotEnvConfig.parsed));
 
         if (!parsedConfig.has("NUXT_OAUTH_GITHUB_CLIENT_ID")) {
-          // eslint-disable-next-line @stylistic/quotes
-          parsedConfig.set("NUXT_OAUTH_GITHUB_CLIENT_ID", `""`);
+          parsedConfig.set("NUXT_OAUTH_GITHUB_CLIENT_ID", "\"\"");
         }
 
         if (!parsedConfig.has("NUXT_OAUTH_GITHUB_CLIENT_SECRET")) {
-          // eslint-disable-next-line @stylistic/quotes
-          parsedConfig.set("NUXT_OAUTH_GITHUB_CLIENT_SECRET", `""`);
+          parsedConfig.set("NUXT_OAUTH_GITHUB_CLIENT_SECRET", "\"\"");
         }
 
         if (!parsedConfig.has("NUXT_SLIP_AUTH_IP_INFO_TOKEN")) {
-          // eslint-disable-next-line @stylistic/quotes
-          parsedConfig.set("NUXT_SLIP_AUTH_IP_INFO_TOKEN", `""`);
+          parsedConfig.set("NUXT_SLIP_AUTH_IP_INFO_TOKEN", "\"\"");
         }
 
         await fs.writeFile(envFilePath, mapToEnv(parsedConfig));
         const logger = consola.withTag("slip-auth-demo");
         logger.success(".env setup");
 
-        const githubHandlerFilePath = path.resolve(process.cwd(), "server/routes/githoub.get.ts");
+        const githubHandlerFilePath = path.resolve(process.cwd(), "server/routes/github.get.ts");
 
         try {
           await fs.stat(githubHandlerFilePath);
         }
-        catch (error) {
+        catch {
           await createFile(githubHandlerFilePath, `
 export default oauthGitHubEventHandler({
   config: {
@@ -115,7 +130,8 @@ export default oauthGitHubEventHandler({
     return sendRedirect(event, "/");
   },
 });
-            `);
+          `);
+          logger.success("github demo route setup");
         }
       },
     }),

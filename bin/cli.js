@@ -5,6 +5,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import dotenv from "dotenv";
 import consola from "consola";
+import { execSync } from "node:child_process";
 
 /**
  * Converts a Map to a string that can be written to an .env file.
@@ -97,6 +98,7 @@ const main = defineCommand({
 
         try {
           await fs.stat(githubHandlerFilePath);
+          logger.warn("github demo already setup");
         }
         catch {
           await createFile(githubHandlerFilePath, `
@@ -133,6 +135,9 @@ export default oauthGitHubEventHandler({
           `);
           logger.success("github demo route setup");
         }
+
+        execSync("npx --yes nypm@latest install better-sqlite3");
+        logger.success(".better-sqlite3 installed");
       },
     }),
   },

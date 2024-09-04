@@ -45,6 +45,16 @@ That's it! You can now use My Module in your Nuxt app ✨
 
 ## Usage
 
+Create a Github OAuth app (or any provider) you want: [click here](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
+
+
+create a .env file
+
+````
+
+```
+
+
 Example: `~/server/routes/auth/github.get.ts`
 
 ```ts
@@ -81,7 +91,6 @@ export default oauthGitHubEventHandler({
 ```
 
 Example: `~/app.vue`
-
 
 ```vue
 <script setup lang="ts">

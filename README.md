@@ -7,12 +7,10 @@ Find and replace all on all files (CMD+SHIFT+F):
 - Description: My new Nuxt module
 -->
 
-# nuxt-slip-auth
 <p align="center">
-  <img src="logo.webp" width="320">
+  <img src="logo.webp" width="240">
 </p>
-
----
+<br>
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -20,18 +18,28 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![Nuxt][nuxt-src]][nuxt-href]
 [![Codecov][codecov-src]][codecov-href]
 
-Plug and play authentication module for Nuxt
+# nuxt-slip-auth 🩲
+> Plug and play authentication module for Nuxt
 
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
-- [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue)
+[Release Notes](/CHANGELOG.md)
+<!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
-## Features
+
+---
+
+Slip (French word for "underwear", pronounced `/sleep/`) is an attempt to be the most simple way to bring authentication to your Nuxt app.
+
+Authentication is like an underwear: you can you put it on, put it off and sometimes get stolen !
+
+This module is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) and [db0](https://github.com/unjs/db0) and adds the following features:
 
 <!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Foo
-- 🚠 &nbsp;Bar
-- 🌲 &nbsp;Baz
+- 💾 Automatic database setup
+- 🤝 100% type-safe schemas and utils
+- 🗑️ Delete expired and invalidate sessions
+- 🪝 Configurable and extendable with hooks
+- [IpInfo](https://ipinfo.io/) integration on login
 
 ## Quick Setup
 
@@ -41,18 +49,24 @@ Install the module to your Nuxt application with one command:
 npx nuxi module add nuxt-slip-auth
 ```
 
-That's it! You can now use My Module in your Nuxt app ✨
+Then create a Github OAuth app (or any provider) you want: [create app](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
 
-## Usage
+For a quick demo run the command:
 
-Create a Github OAuth app (or any provider) you want: [click here](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
-
-
-create a .env file
-
-````
-
+```bash
+npx nuxt-slip-auth demo
 ```
+<details>
+  <summary>Manuel steps</summary>
+
+  #### 1. Install better-sqlite3
+
+  By default, nuxt-auth-utils will use sqlite, so you'll need to run 
+  ```bash
+  npm install better-sqlite3
+  ```
+
+  #### 2. create an API oAuth handler
 
 
 Example: `~/server/routes/auth/github.get.ts`
@@ -90,6 +104,17 @@ export default oauthGitHubEventHandler({
 });
 ```
 
+### 3. Create your .env file
+```toml[.env]
+NUXT_OAUTH_GITHUB_CLIENT_ID=""
+NUXT_OAUTH_GITHUB_CLIENT_SECRET=""
+NUXT_SLIP_AUTH_IP_INFO_TOKEN=""
+```
+
+</details>
+
+Update your `.env` with your app tokens.
+
 Example: `~/app.vue`
 
 ```vue
@@ -111,7 +136,68 @@ const { loggedIn, user, session, clear } = useUserSession();
   </div>
 </template>
 ```
+## Methods
 
+##### `checkDbAndTables(dialect: string)`
+
+Checks if the required database and tables are set up. Ensures that the environment is ready for authentication.
+
+##### `registerUserIfMissingInDb(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
+
+Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
+- **Returns**: A tuple containing the user ID and the created session details.
+
+##### `setCreateRandomUserId(fn: () => string)`
+
+Sets a custom method for generating random user IDs.
+
+##### `setCreateRandomSessionId(fn: () => string)`
+
+Sets a custom method for generating random session IDs.
+
+##### `getSession(sessionId: string)`
+
+Fetches a session by its session ID.
+
+##### `deleteSession(sessionId: string)`
+
+Deletes a session by its session ID.
+
+##### `deleteExpiredSessions(timestamp: number)`
+
+Deletes sessions that have expired before the provided timestamp.
+
+
+## Hooks
+
+The `hooks` property allows you to listen for and respond to events during the authentication process. The available hooks are:
+
+- **`"users:create"`**: Triggered when a new user is created.
+  - **Callback**: `(user: SlipAuthUser) => void`
+
+- **`"oAuthAccount:create"`**: Triggered when a new OAuth account is created.
+  - **Callback**: `(oAuthAccount: SlipAuthOAuthAccount) => void`
+
+- **`"sessions:create"`**: Triggered when a new session is created.
+  - **Callback**: `(session: SlipAuthSession) => void`
+
+- **`"sessions:delete"`**: Triggered when a session is deleted.
+  - **Callback**: `(session: SlipAuthSession) => void`
+
+---
+
+#### Properties
+
+- `schemas`: Contains the database schemas for users, sessions, and OAuth accounts.
+- `hooks`: Provides hooks to extend and configure the authentication behavior.
+
+
+## Roadmap
+- [x] Sqlite support
+- [x] Bun-sqlite support
+- [x] LibSQL support
+- [ ] Postgres support
+- [ ] Email + Password
 
 ## Contribution
 

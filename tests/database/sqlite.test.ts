@@ -1,19 +1,19 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import libSql from "db0/connectors/libsql/node";
+import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
-import { checkDbAndTables } from "../index";
+import { checkDbAndTables } from "../../src/runtime/database";
 
 function testFunction() {
-  return checkDbAndTables(db, "libsql", {
+  return checkDbAndTables(db, "sqlite", {
     users: "slip_users",
     sessions: "slip_sessions",
     oauthAccounts: "slip_oauth_accounts",
   });
 }
 
-const db = createDatabase(libSql({
-  url: "file:.data/libsql.test.db" },
-));
+const db = createDatabase(sqlite({
+  name: "sqlite.test",
+}));
 
 beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_users`;
@@ -21,11 +21,11 @@ beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
 });
 
-describe("libSql connector", () => {
+describe("sqlite connector", () => {
   describe("users table", () => {
     describe("id field", () => {
       it("should throw an error when users table does not exist in database", async () => {
-        await expect(testFunction).rejects.toThrowError("slip_users table for SLIP does not exist");
+        await expect(testFunction()).rejects.toThrowError("slip_users table for SLIP does not exist");
       });
 
       it("should throw an error when users table does not have an id field", async () => {

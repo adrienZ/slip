@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
-import { SlipAuthCore } from "../core";
+import { SlipAuthCore } from "../src/runtime/core/core";
 
 const date = new Date(Date.UTC(1998, 11, 19));
 

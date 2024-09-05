@@ -1,5 +1,5 @@
+// #!/usr/bin/env node
 // @ts-check
-
 import { defineCommand, runMain } from "citty";
 import path from "node:path";
 import fs from "node:fs/promises";

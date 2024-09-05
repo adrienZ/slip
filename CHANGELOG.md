@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.33
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.32...v0.1.33)
+
+### 🩹 Fixes
+
+- **cli:** Demo github route path ([590627d](https://github.com/adrienZ/slip/commit/590627d))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.32
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.31...v0.1.32)

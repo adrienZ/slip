@@ -21,7 +21,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 # nuxt-slip-auth 🩲
 > Plug and play authentication module for Nuxt
 
-- [Release Notes](/CHANGELOG.md)
+[Release Notes](/CHANGELOG.md)
 <!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
@@ -30,9 +30,9 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 Slip (French word for "underwear", pronounced `/sleep/`) is an attempt to be the most simple way to bring authentication to your Nuxt app.
 
-Authentication is like an underwear: you can you put it in, put it off and sometimes get stolen !
+Authentication is like an underwear: you can you put it on, put it off and sometimes get stolen !
 
-This is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) and [db0](https://github.com/unjs/db0) and adds the following features:
+This module is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) and [db0](https://github.com/unjs/db0) and adds the following features:
 
 <!-- Highlight some of the features your module provide here -->
 - 💾 Automatic database setup
@@ -136,6 +136,60 @@ const { loggedIn, user, session, clear } = useUserSession();
   </div>
 </template>
 ```
+## Methods
+
+##### `checkDbAndTables(dialect: string)`
+
+Checks if the required database and tables are set up. Ensures that the environment is ready for authentication.
+
+##### `registerUserIfMissingInDb(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
+
+Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
+- **Returns**: A tuple containing the user ID and the created session details.
+
+##### `setCreateRandomUserId(fn: () => string)`
+
+Sets a custom method for generating random user IDs.
+
+##### `setCreateRandomSessionId(fn: () => string)`
+
+Sets a custom method for generating random session IDs.
+
+##### `getSession(sessionId: string)`
+
+Fetches a session by its session ID.
+
+##### `deleteSession(sessionId: string)`
+
+Deletes a session by its session ID.
+
+##### `deleteExpiredSessions(timestamp: number)`
+
+Deletes sessions that have expired before the provided timestamp.
+
+
+## Hooks
+
+The `hooks` property allows you to listen for and respond to events during the authentication process. The available hooks are:
+
+- **`"users:create"`**: Triggered when a new user is created.
+  - **Callback**: `(user: SlipAuthUser) => void`
+
+- **`"oAuthAccount:create"`**: Triggered when a new OAuth account is created.
+  - **Callback**: `(oAuthAccount: SlipAuthOAuthAccount) => void`
+
+- **`"sessions:create"`**: Triggered when a new session is created.
+  - **Callback**: `(session: SlipAuthSession) => void`
+
+- **`"sessions:delete"`**: Triggered when a session is deleted.
+  - **Callback**: `(session: SlipAuthSession) => void`
+
+---
+
+#### Properties
+
+- `schemas`: Contains the database schemas for users, sessions, and OAuth accounts.
+- `hooks`: Provides hooks to extend and configure the authentication behavior.
 
 
 ## Roadmap

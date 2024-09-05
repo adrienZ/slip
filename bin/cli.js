@@ -94,7 +94,7 @@ const main = defineCommand({
         const logger = consola.withTag("slip-auth-demo");
         logger.success(".env setup");
 
-        const githubHandlerFilePath = path.resolve(process.cwd(), "server/routes/github.get.ts");
+        const githubHandlerFilePath = path.resolve(process.cwd(), "server/routes/auth/github.get.ts");
 
         try {
           await fs.stat(githubHandlerFilePath);

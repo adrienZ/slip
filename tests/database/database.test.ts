@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
-import { checkDatabaseValidity, checkDbAndTables } from "../index";
+import { checkDatabaseValidity, checkDbAndTables } from "../../src/runtime/database";
 
 describe("checkDatabaseValidity", () => {
   it("should throw an error when no arguments are provided", () => {

@@ -8,33 +8,38 @@ Find and replace all on all files (CMD+SHIFT+F):
 -->
 
 <p align="center">
-  <img src="logo.webp" width="320">
+  <img src="logo.webp" width="240">
 </p>
-<br/>
+<br>
+
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![License][license-src]][license-href]
+[![Nuxt][nuxt-src]][nuxt-href]
+[![Codecov][codecov-src]][codecov-href]
 
 # nuxt-slip-auth 🩲
 > Plug and play authentication module for Nuxt
 
----
-[![Nuxt][nuxt-src]][nuxt-href]
-[![Codecov][codecov-src]][codecov-href]
-<!-- [![npm version][npm-version-src]][npm-version-href] -->
-<!-- [![npm downloads][npm-downloads-src]][npm-downloads-href] -->
-<!-- [![License][license-src]][license-href] -->
-
-Slip (French word for "underwear", pronounced `/sleep/`)
-
-
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
+- [Release Notes](/CHANGELOG.md)
 <!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
-## Features
+
+---
+
+Slip (French word for "underwear", pronounced `/sleep/`) is an attempt to be the most simple way to bring authentication to your Nuxt app.
+
+Authentication is like an underwear: you can you put it in, put it off and sometimes get stolen !
+
+This is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) and [db0](https://github.com/unjs/db0) and adds the following features:
 
 <!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Foo
-- 🚠 &nbsp;Bar
-- 🌲 &nbsp;Baz
+- 💾 Automatic database setup
+- 🤝 100% type-safe schemas and utils
+- 🗑️ Delete expired and invalidate sessions
+- 🪝 Configurable and extendable with hooks
+- [IpInfo](https://ipinfo.io/) integration on login
 
 ## Quick Setup
 
@@ -44,11 +49,7 @@ Install the module to your Nuxt application with one command:
 npx nuxi module add nuxt-slip-auth
 ```
 
-That's it! You can now use nuxt-slip-auth Module in your Nuxt app ✨
-
-## Usage
-
-Create a Github OAuth app (or any provider) you want: [click here](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
+Then create a Github OAuth app (or any provider) you want: [create app](https://github.com/settings/applications/new?oauth_application[name]=My%20app&oauth_application[url]=http://localhost:3000&oauth_application[callback_url]=http://localhost:3000/)
 
 For a quick demo run the command:
 
@@ -112,7 +113,7 @@ NUXT_SLIP_AUTH_IP_INFO_TOKEN=""
 
 </details>
 
-
+Update your `.env` with your app tokens.
 
 Example: `~/app.vue`
 
@@ -136,6 +137,13 @@ const { loggedIn, user, session, clear } = useUserSession();
 </template>
 ```
 
+
+## Roadmap
+- [x] Sqlite support
+- [x] Bun-sqlite support
+- [x] LibSQL support
+- [ ] Postgres support
+- [ ] Email + Password
 
 ## Contribution
 

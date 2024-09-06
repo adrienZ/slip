@@ -79,7 +79,7 @@ export default oauthGitHubEventHandler({
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
 
-    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
+    const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,
@@ -142,7 +142,7 @@ const { loggedIn, user, session, clear } = useUserSession();
 
 Checks if the required database and tables are set up. Ensures that the environment is ready for authentication.
 
-##### `registerUserIfMissingInDb(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
+##### `OAuthLoginUser(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
 
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
 - **Returns**: A tuple containing the user ID and the created session details.

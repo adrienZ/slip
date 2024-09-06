@@ -109,7 +109,7 @@ export default oauthGitHubEventHandler({
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
 
-    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
+    const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,

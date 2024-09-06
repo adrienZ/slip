@@ -2,12 +2,15 @@ import { generateRandomString, alphabet } from "oslo/crypto";
 import { checkDbAndTables, type tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { checkDbAndTablesParameters, ICreateOrLoginParams, ISlipAuthCoreOptions, SchemasMockValue } from "./types";
+import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
 import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
 import type { SlipAuthPublicSession } from "../types";
+import { isValidEmail } from "./validators";
+import { hashPassword, verifyPassword } from "./password";
+import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
 
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
@@ -55,8 +58,90 @@ export class SlipAuthCore {
     this.#createRandomUserId = defaultIdGenerationMethod;
   }
 
-  public async checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
+  public checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
     return checkDbAndTables(this.#db, dialect, this.#tableNames);
+  }
+
+  public async login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {
+    const email = values.email;
+    if (!email || typeof email !== "string" || !isValidEmail(email)) {
+      throw new InvalidEmailOrPasswordError("invalid email");
+    }
+    const password = values.password;
+    if (!password || typeof password !== "string" || password.length < 6) {
+      throw new InvalidEmailOrPasswordError("invalid password");
+    }
+
+    const existingUser = await this.#repos.users.findByEmail(email);
+
+    if (!existingUser) {
+      // NOTE:
+      // Returning immediately allows malicious actors to figure out valid emails from response times,
+      // allowing them to only focus on guessing passwords in brute-force attacks.
+      // As a preventive measure, you may want to hash passwords even for invalid emails.
+      // However, valid emails can be already be revealed with the signup page
+      // and a similar timing issue can likely be found in password reset implementation.
+      // It will also be much more resource intensive.
+      // Since protecting against this is non-trivial,
+      // it is crucial your implementation is protected against brute-force attacks with login throttling etc.
+      // If emails/usernames are public, you may outright tell the user that the username is invalid.
+      throw new InvalidEmailOrPasswordError("login no user with this email");
+    }
+
+    if (!existingUser.password) {
+      throw new InvalidEmailOrPasswordError("no password oauth user");
+    }
+
+    const validPassword = await verifyPassword(existingUser.password, password);
+    if (!validPassword) {
+      throw new InvalidEmailOrPasswordError("login invalid password");
+    }
+    const sessionToLoginId = this.#createRandomSessionId();
+    const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
+      userId: existingUser.id,
+      expiresAt: Date.now() + this.#sessionMaxAge,
+      ip: values.ip,
+      ua: values.ua,
+    });
+
+    return [existingUser.id, sessionToLogin];
+  }
+
+  public async register(values: ICreateUserParams): Promise<[ string, SlipAuthPublicSession]> {
+    const email = values.email;
+    if (!email || typeof email !== "string" || !isValidEmail(email)) {
+      throw new InvalidEmailOrPasswordError("invalid email");
+    }
+    const password = values.password;
+    if (!password || typeof password !== "string" || password.length < 6) {
+      throw new InvalidEmailOrPasswordError("invalid password");
+    }
+
+    const userId = this.#createRandomUserId();
+    const passwordHash = await hashPassword(password);
+
+    try {
+      const user = await this.#repos.users.insert(userId, email, passwordHash);
+      const sessionToLoginId = this.#createRandomSessionId();
+      const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
+        userId: user.id,
+        expiresAt: Date.now() + this.#sessionMaxAge,
+        ip: values.ip,
+        ua: values.ua,
+      });
+
+      return [user.id, sessionToLogin];
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        if (error.stack?.startsWith(`SqliteError: UNIQUE constraint failed: ${this.#tableNames.users}.email`)) {
+          throw new InvalidEmailOrPasswordError(`email already taken: ${values.email}`);
+        }
+        throw new UnhandledError();
+      }
+
+      throw new UnhandledError();
+    }
   }
 
   /**
@@ -68,7 +153,7 @@ export class SlipAuthCore {
    * {@link https://v2.lucia-auth.com/guidebook/oauth-account-linking/}
    * {@link https://thecopenhagenbook.com/oauth#account-linking}
    */
-  public async registerUserIfMissingInDb(
+  public async OAuthLoginUser(
     params: ICreateOrLoginParams,
   ): Promise<[ string, SlipAuthPublicSession]> {
     const existingUser = await this.#repos.users.findByEmail(params.email);

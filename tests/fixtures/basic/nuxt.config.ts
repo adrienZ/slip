@@ -5,4 +5,14 @@ export default defineNuxtConfig({
     // @ts-expect-error nuxt template
     MyModule,
   ],
+  nitro: {
+    database: {
+      default: {
+        connector: "sqlite",
+        options: {
+          name: "basic.test",
+        },
+      },
+    },
+  },
 });

@@ -19,6 +19,11 @@ describe("database", async () => {
     });
   });
 
+  it("auto-setup of db is not on error", async () => {
+    const json = await $fetch("/api/auto-setup-check");
+    expect(json).toStrictEqual({ validation: true });
+  });
+
   it("module config is passed in runtime config", async () => {
     const json = await $fetch("/api/runtime-config");
 

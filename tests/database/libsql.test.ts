@@ -21,11 +21,11 @@ beforeEach(async () => {
   await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
 });
 
-describe("libSql connector", () => {
+describe("sqlite connector", () => {
   describe("users table", () => {
     describe("id field", () => {
       it("should throw an error when users table does not exist in database", async () => {
-        await expect(testFunction).rejects.toThrowError("slip_users table for SLIP does not exist");
+        await expect(testFunction()).rejects.toThrowError("slip_users table for SLIP does not exist");
       });
 
       it("should throw an error when users table does not have an id field", async () => {
@@ -57,30 +57,46 @@ describe("libSql connector", () => {
       });
     });
 
+    describe("password field", () => {
+      it("should throw an error when users table does not have a password field", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE)`;
+        await expect(testFunction()).rejects.toThrowError(
+          "slip_users table must contain a column with name \"password\"",
+        );
+      });
+
+      it("should throw an error when users table does not have an email field with type of text", async () => {
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "password" INTEGER)`;
+        await expect(testFunction()).rejects.toThrowError(
+          "slip_users table must contain a column \"password\" with type \"TEXT\"",
+        );
+      });
+    });
+
     describe("email field", () => {
       it("should throw an error when users table does not have an email field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "password" TEXT)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column with name \"email\"",
         );
       });
 
       it("should throw an error when users table does not have an email field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" INTEGER)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "password" TEXT, "email" INTEGER)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"email\" with type \"TEXT\"",
         );
       });
 
       it("should throw an error when users table does not have an not nullable email field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "password" TEXT, "email" TEXT)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"email\" not nullable",
         );
       });
 
       it("should throw an error when users table does not have a unique email field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "password" TEXT, "email" TEXT NOT NULL)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"email\" unique",
         );
@@ -89,28 +105,28 @@ describe("libSql connector", () => {
 
     describe("created_at field", () => {
       it("should throw an error when users table does not have an created_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column with name \"created_at\"",
         );
       });
 
       it("should throw an error when users table does not have an created_at field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" INTEGER)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" INTEGER)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"created_at\" with type \"TIMESTAMP\"",
         );
       });
 
       it("should throw an error when users table does not have an not nullable created_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"created_at\" not nullable",
         );
       });
 
       it("should throw an error when users table does not have a default value of CURRENT_TIMESTAMP at created_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column with name \"created_at\" with default value of CURRENT_TIMESTAMP",
         );
@@ -119,28 +135,28 @@ describe("libSql connector", () => {
 
     describe("updated_at field", () => {
       it("should throw an error when users table does not have an updated_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column with name \"updated_at\"",
         );
       });
 
       it("should throw an error when users table does not have an updated_at field with type of text", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" INTEGER)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" INTEGER)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"updated_at\" with type \"TIMESTAMP\"",
         );
       });
 
       it("should throw an error when users table does not have an not nullable updated_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column \"updated_at\" not nullable",
         );
       });
 
       it("should throw an error when users table does not have a default value of CURRENT_TIMESTAMP at updated_at field", async () => {
-        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL)`;
+        await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL)`;
         await expect(testFunction()).rejects.toThrowError(
           "slip_users table must contain a column with name \"updated_at\" with default value of CURRENT_TIMESTAMP",
         );
@@ -150,7 +166,7 @@ describe("libSql connector", () => {
 
   describe("sessions table", () => {
     const validUsersTableSetup = () =>
-      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
+      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
 
     beforeEach(async () => {
       await validUsersTableSetup();
@@ -294,7 +310,7 @@ describe("libSql connector", () => {
 
   describe("slip_oauth_accounts table", () => {
     const validUsersTableSetup = () =>
-      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
+      db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
     const validSessionsTableSetup = () =>
       db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
 

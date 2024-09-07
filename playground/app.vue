@@ -11,17 +11,14 @@ const tabs = [{
   icon: "i-heroicons-solid-lock-open",
 }];
 
-function loginToGithub() {
-  navigateTo("/auth/github", {
-    external: true,
-  });
-}
-
 function sendForm() {
   const form = document.querySelector("form");
   const submitButton = document.querySelector("[formaction]") as HTMLElement;
+
   if (form && submitButton) {
-    form.requestSubmit(submitButton);
+    form.action = submitButton.getAttribute("formaction") ?? "";
+    form.method = submitButton.getAttribute("formmethod") ?? "";
+    form.submit();
   }
 }
 </script>
@@ -64,7 +61,7 @@ function sendForm() {
             :title="item.label"
             align="top"
             :fields="[{ type: 'email', name: 'email', label: 'Email', placeholder: 'Enter your email', color: 'gray' }, { type: 'password', name: 'password', label: 'Password', placeholder: 'Enter your password', color: 'gray' }]"
-            :providers="[{ label: 'GitHub', icon: 'i-simple-icons-github', color: 'gray', click: loginToGithub }]"
+            :providers="[{ label: 'GitHub', icon: 'i-simple-icons-github', color: 'gray', to: '/auth/github' }]"
             :submit-button="{ label: 'Submit', type: 'submit', formmethod: 'post', formaction: item.label === 'Register' ? '/auth/register' : '/auth/login' }"
             @submit="sendForm"
           />

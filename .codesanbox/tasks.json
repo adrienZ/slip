@@ -1,0 +1,17 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    "pnpm install && cd playground && pnpm install"
+  ],
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "Start": {
+      "name": "Start",
+      "command": "pnpm dev",
+      "runAtStart": true,
+      "preview": {
+        "port": 3000
+      }
+    }
+  }
+}

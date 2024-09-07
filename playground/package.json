@@ -15,5 +15,6 @@
   "devDependencies": {
     "@iconify-json/simple-icons": "^1.2.1",
     "drizzle-kit": "^0.24.2"
-  }
+  },
+  "packageManager": "pnpm@9.9.0"
 }

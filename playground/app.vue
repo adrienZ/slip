@@ -1,107 +1,89 @@
-<script setup>
+<script setup lang="ts">
 const { loggedIn, user, session, clear } = useUserSession();
 
 const { data: usersInDb } = await useAsyncData("usersInDb", () => $fetch("/api/users"));
+
+const tabs = [{
+  label: "Register",
+  icon: "i-heroicons-solid-user-plus",
+}, {
+  label: "Login",
+  icon: "i-heroicons-solid-lock-open",
+}];
+
+function loginToGithub() {
+  navigateTo("/auth/github", {
+    external: true,
+  });
+}
+
+function sendForm() {
+  const form = document.querySelector("form");
+  const submitButton = document.querySelector("[formaction]") as HTMLElement;
+  if (form && submitButton) {
+    form.requestSubmit(submitButton);
+  }
+}
 </script>
 
 <template>
-  <UAlert title="Heads up!" />
+  <UContainer>
+    <UHeader>
+      <template #logo>
+        <img
+          src="~/assets/logo.webp"
+          class="w-auto h-10"
+        >
+      </template>
 
-  <div v-if="loggedIn">
-    <h1>Welcome {{ user.id }}!</h1>
-    <p>Logged in until {{ new Date(session.expires_at).toDateString() }}</p>
-    <button @click="clear">
-      Logout
-    </button>
-  </div>
-  <div v-else>
-    <h1>Not logged in</h1>
+      <template #right>
+        <UColorModeButton />
 
-    <fieldset>
-      <legend>Register</legend>
-      <form
-        action="/auth/register"
-        method="post"
-      >
-        <label for="email">email</label>
-        <div>
-          <input
-            id="email"
-            type="text"
-            name="email"
-          >
-        </div>
-        <label for="password">password</label>
-        <br>
-        <div>
-          <input
-            id="password"
-            type="password"
-            name="password"
-          >
-        </div>
-        <br>
-        <div>
-          <button>SUBMIT</button>
-        </div>
-      </form>
-    </fieldset>
-    <fieldset>
-      <legend>Login</legend>
-      <form
-        action="/auth/login"
-        method="post"
-      >
-        <label for="email">email</label>
-        <div>
-          <input
-            id="email"
-            type="text"
-            name="email"
-          >
-        </div>
-        <label for="password">password</label>
-        <br>
-        <div>
-          <input
-            id="password"
-            type="password"
-            name="password"
-          >
-        </div>
-        <br>
-        <div>
-          <button>SUBMIT</button>
-        </div>
-      </form>
-    </fieldset>
-    <a href="/auth/github">Login with GitHub</a>
-  </div>
+        <UButton
+          to="https://github.com/adrienZ/slip"
+          target="_blank"
+          icon="i-simple-icons-github"
+          color="gray"
+          variant="ghost"
+        />
+      </template>
+    </UHeader>
 
-  <br>
-  <br>
-  <br>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Email</th>
-        <th>Password</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="row in usersInDb.rows"
-        :key="row.id"
-      >
-        <td>{{ row.id }}</td>
-        <td>{{ row.email }}</td>
-        <td>{{ row.password?.substring(0, 5) }}...</td>
-        <td>{{ row.created_at }}</td>
-        <td>{{ row.updated_at }}</td>
-      </tr>
-    </tbody>
-  </table>
+    <div v-if="loggedIn">
+      <h1>Welcome {{ user.id }}!</h1>
+      <p>Logged in until {{ new Date(session.expires_at).toDateString() }}</p>
+      <button @click="clear">
+        Logout
+      </button>
+    </div>
+    <div v-else>
+      <UTabs :items="tabs">
+        <template #item="{ item }">
+          <UAuthForm
+            class="mx-auto mt-12"
+            :title="item.label"
+            align="top"
+            :fields="[{ type: 'email', name: 'email', label: 'Email', placeholder: 'Enter your email', color: 'gray' }, { type: 'password', name: 'password', label: 'Password', placeholder: 'Enter your password', color: 'gray' }]"
+            :providers="[{ label: 'GitHub', icon: 'i-simple-icons-github', color: 'gray', click: loginToGithub }]"
+            :submit-button="{ label: 'Submit', type: 'submit', formmethod: 'post', formaction: item.label === 'Register' ? '/auth/register' : '/auth/login' }"
+            @submit="sendForm"
+          />
+          <UAlert
+            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
+            color="orange"
+            class="max-w-sm mt-2 mx-auto"
+            variant="subtle"
+            title="Warning !"
+            description="Github or any OAuth provider will not work inside an iframe, Stackblitz or Codesandbox"
+          />
+        </template>
+      </UTabs>
+    </div>
+
+    <UTable
+      v-if="usersInDb"
+      class="mt-12"
+      :rows="usersInDb.rows"
+    />
+  </UContainer>
 </template>

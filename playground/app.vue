@@ -5,6 +5,8 @@ const { data: usersInDb } = await useAsyncData("usersInDb", () => $fetch("/api/u
 </script>
 
 <template>
+  <UAlert title="Heads up!" />
+
   <div v-if="loggedIn">
     <h1>Welcome {{ user.id }}!</h1>
     <p>Logged in until {{ new Date(session.expires_at).toDateString() }}</p>

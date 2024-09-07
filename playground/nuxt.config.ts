@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["../src/module"],
+  modules: ["../src/module", "@nuxt/ui"],
   devtools: { enabled: true },
   compatibilityDate: "2024-07-27",
   slipAuth: {
@@ -20,5 +20,10 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+  tailwindcss: {
+    viewer: false,
+    // cssPath: false,
+    // and more...
   },
 });

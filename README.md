@@ -8,7 +8,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 -->
 
 <p align="center">
-  <img src="logo.webp" width="240">
+  <img src="/playground/assets/logo.webp" width="240">
 </p>
 <br>
 

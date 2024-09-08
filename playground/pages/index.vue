@@ -75,16 +75,62 @@ function loginToGithub() {
         :items="tabs"
       >
         <template #item="{ item }">
-          <UAuthForm
-            class="mx-auto mt-12"
-            :title="item.label"
-            :class="`${item.label.toLowerCase()}`"
-            align="top"
-            :fields="[{ type: 'email', name: 'email', label: 'Email', placeholder: 'Enter your email', color: 'gray' }, { type: 'password', name: 'password', label: 'Password', placeholder: 'Enter your password', color: 'gray' }]"
-            :providers="[{ label: 'GitHub', icon: 'i-simple-icons-github', color: 'gray', click: loginToGithub }]"
-            :submit-button="{ label: 'Submit', type: 'submit', formmethod: 'post', formaction: item.label === 'Register' ? '/auth/register' : '/auth/login' }"
-            @submit="sendForm(item)"
-          />
+          <form
+            method="post"
+            :action="item.label === 'Register' ? '/auth/register' : '/auth/login'"
+            class="w-full max-w-sm space-y-6 mx-auto mt-12 register"
+          >
+            <p class="text-2xl text-gray-900 dark:text-white font-bold">
+              {{ item.label }}
+            </p>
+
+            <div class="space-yy-6">
+              <UFormGroup
+                label="Email"
+              >
+                <UInput
+                  placeholder="Enter your email"
+                  name="email"
+                  type="email"
+                  icon="i-heroicons-envelope"
+                  color="gray"
+                />
+              </UFormGroup>
+            </div>
+            <div class="space-yy-6">
+              <UFormGroup
+                label="Password"
+                class="space-yy-6"
+              >
+                <UInput
+                  placeholder="Enter your password"
+                  name="password"
+                  type="password"
+                  icon="i-heroicons-lock-closed"
+                  color="gray"
+                />
+              </UFormGroup>
+            </div>
+
+            <UButton type="submit" block>
+              Submit
+            </UButton>
+
+            <UDivider
+              label="or"
+              class="my-6"
+            />
+
+            <UButton
+              icon="i-simple-icons-github"
+              color="gray"
+              block
+              @click="loginToGithub"
+            >
+              Github
+            </UButton>
+          </form>
+
           <UAlert
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
             color="orange"

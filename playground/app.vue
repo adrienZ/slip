@@ -2,26 +2,7 @@
 
 <template>
   <UContainer>
-    <UHeader>
-      <template #logo>
-        <img
-          src="/logo.webp"
-          class="w-auto h-10"
-        >
-      </template>
-
-      <template #right>
-        <UColorModeButton />
-
-        <UButton
-          to="https://github.com/adrienZ/slip"
-          target="_blank"
-          icon="i-simple-icons-github"
-          color="gray"
-          variant="ghost"
-        />
-      </template>
-    </UHeader>
+    <TheHeader />
 
     <NuxtLayout>
       <NuxtPage />

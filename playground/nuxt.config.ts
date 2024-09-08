@@ -1,6 +1,5 @@
 export default defineNuxtConfig({
   modules: ["../src/module", "@nuxt/ui"],
-  extends: ["@nuxt/ui-pro"],
   devtools: { enabled: true },
   compatibilityDate: "2024-07-27",
   slipAuth: {

@@ -27,4 +27,14 @@ export default defineNuxtConfig({
     // cssPath: false,
     // and more...
   },
+  runtimeConfig: {
+    // added to be overriden in .env files for codesandbox
+    session: {
+      cookie: {
+        sameSite: "",
+        secure: true,
+        path: "",
+      },
+    },
+  },
 });

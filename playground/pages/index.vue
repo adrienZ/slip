@@ -11,14 +11,33 @@ const tabs = [{
   icon: "i-heroicons-solid-lock-open",
 }];
 
-function sendForm() {
-  const form = document.querySelector("form");
-  const submitButton = document.querySelector("[formaction]") as HTMLElement;
+const route = useRoute();
+const router = useRouter();
+
+const selected = computed({
+  get() {
+    const index = tabs.findIndex(item => item.label === route.query.tab);
+    if (index === -1) {
+      return 0;
+    }
+
+    return index;
+  },
+  set(value) {
+    // Hash is specified here to prevent the page from scrolling to the top
+    router.replace({ query: { tab: tabs[value].label }, hash: "#control-the-selected-index" });
+  },
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sendForm(item: any) {
+  const form = document.querySelector(`.${item.label.toLowerCase()} form`) as HTMLFormElement;
+  const submitButton = document.querySelector(`.${item.label.toLowerCase()} [formaction]`) as HTMLElement;
 
   if (form && submitButton) {
     form.action = submitButton.getAttribute("formaction") ?? "";
     form.method = submitButton.getAttribute("formmethod") ?? "";
-    form.requestSubmit(submitButton);
+    form.submit();
   }
 }
 
@@ -51,16 +70,20 @@ function loginToGithub() {
     </UButton>
   </div>
   <div v-else>
-    <UTabs :items="tabs">
+    <UTabs
+      v-model="selected"
+      :items="tabs"
+    >
       <template #item="{ item }">
         <UAuthForm
           class="mx-auto mt-12"
           :title="item.label"
+          :class="`${item.label.toLowerCase()}`"
           align="top"
           :fields="[{ type: 'email', name: 'email', label: 'Email', placeholder: 'Enter your email', color: 'gray' }, { type: 'password', name: 'password', label: 'Password', placeholder: 'Enter your password', color: 'gray' }]"
           :providers="[{ label: 'GitHub', icon: 'i-simple-icons-github', color: 'gray', click: loginToGithub }]"
           :submit-button="{ label: 'Submit', type: 'submit', formmethod: 'post', formaction: item.label === 'Register' ? '/auth/register' : '/auth/login' }"
-          @submit="sendForm"
+          @submit="sendForm(item)"
         />
         <UAlert
           :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"

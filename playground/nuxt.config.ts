@@ -28,12 +28,15 @@ export default defineNuxtConfig({
     // and more...
   },
   runtimeConfig: {
-    // added to be overriden in .env files for codesandbox
+    // added for codesandbox
     session: {
       cookie: {
-        sameSite: "",
+        // Required when SameSite=None is set
         secure: true,
-        path: "",
+        // This allows the cookie to be used in iframes
+        sameSite: "None",
+        // Ensures cookie is accessible across the whole domain
+        path: "/",
       },
     },
   },

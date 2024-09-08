@@ -3,7 +3,7 @@
   "name": "my-module-playground",
   "type": "module",
   "scripts": {
-    "dev": "nuxi dev --dotenv .env.codesandbox",
+    "dev": "nuxi dev",
     "build": "nuxi build",
     "generate": "nuxi generate"
   },

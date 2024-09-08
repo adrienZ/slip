@@ -12,7 +12,6 @@ interface ISessionCreateMetada {
   ua?: string
 }
 
-
 export interface ICreateOrLoginParams extends ISessionCreateMetada {
   providerId: string
   providerUserId: string

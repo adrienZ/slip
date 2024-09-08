@@ -3,7 +3,7 @@
     <UHeader>
       <template #logo>
         <img
-          src="~/assets/logo.webp"
+          src="/logo.webp"
           class="w-auto h-10"
         >
       </template>

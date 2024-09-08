@@ -21,8 +21,8 @@ Find and replace all on all files (CMD+SHIFT+F):
 # nuxt-slip-auth 🩲
 > Plug and play authentication module for Nuxt
 
-[Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
+- [✨ Release Notes](/CHANGELOG.md)
+- [🏀 Online playground](https://codesandbox.io/p/github/adrienZ/slip/?file=%2Fplayground%2Fserver%2Froutes%2Fauth%2Fregister.post.ts)
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 

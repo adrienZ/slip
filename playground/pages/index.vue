@@ -29,17 +29,6 @@ const selected = computed({
   },
 });
 
-function sendForm(item) {
-  const form = document.querySelector(`.${item.label.toLowerCase()} form`);
-  const submitButton = document.querySelector(`.${item.label.toLowerCase()} [formaction]`);
-
-  if (form && submitButton) {
-    form.action = submitButton.getAttribute("formaction") ?? "";
-    form.method = submitButton.getAttribute("formmethod") ?? "";
-    form.submit();
-  }
-}
-
 function loginToGithub() {
   return navigateTo("/auth/github", {
     external: true,
@@ -112,7 +101,10 @@ function loginToGithub() {
               </UFormGroup>
             </div>
 
-            <UButton type="submit" block>
+            <UButton
+              type="submit"
+              block
+            >
               Submit
             </UButton>
 

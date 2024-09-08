@@ -7,20 +7,36 @@ export type { supportedConnectors } from "../database";
 
 export type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
 
-export interface ICreateOrLoginParams {
-  providerId: string
-  providerUserId: string
-  // because our slip is based on unique emails
-  email: string
+interface ISessionCreateMetada {
   ip?: string
   ua?: string
 }
 
-export interface ICreateSessionsParams {
+export interface ICreateOrLoginParams extends ISessionCreateMetada {
+  providerId: string
+  providerUserId: string
+  // because our slip is based on unique emails
+  email: string
+
+}
+
+export interface ICreateSessionsParams extends ISessionCreateMetada {
   userId: string
   expiresAt: number
   ip?: string
   ua?: string
+}
+
+export interface ICreateUserParams extends ISessionCreateMetada {
+  // because our slip is based on unique emails
+  email?: unknown
+  password?: unknown
+}
+
+export interface ILoginUserParams extends ISessionCreateMetada {
+  // because our slip is based on unique emails
+  email?: unknown
+  password?: unknown
 }
 
 type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];

@@ -6,7 +6,7 @@ import { SlipAuthCore } from "../src/runtime/core/core";
 const date = new Date(Date.UTC(1998, 11, 19));
 
 const db = createDatabase(sqlite({
-  name: "core.test",
+  name: "core-email-password.test",
 }));
 
 beforeEach(async () => {
@@ -21,8 +21,7 @@ beforeEach(async () => {
 
 const defaultInsert = {
   email: "email@test.com",
-  providerId: "github",
-  providerUserId: "github:user:id",
+  password: "password",
 };
 
 const mocks = vi.hoisted(() => {
@@ -70,30 +69,6 @@ describe("SlipAuthCore", () => {
     });
   });
 
-  describe("users", () => {
-    beforeAll(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(date);
-    });
-
-    it("should insert when database has no users", async () => {
-      const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
-      expect(inserted).toMatchObject(mockedCreateSession);
-      expect(
-        db.prepare("SELECT * from slip_users").all(),
-      ).resolves.toHaveLength(1);
-    });
-
-    it("should insert when database has no users", async () => {
-      const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
-      expect(inserted).toMatchObject(mockedCreateSession);
-
-      expect(
-        db.prepare("SELECT * from slip_users").all(),
-      ).resolves.toHaveLength(1);
-    });
-  });
-
   describe("register", () => {
     beforeAll(() => {
       vi.useFakeTimers();
@@ -101,24 +76,23 @@ describe("SlipAuthCore", () => {
     });
 
     it("should throw an error when registering a user with an email in the database and a different provider", async () => {
-      const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
-      const inserted2 = auth.OAuthLoginUser({
+      const [_, inserted] = await auth.register(defaultInsert);
+      const inserted2 = auth.register({
         email: defaultInsert.email,
-        providerId: "discord",
-        providerUserId: "jioazdjuadiadaogfoz",
+        password: "password",
       });
+
       expect(inserted).toMatchObject(mockedCreateSession);
       expect(inserted2).rejects.toThrowError(
-        "user already have an account with another provider",
+        "InvalidEmailOrPasswordError",
       );
     });
 
     it("should insert twice when database users have different emails", async () => {
-      const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
-      const [__, inserted2] = await auth.OAuthLoginUser({
+      const [_, inserted] = await auth.register(defaultInsert);
+      const [__, inserted2] = await auth.register({
         email: "email2@test.com",
-        providerUserId: "azdjazoodncazd",
-        providerId: defaultInsert.providerId,
+        password: "password",
       });
       expect(inserted).toMatchObject(mockedCreateSession);
       expect(inserted2).toMatchObject({
@@ -129,46 +103,6 @@ describe("SlipAuthCore", () => {
       expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);
-    });
-  });
-
-  describe("sessions", () => {
-    beforeAll(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(date);
-    });
-
-    it("should delete an existant session", async () => {
-      const [_, session] = await auth.OAuthLoginUser(defaultInsert);
-
-      await auth.deleteSession(session.id);
-
-      const notASession = await auth.getSession(session.id);
-
-      expect(notASession).toBe(undefined);
-    });
-
-    it("should throw when trying to delete an non existant session", async () => {
-      await auth.OAuthLoginUser(defaultInsert);
-
-      const deletion = auth.deleteSession("notInDB");
-      expect(deletion).rejects.toThrowError(
-        "Unable to delete session with id notInDB",
-      );
-    });
-
-    it("should delete expired sessions", async () => {
-      await auth.OAuthLoginUser(defaultInsert);
-
-      vi.useRealTimers();
-      await auth.OAuthLoginUser({
-        ...defaultInsert,
-        email: "another-unique-email@test.com",
-        providerUserId: `another-${defaultInsert.providerUserId}`,
-      });
-
-      const deletions = await auth.deleteExpiredSessions(Date.now());
-      expect(deletions).toStrictEqual({ success: true, count: 1 });
     });
   });
 
@@ -192,24 +126,11 @@ describe("SlipAuthCore", () => {
         });
       });
 
-      const oAuthAccountCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(() => reject("TIMEOUT"), 1000);
-        auth.hooks.hookOnce("oAuthAccount:create", (account) => {
-          resolve(account);
-        });
-      });
-
-      const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
+      const [_, inserted] = await auth.register(defaultInsert);
 
       expect(userCreatedHookPromise).resolves.toMatchObject({
         email: defaultInsert.email,
         id: "user-id-1",
-      });
-
-      expect(oAuthAccountCreatedHookPromise).resolves.toMatchObject({
-        provider_id: defaultInsert.providerId,
-        provider_user_id: defaultInsert.providerUserId,
-        user_id: "user-id-1",
       });
 
       expect(sessionCreatedHookPromise).resolves.toBe(inserted);
@@ -217,7 +138,7 @@ describe("SlipAuthCore", () => {
 
     it("should only hook \"sessions:create\" when login an existing user", async () => {
       // register
-      const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
+      const [_, registerSession] = await auth.register(defaultInsert);
       // logout
       auth.deleteSession(registerSession.id);
 
@@ -235,19 +156,10 @@ describe("SlipAuthCore", () => {
         });
       });
 
-      const oAuthAccountCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(() => reject("TIMEOUT"), 1000);
-        auth.hooks.hookOnce("oAuthAccount:create", (account) => {
-          resolve(account);
-        });
-      });
-
       // login
-      const [__, loginSession] = await auth.OAuthLoginUser(defaultInsert);
+      const [__, loginSession] = await auth.login(defaultInsert);
 
       expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
-      expect(oAuthAccountCreatedHookPromise).rejects.toBe("TIMEOUT");
-
       expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
     });
 
@@ -260,7 +172,7 @@ describe("SlipAuthCore", () => {
       });
 
       // register
-      const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
+      const [_, registerSession] = await auth.register(defaultInsert);
       // logout
       auth.deleteSession(registerSession.id);
 

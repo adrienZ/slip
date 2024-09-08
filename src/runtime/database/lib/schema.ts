@@ -9,6 +9,7 @@ const datesColumns = {
 
 export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.users, {
   id: text("id").primaryKey().notNull(),
+  password: text("password"),
   email: text("email").notNull().unique(),
   ...datesColumns,
 });

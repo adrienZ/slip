@@ -5,7 +5,7 @@ export default oauthGitHubEventHandler({
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
 
-    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
+    const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,
@@ -25,6 +25,6 @@ export default oauthGitHubEventHandler({
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {
     console.error("GitHub OAuth error:", error);
-    return sendRedirect(event, "/");
+    return sendRedirect(event, "/?authError=" + error);
   },
 });

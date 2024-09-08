@@ -2,12 +2,13 @@ import { eq } from "drizzle-orm";
 import { TableRepository } from "./_repo";
 
 export class UsersRepository extends TableRepository<"users"> {
-  async insert(userId: string, email: string): Promise<typeof this.table.$inferSelect> {
+  async insert(userId: string, email: string, password?: string): Promise<typeof this.table.$inferSelect> {
     await this._orm
       .insert(this.table)
       .values({
         id: userId,
-        email: email,
+        email,
+        password,
       }).run();
 
     const user = await this.findById(userId);

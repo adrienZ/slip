@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["../src/module"],
+  modules: ["../src/module", "@nuxt/ui"],
   devtools: { enabled: true },
   compatibilityDate: "2024-07-27",
   slipAuth: {
@@ -18,6 +18,24 @@ export default defineNuxtConfig({
         options: {
           url: "file:./.data/libsql.playground.db",
         },
+      },
+    },
+  },
+  tailwindcss: {
+    viewer: false,
+    // cssPath: false,
+    // and more...
+  },
+  runtimeConfig: {
+    // added for codesandbox
+    session: {
+      cookie: {
+        // Required when SameSite=None is set
+        secure: true,
+        // This allows the cookie to be used in iframes
+        sameSite: "None",
+        // Ensures cookie is accessible across the whole domain
+        path: "/",
       },
     },
   },

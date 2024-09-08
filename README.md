@@ -8,7 +8,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 -->
 
 <p align="center">
-  <img src="logo.webp" width="240">
+  <img src="/playground/public/logo.webp" width="240">
 </p>
 <br>
 
@@ -21,8 +21,8 @@ Find and replace all on all files (CMD+SHIFT+F):
 # nuxt-slip-auth 🩲
 > Plug and play authentication module for Nuxt
 
-[Release Notes](/CHANGELOG.md)
-<!-- - [🏀 Online playground](https://stackblitz.com/github/adrienZ/slip?file=playground%2Fapp.vue) -->
+- [✨ Release Notes](/CHANGELOG.md)
+- [🏀 Online playground](https://codesandbox.io/p/github/adrienZ/slip/?file=%2Fplayground%2Fserver%2Froutes%2Fauth%2Fregister.post.ts)
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 
@@ -79,7 +79,7 @@ export default oauthGitHubEventHandler({
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
 
-    const [userId, sessionFromDb] = await auth.registerUserIfMissingInDb({
+    const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
       providerId: "github",
       providerUserId: user.id,
@@ -142,7 +142,7 @@ const { loggedIn, user, session, clear } = useUserSession();
 
 Checks if the required database and tables are set up. Ensures that the environment is ready for authentication.
 
-##### `registerUserIfMissingInDb(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
+##### `OAuthLoginUser(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
 
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
 - **Returns**: A tuple containing the user ID and the created session details.

@@ -1,3 +1,5 @@
+<script setup></script>
+
 <template>
   <UContainer>
     <UHeader>
@@ -22,7 +24,7 @@
     </UHeader>
 
     <NuxtLayout>
-      <NuxtPage/>
+      <NuxtPage />
     </NuxtLayout>
   </UContainer>
 </template>

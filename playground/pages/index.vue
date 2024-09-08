@@ -18,14 +18,7 @@ function sendForm() {
   if (form && submitButton) {
     form.action = submitButton.getAttribute("formaction") ?? "";
     form.method = submitButton.getAttribute("formmethod") ?? "";
-
-    const validity = form.reportValidity();
-    if (validity) {
-      form.submit();
-      // return navigateTo(form.action, {
-      //   external: false,
-      // });
-    }
+    form.requestSubmit(submitButton);
   }
 }
 
@@ -37,9 +30,16 @@ function loginToGithub() {
 </script>
 
 <template>
-  <div v-if="loggedIn" class="mt-12 prose">
-    <h1 class="text-gray-900 dark:text-white mb-0">Welcome {{ user.id }}!</h1>
-    <p class="text-gray-900 dark:text-white">Logged in until {{ new Date(session.expires_at).toDateString() }}</p>
+  <div
+    v-if="loggedIn"
+    class="mt-12 prose"
+  >
+    <h1 class="text-gray-900 dark:text-white mb-0">
+      Welcome {{ user.id }}!
+    </h1>
+    <p class="text-gray-900 dark:text-white">
+      Logged in until {{ new Date(session.expires_at).toDateString() }}
+    </p>
 
     <UDivider class="my-4" />
 

@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.34
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.33...v0.1.34)
+
+### 🚀 Enhancements
+
+- **core:** Add basic email + password ([#28](https://github.com/adrienZ/slip/pull/28))
+
+### 🩹 Fixes
+
+- **playground:** Typo of folder name ([45c3ac6](https://github.com/adrienZ/slip/commit/45c3ac6))
+
+### 🏡 Chore
+
+- **release:** V0.1.33 ([88e6d2f](https://github.com/adrienZ/slip/commit/88e6d2f))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.33
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.32...v0.1.33)

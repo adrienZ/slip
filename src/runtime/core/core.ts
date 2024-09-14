@@ -1,5 +1,5 @@
 import { generateRandomString, alphabet } from "oslo/crypto";
-import { createChecker, supportedConnectors } from "drizzle-schema-checker";
+import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
 import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, tableNames } from "./types";

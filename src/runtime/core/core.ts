@@ -66,7 +66,7 @@ export class SlipAuthCore {
       checker.checkTableWithSchema(this.#tableNames.users, this.schemas.users),
       checker.checkTableWithSchema(this.#tableNames.sessions, this.schemas.sessions),
       checker.checkTableWithSchema(this.#tableNames.oauthAccounts, this.schemas.oauthAccounts),
-    ]);
+    ]).then(results => results.every(Boolean));
   }
 
   public async login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {

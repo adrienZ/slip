@@ -1,11 +1,9 @@
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
-import type { checkDbAndTables, tableNames } from "../database";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
+import type { tableNames } from "../database/lib/tables";
 
 export type { tableNames };
-export type { supportedConnectors } from "../database";
-
-export type checkDbAndTablesParameters = Parameters<typeof checkDbAndTables>;
+export type { supportedConnectors } from "../database/lib/tables";
 
 interface ISessionCreateMetada {
   ip?: string

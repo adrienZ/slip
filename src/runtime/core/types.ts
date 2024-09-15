@@ -3,7 +3,6 @@ import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchem
 import type { tableNames } from "../database/lib/tables";
 
 export type { tableNames };
-export type { supportedConnectors } from "../database/lib/tables";
 
 interface ISessionCreateMetada {
   ip?: string

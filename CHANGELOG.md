@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.1.35
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.34...v0.1.35)
+
+### 💅 Refactors
+
+- **tests:** Database schema tests are now contained under the drizzle-schema-checker package ([#29](https://github.com/adrienZ/slip/pull/29))
+
+### 🏡 Chore
+
+- **git:** Add pkg-pr-new ([ac4aed2](https://github.com/adrienZ/slip/commit/ac4aed2))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.34
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.33...v0.1.34)

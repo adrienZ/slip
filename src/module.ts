@@ -2,7 +2,7 @@ import { defineNuxtModule, createResolver, installModule, addServerScanDir, upda
 import type { SessionConfig, SlipModuleOptions } from "./runtime/types";
 
 // Module options TypeScript interface definition
-export interface ModuleOptions extends SlipModuleOptions {}
+export type ModuleOptions = SlipModuleOptions;
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

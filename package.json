@@ -62,6 +62,7 @@
     "hookable": "^5.5.3",
     "nuxt": "^3.13.1",
     "nuxt-auth-utils": "^0.3.7",
+    "pkg-pr-new": "^0.0.24",
     "typescript": "latest",
     "vitest": "^2.0.5",
     "vue-tsc": "^2.1.6"

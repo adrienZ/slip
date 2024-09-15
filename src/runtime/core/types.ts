@@ -37,15 +37,13 @@ export interface ILoginUserParams extends ISessionCreateMetada {
 }
 
 type SessionsTableSelect = ReturnType<typeof getSessionsTableSchema>["$inferSelect"];
-export interface SlipAuthSession extends SessionsTableSelect {
-
-}
+export type SlipAuthSession = SessionsTableSelect;
 
 type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
-export interface SlipAuthUser extends UsersTableSelect {}
+export type SlipAuthUser = UsersTableSelect;
 
 export type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
-export interface SlipAuthOAuthAccount extends OAuthAccountsTableSelect {}
+export type SlipAuthOAuthAccount = OAuthAccountsTableSelect;
 
 export interface ISlipAuthCoreOptions {
   /**
@@ -61,6 +59,7 @@ const fakeTableNames: tableNames = {
   oauthAccounts: "fakeOauthAccounts",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const schemasMockValue = {
   users: getUsersTableSchema(fakeTableNames),
   sessions: getSessionsTableSchema(fakeTableNames),

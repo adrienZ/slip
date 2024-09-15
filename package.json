@@ -30,7 +30,7 @@
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
-		"test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
+    "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && pnpm i && pnpm exec nuxt prepare && vue-tsc --noEmit"
   },
@@ -45,13 +45,11 @@
     "oslo": "^1.2.1"
   },
   "devDependencies": {
-    "@libsql/client": "^0.10.0",
     "@nuxt/devtools": "^1.4.1",
     "@nuxt/eslint-config": "^0.3.13",
     "@nuxt/module-builder": "^0.8.3",
     "@nuxt/schema": "^3.13.1",
     "@nuxt/test-utils": "^3.14.1",
-    "@types/bun": "latest",
     "@types/node": "^20.16.5",
     "@vitest/coverage-v8": "^2.0.5",
     "better-sqlite3": "^11.2.1",

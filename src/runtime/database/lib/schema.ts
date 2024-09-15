@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 
 const datesColumns = {
   created_at: integer("created_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
-  update_at: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`CURRENT_TIMESTAMP`),
 };
 
 export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.users, {

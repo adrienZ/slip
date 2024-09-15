@@ -1,5 +1,5 @@
 import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
-import type { tableNames } from "..";
+import type { tableNames } from "../lib/tables";
 import { sql } from "drizzle-orm";
 
 const datesColumns = {

@@ -30,9 +30,8 @@
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
-    "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit && pnpm test:bun",
+    "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit",
     "test:watch": "vitest watch",
-    "test:bun": "bun test ./src/runtime/database/tests/bun-sqlite.test.bun",
     "test:types": "vue-tsc --noEmit && cd playground && pnpm i && pnpm exec nuxt prepare && vue-tsc --noEmit"
   },
   "dependencies": {
@@ -41,9 +40,9 @@
     "consola": "^3.2.3",
     "db0": "^0.1.4",
     "drizzle-orm": "^0.33.0",
+    "drizzle-schema-checker": "^1.0.3",
     "node-ipinfo": "^3.5.3",
-    "oslo": "^1.2.1",
-    "zod": "^3.23.8"
+    "oslo": "^1.2.1"
   },
   "devDependencies": {
     "@libsql/client": "^0.10.0",

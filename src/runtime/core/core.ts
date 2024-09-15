@@ -1,8 +1,8 @@
 import { generateRandomString, alphabet } from "oslo/crypto";
-import { checkDbAndTables, type tableNames } from "../database";
+import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { checkDbAndTablesParameters, ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue } from "./types";
+import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
@@ -11,11 +11,12 @@ import type { SlipAuthPublicSession } from "../types";
 import { isValidEmail } from "./validators";
 import { hashPassword, verifyPassword } from "./password";
 import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
+import type { Database } from "db0";
 
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
 export class SlipAuthCore {
-  readonly #db: checkDbAndTablesParameters[0];
+  readonly #db: Database;
   readonly #orm: ReturnType<typeof drizzleIntegration>;
   readonly #tableNames: tableNames;
   readonly #sessionMaxAge: number;
@@ -32,7 +33,7 @@ export class SlipAuthCore {
   readonly hooks = createSlipHooks();
 
   constructor(
-    providedDatabase: checkDbAndTablesParameters[0],
+    providedDatabase: Database,
     tableNames: tableNames,
     options: ISlipAuthCoreOptions,
   ) {
@@ -58,8 +59,14 @@ export class SlipAuthCore {
     this.#createRandomUserId = defaultIdGenerationMethod;
   }
 
-  public checkDbAndTables(dialect: checkDbAndTablesParameters[1]) {
-    return checkDbAndTables(this.#db, dialect, this.#tableNames);
+  public checkDbAndTables(dialect: supportedConnectors) {
+    const checker = createChecker(this.#db, dialect);
+
+    return Promise.all([
+      checker.checkTableWithSchema(this.#tableNames.users, this.schemas.users),
+      checker.checkTableWithSchema(this.#tableNames.sessions, this.schemas.sessions),
+      checker.checkTableWithSchema(this.#tableNames.oauthAccounts, this.schemas.oauthAccounts),
+    ]).then(results => results.every(Boolean));
   }
 
   public async login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {

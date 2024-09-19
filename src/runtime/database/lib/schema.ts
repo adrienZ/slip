@@ -11,7 +11,7 @@ export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(table
   id: text("id").primaryKey().notNull(),
   password: text("password"),
   email: text("email").notNull().unique(),
-  email_verified: integer("email_verified", { mode: "boolean" }).default(false),
+  email_verified: integer("email_verified", { mode: "boolean" }).default(sql`0`),
   ...datesColumns,
 });
 

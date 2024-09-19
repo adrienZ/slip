@@ -1,5 +1,6 @@
 import { createHooks, type Hookable, type HookKeys } from "hookable";
 import type { SlipAuthSession, SlipAuthUser, SlipAuthOAuthAccount } from "./types";
+import type { H3Event } from "h3";
 
 interface ISlipAuthHooksMap {
   // users
@@ -9,6 +10,8 @@ interface ISlipAuthHooksMap {
   // sessions
   "sessions:create": (session: SlipAuthSession) => void
   "sessions:delete": (session: SlipAuthSession) => void
+  // login
+  "login:password-failed": (email: string, event?: H3Event) => void
 }
 
 export type ISlipAuthHooks = Hookable<ISlipAuthHooksMap, HookKeys<ISlipAuthHooksMap>>;

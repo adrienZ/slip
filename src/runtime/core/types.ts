@@ -45,7 +45,7 @@ export type SlipAuthUser = UsersTableSelect;
 export type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
 export type SlipAuthOAuthAccount = OAuthAccountsTableSelect;
 
-export interface ISlipAuthCoreOptions {
+export interface ISlipAuthCoreConfig {
   /**
    * {@link https://github.com/unjs/h3/blob/c04c458810e34eb15c1647e1369e7d7ef19f567d/src/utils/session.ts#L24}
    */

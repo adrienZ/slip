@@ -39,10 +39,13 @@
     "@nuxt/kit": "^3.13.1",
     "consola": "^3.2.3",
     "db0": "^0.1.4",
+    "defu": "^6.1.4",
     "drizzle-orm": "^0.33.0",
     "drizzle-schema-checker": "^1.1.0",
+    "h3": "^1.12.0",
     "node-ipinfo": "^3.5.3",
-    "oslo": "^1.2.1"
+    "oslo": "^1.2.1",
+    "unstorage": "^1.12.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.4.2",

@@ -1,6 +1,6 @@
 import { SlipAuthErrorsCode } from "./SlipAuthErrorsCode";
 
-class SlipAuthError extends Error {
+export class SlipAuthError extends Error {
   slipError!: SlipAuthErrorsCode;
 };
 
@@ -22,3 +22,18 @@ export class InvalidEmailOrPasswordError extends SlipAuthError {
     this.#debugReason = reason;
   }
 }
+
+export class LoginRateLimitError extends SlipAuthError {
+  override slipError = SlipAuthErrorsCode.LogginRateLimit;
+  override name = "LoginRateLimitError";
+  override message = "LoginRateLimitError";
+  unlockedAt?: Date;
+
+  constructor(unlockedAt?: Date) {
+    super("LogginRateLimitError", {});
+
+    if (unlockedAt) {
+      this.unlockedAt = unlockedAt;
+    }
+  }
+};

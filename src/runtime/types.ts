@@ -1,10 +1,10 @@
 import type { supportedConnectors } from "drizzle-schema-checker";
-import type { SlipAuthSession, SlipAuthUser, tableNames, ISlipAuthCoreOptions } from "./core/types";
+import type { SlipAuthSession, SlipAuthUser, tableNames, ISlipAuthCoreConfig } from "./core/types";
 import type { useSession } from "h3";
 
 export type SessionConfig = Parameters<typeof useSession>[1];
 
-export interface SlipModuleOptions extends ISlipAuthCoreOptions {
+export interface SlipModuleOptions extends ISlipAuthCoreConfig {
   /**
    * db0 related options
    */

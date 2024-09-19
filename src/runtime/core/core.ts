@@ -2,7 +2,7 @@ import { generateRandomString, alphabet } from "oslo/crypto";
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, tableNames } from "./types";
+import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreConfig, SchemasMockValue, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
@@ -12,6 +12,7 @@ import { isValidEmail } from "./validators";
 import { hashPassword, verifyPassword } from "./password";
 import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
+import type { H3Event } from "h3";
 
 const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
@@ -35,13 +36,13 @@ export class SlipAuthCore {
   constructor(
     providedDatabase: Database,
     tableNames: tableNames,
-    options: ISlipAuthCoreOptions,
+    config: ISlipAuthCoreConfig,
   ) {
     this.#db = providedDatabase;
     this.#orm = drizzleIntegration(this.#db);
     this.#tableNames = tableNames;
     // in seconds
-    this.#sessionMaxAge = options.sessionMaxAge * 1000;
+    this.#sessionMaxAge = config.sessionMaxAge * 1000;
 
     this.schemas = {
       users: getUsersTableSchema(tableNames),
@@ -69,7 +70,7 @@ export class SlipAuthCore {
     ]).then(results => results.every(Boolean));
   }
 
-  public async login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {
+  public async login(values: ILoginUserParams, event?: H3Event): Promise<[ string, SlipAuthPublicSession]> {
     const email = values.email;
     if (!email || typeof email !== "string" || !isValidEmail(email)) {
       throw new InvalidEmailOrPasswordError("invalid email");
@@ -92,15 +93,18 @@ export class SlipAuthCore {
       // Since protecting against this is non-trivial,
       // it is crucial your implementation is protected against brute-force attacks with login throttling etc.
       // If emails/usernames are public, you may outright tell the user that the username is invalid.
+      await this.hooks.callHookParallel("login:password-failed", email, event);
       throw new InvalidEmailOrPasswordError("login no user with this email");
     }
 
     if (!existingUser.password) {
+      await this.hooks.callHookParallel("login:password-failed", email, event);
       throw new InvalidEmailOrPasswordError("no password oauth user");
     }
 
     const validPassword = await verifyPassword(existingUser.password, password);
     if (!validPassword) {
+      await this.hooks.callHookParallel("login:password-failed", email, event);
       throw new InvalidEmailOrPasswordError("login invalid password");
     }
     const sessionToLoginId = this.#createRandomSessionId();
@@ -217,6 +221,10 @@ export class SlipAuthCore {
 
   public setCreateRandomSessionId(fn: () => string) {
     this.#createRandomSessionId = fn;
+  }
+
+  public getUser(userId: string) {
+    return this.#repos.users.findById(userId);
   }
 
   public getSession(sessionId: string) {

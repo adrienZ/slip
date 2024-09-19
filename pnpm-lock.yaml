@@ -20,18 +20,27 @@ importers:
       db0:
         specifier: ^0.1.4
         version: 0.1.4(@libsql/client@0.11.0)(better-sqlite3@11.3.0)(drizzle-orm@0.33.0(@libsql/client@0.11.0)(better-sqlite3@11.3.0)(bun-types@1.1.26))
+      defu:
+        specifier: ^6.1.4
+        version: 6.1.4
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@libsql/client@0.11.0)(better-sqlite3@11.3.0)(bun-types@1.1.26)
       drizzle-schema-checker:
         specifier: ^1.1.0
         version: 1.1.0(bun-types@1.1.26)(magicast@0.3.5)
+      h3:
+        specifier: ^1.12.0
+        version: 1.12.0
       node-ipinfo:
         specifier: ^3.5.3
         version: 3.5.3
       oslo:
         specifier: ^1.2.1
         version: 1.2.1
+      unstorage:
+        specifier: ^1.12.0
+        version: 1.12.0(ioredis@5.4.1)
     devDependencies:
       '@nuxt/devtools':
         specifier: ^1.4.2

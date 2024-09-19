@@ -9,6 +9,7 @@ import { IPinfoWrapper, ApiLimitError } from "node-ipinfo";
 import net from "node:net";
 import fsDriver from "unstorage/drivers/fs";
 import { createStorage } from "unstorage";
+import { slipAuthExtendWithRateLimit } from "../../core/plugins/rate-limit";
 
 let instance: SlipAuthCore;
 
@@ -20,6 +21,8 @@ export function useSlipAuth() {
     instance = new SlipAuthCore(useDatabase(), slipAuthConfig.tableNames, {
       sessionMaxAge: slipAuthConfig.sessionMaxAge,
     });
+
+    slipAuthExtendWithRateLimit(instance);
 
     if (config.slipAuthIpInfoToken && typeof config.slipAuthIpInfoToken === "string" && config.slipAuthIpInfoToken.length > 0) {
       setupIpInfoAddOn(instance, config.slipAuthIpInfoToken);

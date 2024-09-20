@@ -266,5 +266,21 @@ describe("SlipAuthCore", () => {
 
       expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
+
+    it("should hoook \"login:password-failed\" on wrong login credentials", async () => {
+      const loginPasswordFailedHookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject("TIMEOUT"), 2000);
+        auth.hooks.hookOnce("login:password-failed", (user) => {
+          resolve(user);
+        });
+      });
+
+      const invalidLoginAttemptWithoutTimeout = auth.login({
+        email: defaultInsert.email,
+        password: defaultInsert.email,
+      });
+      await expect(invalidLoginAttemptWithoutTimeout).rejects.toThrowError("InvalidEmailOrPasswordError");
+      expect(loginPasswordFailedHookPromise).resolves.toBe(defaultInsert.email);
+    });
   });
 });

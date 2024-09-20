@@ -32,21 +32,14 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-const mockedCreateSession = {
-  expires_at: 914630400000,
-  id: "session-id-1",
-  user_id: "user-id-1",
-  ip: null,
-  ua: null,
-};
-
-// function wait(ms: number) {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// }
-
 let auth: SlipAuthCore;
 
 describe("SlipAuthCore", () => {
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(date);
+  });
+
   beforeEach(() => {
     mocks.userCreatedCount = 0;
     mocks.sessionCreatedCount = 0;
@@ -77,23 +70,24 @@ describe("SlipAuthCore", () => {
   });
 
   describe("login with not existing user", () => {
-    it.only("should prevent brute force", async () => {
-      const pageLoadedDateTime = new Date();
+    it("should prevent brute force", async () => {
       const validTry = auth.login(defaultInsert);
       await expect(validTry).rejects.toThrowError("InvalidEmailOrPasswordError");
+      const timeoutDuration = 1000;
 
+      const pageLoadedDateTime = new Date();
       const loginWithFirstRateLimit = auth.login(defaultInsert);
 
       expect(loginWithFirstRateLimit).rejects.toMatchObject({
         name: "LoginRateLimitError",
         // 1000 is the default timeout duration
-        unlockedAt: new Date(pageLoadedDateTime.getTime() + 1000),
+        unlockedAt: new Date(pageLoadedDateTime.getTime() + timeoutDuration),
       });
     });
 
     it("should expand brute force protection timeout on each request", async () => {
-      const validTry = auth.login(defaultInsert);
-      await expect(validTry).rejects.toThrowError("InvalidEmailOrPasswordError");
+      const attemptWithoutTimeout = auth.login(defaultInsert);
+      await expect(attemptWithoutTimeout).rejects.toThrowError("InvalidEmailOrPasswordError");
       const timeoutDuration = 1000;
       const pageLoadedDateTime = new Date();
 
@@ -105,12 +99,38 @@ describe("SlipAuthCore", () => {
         unlockedAt: new Date(pageLoadedDateTime.getTime() + timeoutDuration),
       });
 
+      vi.advanceTimersByTime(timeoutDuration);
+
+      const attemptWithoutTimeou2 = auth.login(defaultInsert);
+      await expect(attemptWithoutTimeou2).rejects.toThrowError("InvalidEmailOrPasswordError");
+
       const loginWithSecondRateLimit = auth.login(defaultInsert);
       expect(loginWithSecondRateLimit).rejects.toMatchObject({
         name: "LoginRateLimitError",
         // 1000 is the default timeout duration
-        unlockedAt: new Date(pageLoadedDateTime.getTime()),
+        unlockedAt: new Date(pageLoadedDateTime.getTime() + timeoutDuration * 3),
       });
+    });
+
+    it("should empty rate limit timeout when user succeed to login", async () => {
+      await auth.register(defaultInsert);
+
+      const wrongPasswordLoginParams = {
+        email: defaultInsert.email,
+        password: "wrong password",
+      };
+
+      const attemptWithoutTimeout = auth.login(wrongPasswordLoginParams);
+      await expect(attemptWithoutTimeout).rejects.toThrowError("InvalidEmailOrPasswordError");
+
+      const loginWithFirstRateLimit = auth.login(wrongPasswordLoginParams);
+      await expect(loginWithFirstRateLimit).rejects.toThrowError("LoginRateLimitError");
+
+      const validLogin = auth.login(defaultInsert);
+      await expect(validLogin).resolves.toHaveLength(2);
+
+      const attemptWithoutTimeout2 = auth.login(wrongPasswordLoginParams);
+      await expect(attemptWithoutTimeout2).rejects.toThrowError("InvalidEmailOrPasswordError");
     });
   });
 });

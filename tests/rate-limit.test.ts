@@ -3,6 +3,9 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import { slipAuthExtendWithRateLimit } from "../src/runtime/core/plugins/rate-limit";
+import { H3Event } from "h3";
+import { IncomingMessage, OutgoingMessage } from "node:http";
+import { Socket } from "node:net";
 
 const date = new Date(Date.UTC(1998, 11, 19));
 
@@ -32,6 +35,9 @@ const mocks = vi.hoisted(() => {
   };
 });
 
+const req = new IncomingMessage(new Socket());
+const res = new OutgoingMessage();
+const fakeH3Event = new H3Event(req, res);
 let auth: SlipAuthCore;
 
 describe("SlipAuthCore", () => {
@@ -71,12 +77,12 @@ describe("SlipAuthCore", () => {
 
   describe("login with not existing user", () => {
     it("should prevent brute force", async () => {
-      const validTry = auth.login(defaultInsert);
+      const validTry = auth.login(defaultInsert, fakeH3Event);
       await expect(validTry).rejects.toThrowError("InvalidEmailOrPasswordError");
       const timeoutDuration = 1000;
 
       const pageLoadedDateTime = new Date();
-      const loginWithFirstRateLimit = auth.login(defaultInsert);
+      const loginWithFirstRateLimit = auth.login(defaultInsert, fakeH3Event);
 
       expect(loginWithFirstRateLimit).rejects.toMatchObject({
         name: "LoginRateLimitError",
@@ -86,12 +92,12 @@ describe("SlipAuthCore", () => {
     });
 
     it("should expand brute force protection timeout on each request", async () => {
-      const attemptWithoutTimeout = auth.login(defaultInsert);
+      const attemptWithoutTimeout = auth.login(defaultInsert, fakeH3Event);
       await expect(attemptWithoutTimeout).rejects.toThrowError("InvalidEmailOrPasswordError");
       const timeoutDuration = 1000;
       const pageLoadedDateTime = new Date();
 
-      const loginWithFirstRateLimit = auth.login(defaultInsert);
+      const loginWithFirstRateLimit = auth.login(defaultInsert, fakeH3Event);
 
       await expect(loginWithFirstRateLimit).rejects.toMatchObject({
         name: "LoginRateLimitError",
@@ -101,10 +107,10 @@ describe("SlipAuthCore", () => {
 
       vi.advanceTimersByTime(timeoutDuration);
 
-      const attemptWithoutTimeou2 = auth.login(defaultInsert);
+      const attemptWithoutTimeou2 = auth.login(defaultInsert, fakeH3Event);
       await expect(attemptWithoutTimeou2).rejects.toThrowError("InvalidEmailOrPasswordError");
 
-      const loginWithSecondRateLimit = auth.login(defaultInsert);
+      const loginWithSecondRateLimit = auth.login(defaultInsert, fakeH3Event);
       expect(loginWithSecondRateLimit).rejects.toMatchObject({
         name: "LoginRateLimitError",
         // 1000 is the default timeout duration
@@ -120,16 +126,16 @@ describe("SlipAuthCore", () => {
         password: "wrong password",
       };
 
-      const attemptWithoutTimeout = auth.login(wrongPasswordLoginParams);
+      const attemptWithoutTimeout = auth.login(wrongPasswordLoginParams, fakeH3Event);
       await expect(attemptWithoutTimeout).rejects.toThrowError("InvalidEmailOrPasswordError");
 
-      const loginWithFirstRateLimit = auth.login(wrongPasswordLoginParams);
+      const loginWithFirstRateLimit = auth.login(wrongPasswordLoginParams, fakeH3Event);
       await expect(loginWithFirstRateLimit).rejects.toThrowError("LoginRateLimitError");
 
       const validLogin = auth.login(defaultInsert);
       await expect(validLogin).resolves.toHaveLength(2);
 
-      const attemptWithoutTimeout2 = auth.login(wrongPasswordLoginParams);
+      const attemptWithoutTimeout2 = auth.login(wrongPasswordLoginParams, fakeH3Event);
       await expect(attemptWithoutTimeout2).rejects.toThrowError("InvalidEmailOrPasswordError");
     });
   });

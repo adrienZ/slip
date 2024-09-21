@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const [userId, session] = await auth.login({
     ...body,
     ua: getHeader(event, "User-Agent"),
-  });
+  }, event);
 
   await setUserSession(event, {
     expires_at: session.expires_at,

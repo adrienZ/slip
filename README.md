@@ -25,6 +25,8 @@ Find and replace all on all files (CMD+SHIFT+F):
 - [🏀 Online playground](https://codesandbox.io/p/github/adrienZ/slip/?file=%2Fplayground%2Fserver%2Froutes%2Fauth%2Fregister.post.ts)
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
+> [!IMPORTANT]
+> nuxt-slip-auth development is in the early stages.
 
 ---
 

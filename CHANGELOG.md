@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v0.1.36
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.35...v0.1.36)
+
+### 🚀 Enhancements
+
+- **users:** Add email_verified column ([7a489f9](https://github.com/adrienZ/slip/commit/7a489f9))
+- **email:** Hadnle email verification code ([740600e](https://github.com/adrienZ/slip/commit/740600e))
+
+### 🩹 Fixes
+
+- **users:** Remove not null from email_verified in users table ([2000936](https://github.com/adrienZ/slip/commit/2000936))
+
+### 🏡 Chore
+
+- **release:** V0.1.35 ([0703475](https://github.com/adrienZ/slip/commit/0703475))
+- **readme:** Add warning about early stages ([b3a6f8e](https://github.com/adrienZ/slip/commit/b3a6f8e))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.35
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.34...v0.1.35)

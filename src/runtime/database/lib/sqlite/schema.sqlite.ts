@@ -1,5 +1,5 @@
 import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
-import type { tableNames } from "../lib/tables";
+import type { tableNames } from "../tables";
 import { sql } from "drizzle-orm";
 
 const datesColumns = {
@@ -11,7 +11,7 @@ export const getUsersTableSchema = (tableNames: tableNames) => sqliteTable(table
   id: text("id").primaryKey().notNull(),
   password: text("password"),
   email: text("email").notNull().unique(),
-  email_verified: integer("email_verified", { mode: "boolean" }).default(sql`0`),
+  email_verified: integer("email_verified", { mode: "boolean" }).default(sql`FALSE`),
   ...datesColumns,
 });
 
@@ -37,3 +37,15 @@ export const getOAuthAccountsTableSchema = (tableNames: tableNames) => sqliteTab
 }, slipAuthOAuthAccounts => ({
   pk: primaryKey(slipAuthOAuthAccounts.provider_id, slipAuthOAuthAccounts.provider_user_id),
 }));
+
+// https://lucia-auth.com/guides/email-and-password/email-verification-codes
+export const getEmailVerificationCodesTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.emailVerificationCodes, {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+  code: text("code", { length: 6 }).notNull(),
+  email: text("email").notNull(),
+  user_id: text("user_id").unique()
+    .references(() => getUsersTableSchema(tableNames).id)
+    .notNull(),
+  expires_at: integer("expires_at", { mode: "timestamp" }).notNull(),
+  ...datesColumns,
+});

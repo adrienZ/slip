@@ -1,19 +1,18 @@
-import { generateRandomString, alphabet } from "oslo/crypto";
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema } from "../database/lib/sqlite/schema.sqlite";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, tableNames } from "./types";
+import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
 import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
+import { EmailVerificationCodesRepository } from "./repositories/EmailVerificationCodesRepository";
 import type { SlipAuthPublicSession } from "../types";
-import { isValidEmail } from "./validators";
+import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod } from "./email-and-password-utils";
 import { hashPassword, verifyPassword } from "./password";
 import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
-
-const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
+import { isWithinExpirationDate } from "oslo";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -24,10 +23,12 @@ export class SlipAuthCore {
     users: UsersRepository
     sessions: SessionsRepository
     oAuthAccounts: OAuthAccountsRepository
+    emailVerificationCodes: EmailVerificationCodesRepository
   };
 
   #createRandomUserId: () => string;
   #createRandomSessionId: () => string;
+  #createRandomEmailVerificationCode: () => string;
 
   readonly schemas: SchemasMockValue;
   readonly hooks = createSlipHooks();
@@ -47,16 +48,20 @@ export class SlipAuthCore {
       users: getUsersTableSchema(tableNames),
       sessions: getSessionsTableSchema(tableNames),
       oauthAccounts: getOAuthAccountsTableSchema(tableNames),
+      emailVerificationCodes: getEmailVerificationCodesTableSchema(tableNames),
     };
 
     this.#repos = {
       users: new UsersRepository(this.#orm, this.schemas, this.hooks, "users"),
       sessions: new SessionsRepository(this.#orm, this.schemas, this.hooks, "sessions"),
       oAuthAccounts: new OAuthAccountsRepository(this.#orm, this.schemas, this.hooks, "oauthAccounts"),
+      emailVerificationCodes: new EmailVerificationCodesRepository(this.#orm, this.schemas, this.hooks, "emailVerificationCodes"),
     };
 
     this.#createRandomSessionId = defaultIdGenerationMethod;
     this.#createRandomUserId = defaultIdGenerationMethod;
+
+    this.#createRandomEmailVerificationCode = defaultEmailVerificationCodeGenerationMethod;
   }
 
   public checkDbAndTables(dialect: supportedConnectors) {
@@ -66,6 +71,7 @@ export class SlipAuthCore {
       checker.checkTableWithSchema(this.#tableNames.users, this.schemas.users),
       checker.checkTableWithSchema(this.#tableNames.sessions, this.schemas.sessions),
       checker.checkTableWithSchema(this.#tableNames.oauthAccounts, this.schemas.oauthAccounts),
+      checker.checkTableWithSchema(this.#tableNames.emailVerificationCodes, this.schemas.emailVerificationCodes),
     ]).then(results => results.every(Boolean));
   }
 
@@ -129,6 +135,7 @@ export class SlipAuthCore {
 
     try {
       const user = await this.#repos.users.insert(userId, email, passwordHash);
+      await this.#repos.emailVerificationCodes.insert(user.id, user.email, this.#createRandomEmailVerificationCode());
       const sessionToLoginId = this.#createRandomSessionId();
       const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
         userId: user.id,
@@ -211,12 +218,40 @@ export class SlipAuthCore {
     throw new Error("could not find oauth user");
   }
 
+  // TODO: use transactions
+  // should recreate session if true
+  public async verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean> {
+    const databaseCode = await this.#repos.emailVerificationCodes.findByUserId(user.id);
+    if (!databaseCode || databaseCode.code !== code) {
+      return false;
+    }
+
+    this.#repos.emailVerificationCodes.deleteById(databaseCode.id);
+
+    const expirationDate = databaseCode.expires_at instanceof Date ? databaseCode.expires_at : new Date(databaseCode.expires_at);
+    const offset = expirationDate.getTimezoneOffset() * 60000; // Get local time zone offset in milliseconds
+    const localExpirationDate = new Date(expirationDate.getTime() - offset); // Adjust for local time zone
+
+    if (!isWithinExpirationDate(localExpirationDate)) {
+      return false;
+    }
+    if (databaseCode.email !== user.email) {
+      return false;
+    }
+
+    return true;
+  }
+
   public setCreateRandomUserId(fn: () => string) {
     this.#createRandomUserId = fn;
   }
 
   public setCreateRandomSessionId(fn: () => string) {
     this.#createRandomSessionId = fn;
+  }
+
+  public setCreateRandomEmailVerificationCode(fn: () => string) {
+    this.#createRandomEmailVerificationCode = fn;
   }
 
   public getSession(sessionId: string) {

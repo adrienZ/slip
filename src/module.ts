@@ -20,6 +20,7 @@ export default defineNuxtModule<ModuleOptions>({
       sessions: "slip_auth_sessions",
       users: "slip_auth_users",
       oauthAccounts: "slip_auth_oauth_accounts",
+      emailVerificationCodes: "slip_auth_email_verification_codes",
     },
   },
   async setup(options, nuxt) {

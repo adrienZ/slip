@@ -39,6 +39,7 @@ describe("database", async () => {
         oauthAccounts: "slip_auth_oauth_accounts",
         sessions: "slip_auth_sessions",
         users: "slip_auth_users",
+        emailVerificationCodes: "slip_auth_email_verification_codes",
       },
     });
   });

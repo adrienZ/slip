@@ -58,7 +58,7 @@
     "dotenv": "^16.4.5",
     "eslint": "^9.10.0",
     "hookable": "^5.5.3",
-    "nuxt": "^3.13.1",
+    "nuxt": "^3.13.2",
     "nuxt-auth-utils": "^0.3.8",
     "pkg-pr-new": "^0.0.24",
     "typescript": "latest",

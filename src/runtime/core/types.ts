@@ -1,5 +1,5 @@
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema } from "../database/lib/schema";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema } from "../database/lib/sqlite/schema.sqlite";
 import type { tableNames } from "../database/lib/tables";
 
 export type { tableNames };
@@ -42,8 +42,10 @@ export type SlipAuthSession = SessionsTableSelect;
 type UsersTableSelect = ReturnType<typeof getUsersTableSchema>["$inferSelect"];
 export type SlipAuthUser = UsersTableSelect;
 
-export type OAuthAccountsTableSelect = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
-export type SlipAuthOAuthAccount = OAuthAccountsTableSelect;
+export type SlipAuthOAuthAccount = ReturnType<typeof getOAuthAccountsTableSchema>["$inferSelect"];
+
+export type EmailVerificationCodeTableInsert = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferInsert"];
+export type SlipAuthEmailVerificationCode = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferSelect"];
 
 export interface ISlipAuthCoreOptions {
   /**
@@ -57,6 +59,7 @@ const fakeTableNames: tableNames = {
   users: "fakeUsers",
   sessions: "fakeSessions",
   oauthAccounts: "fakeOauthAccounts",
+  emailVerificationCodes: "fakeEmailVerificationCodes",
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -64,6 +67,7 @@ const schemasMockValue = {
   users: getUsersTableSchema(fakeTableNames),
   sessions: getSessionsTableSchema(fakeTableNames),
   oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
+  emailVerificationCodes: getEmailVerificationCodesTableSchema(fakeTableNames),
 } satisfies Record<keyof tableNames, SQLiteTable>;
 export type SchemasMockValue = typeof schemasMockValue;
 // #endregion

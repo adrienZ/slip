@@ -38,6 +38,7 @@ This module is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-
 - 💾 Automatic database setup
 - 🤝 100% type-safe schemas and utils
 - 🗑️ Delete expired and invalidate sessions
+- 💌 Email + password (+ email verification code)
 - 🪝 Configurable and extendable with hooks
 - [IpInfo](https://ipinfo.io/) integration on login
 
@@ -142,6 +143,19 @@ const { loggedIn, user, session, clear } = useUserSession();
 
 Checks if the required database and tables are set up. Ensures that the environment is ready for authentication.
 
+##### `register(values: ICreateUserParams): Promise<[ string, SlipAuthPublicSession]>`
+
+Registers a new user in the database if they don’t already exist, email + password.
+
+##### `login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]>`
+
+Email + password login. Creates a session in database
+
+##### `verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean>`
+
+Checks the email verification code. Returns a boolean.
+Don't forget to re-login after verifying the email verification code.
+
 ##### `OAuthLoginUser(params: ICreateOrLoginParams): Promise<[string, SlipAuthPublicSession]>`
 
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
@@ -154,6 +168,10 @@ Sets a custom method for generating random user IDs.
 ##### `setCreateRandomSessionId(fn: () => string)`
 
 Sets a custom method for generating random session IDs.
+
+##### `setCreateRandomEmailVerificationCode(fn: () => string)`
+
+Sets a custom method for generating random email verification codes.
 
 ##### `getSession(sessionId: string)`
 
@@ -170,19 +188,16 @@ Deletes sessions that have expired before the provided timestamp.
 
 ## Hooks
 
-The `hooks` property allows you to listen for and respond to events during the authentication process. The available hooks are:
+The hooks property allows you to listen for and respond to events during the authentication process. The available hooks are:
 
-- **`"users:create"`**: Triggered when a new user is created.
-  - **Callback**: `(user: SlipAuthUser) => void`
-
-- **`"oAuthAccount:create"`**: Triggered when a new OAuth account is created.
-  - **Callback**: `(oAuthAccount: SlipAuthOAuthAccount) => void`
-
-- **`"sessions:create"`**: Triggered when a new session is created.
-  - **Callback**: `(session: SlipAuthSession) => void`
-
-- **`"sessions:delete"`**: Triggered when a session is deleted.
-  - **Callback**: `(session: SlipAuthSession) => void`
+| Hook Name                | Description                                  | Callback                                    |
+|-------------------------|----------------------------------------------|---------------------------------------------|
+| **"users:create"**      | Triggered when a new user is created.       | (user: SlipAuthUser) => void                |
+| **"emailVerificationCode:create"**      | Triggered when a new user is created.       | (code: EmailVerificationCodeTableInsert) => void                |
+| **"oAuthAccount:create"**| Triggered when a new OAuth account is created.| (oAuthAccount: SlipAuthOAuthAccount) => void |
+| **"sessions:create"**   | Triggered when a new session is created.    | (session: SlipAuthSession) => void          |
+| **"sessions:delete"**   | Triggered when a session is deleted.        | (session: SlipAuthSession) => void          |
+| **"emailVerificationCode:delete"**   | Triggered when a user email is validated.        | (code: SlipAuthEmailVerificationCode) => void          |
 
 ---
 
@@ -197,8 +212,23 @@ The `hooks` property allows you to listen for and respond to events during the a
 - [x] Bun-sqlite support
 - [x] LibSQL support
 - [ ] Postgres support
-- [ ] Email + Password
-
+- [x] Email + Password
+  - [ ] forgot password
+  - [ ] reset password
+  - [ ] rate-limit login
+  - [ ] rate-limit email verification
+  - [ ] rate-limit forgot password
+  - [ ] rate-limit reset password
+  - [ ] rate limit register
+- [ ] error message strategy (email already taken, etc)
+- [ ] oauth accounts linking
+- [ ] Ihavebeenpwnd plugin
+- [ ] handle sub-adressing
+- [ ] MFA plugin
+- [ ] CSRF plugin
+- [ ] organization plugin
+- [ ] magick link plugin
+- [ ] passkey link plugin
 ## Contribution
 
 <details>

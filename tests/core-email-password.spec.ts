@@ -78,7 +78,7 @@ describe("SlipAuthCore", () => {
     }
     auth.setPasswordHashingMethods(() => ({
       hash: async (password: string) => sanitizePassword(password) + mocks.passwordCount,
-      verify: async (sourceHashedPassword, rawPassword) => {
+      verify: async (sourceHashedPassword: string, rawPassword: string) => {
         const salt = sourceHashedPassword.split("$").at(-1);
         if (!salt) {
           return false;

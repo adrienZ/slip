@@ -66,7 +66,7 @@ export class SlipAuthCore {
 
     this.#passwordHashingMethods = {
       hash: defaultHashPasswordMethod,
-      verify: defaultHashPasswordMethod,
+      verify: defaultVerifyPasswordMethod,
     };
   }
 

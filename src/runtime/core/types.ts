@@ -47,6 +47,11 @@ export type SlipAuthOAuthAccount = ReturnType<typeof getOAuthAccountsTableSchema
 export type EmailVerificationCodeTableInsert = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferInsert"];
 export type SlipAuthEmailVerificationCode = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferSelect"];
 
+export interface IPasswordHashingMethods {
+  hash: (rawPassword: string) => Promise<string>
+  verify: (sourceHashedPassword: string, rawPassword: string) => Promise<boolean>
+}
+
 export interface ISlipAuthCoreOptions {
   /**
    * {@link https://github.com/unjs/h3/blob/c04c458810e34eb15c1647e1369e7d7ef19f567d/src/utils/session.ts#L24}

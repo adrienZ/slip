@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.1.37
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.36...v0.1.37)
+
+### 🚀 Enhancements
+
+- **D1:** Add supports for coudfalre D1 and nuxthub ([f48d42a](https://github.com/adrienZ/slip/commit/f48d42a))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.36
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.35...v0.1.36)

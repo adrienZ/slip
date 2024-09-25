@@ -24,13 +24,14 @@ beforeEach(async () => {
 
 const defaultInsert = {
   email: "email@test.com",
-  password: "password",
+  password: "pa$$word",
 };
 
 const mocks = vi.hoisted(() => {
   return {
     userCreatedCount: 0,
     sessionCreatedCount: 0,
+    passwordCount: 0,
   };
 });
 
@@ -71,6 +72,21 @@ describe("SlipAuthCore", () => {
       mocks.sessionCreatedCount++;
       return `session-id-${mocks.sessionCreatedCount}`;
     });
+
+    function sanitizePassword(str: string) {
+      return str.replaceAll("$", "") + "$";
+    }
+    auth.setPasswordHashingMethods(() => ({
+      hash: async (password: string) => sanitizePassword(password) + mocks.passwordCount,
+      verify: async (sourceHashedPassword, rawPassword) => {
+        const salt = sourceHashedPassword.split("$").at(-1);
+        if (!salt) {
+          return false;
+        }
+        return sourceHashedPassword === sanitizePassword(rawPassword) + salt;
+      },
+    }),
+    );
   });
 
   describe("register", () => {

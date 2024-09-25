@@ -49,7 +49,7 @@ export type SlipAuthEmailVerificationCode = ReturnType<typeof getEmailVerificati
 
 export interface IPasswordHashingMethods {
   hash: (rawPassword: string) => Promise<string>
-  verify: (sourceHashedPassword: string, rawPassword: string) => Promise<string>
+  verify: (sourceHashedPassword: string, rawPassword: string) => Promise<boolean>
 }
 
 export interface ISlipAuthCoreOptions {

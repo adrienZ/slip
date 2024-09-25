@@ -31,7 +31,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
       .where(
         eq(this.table.id, sessionId),
       );
-    const user = rows.at(0);
+    const user = this.getRawSQlResults(rows).at(0);
 
     return user;
   }
@@ -46,7 +46,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     // TODO: fix typings in db0 / drizzle
     // as the delete from drizzle returns any we do an extra query to check if the deletion went fine
     const expiredSessions = await this._orm.select().from(this.table).where(sql`${this.table.expires_at} < ${timestamp}`);
-    return { success: expiredSessions.length === 0, count: sessionsToDelete.length };
+    return { success: this.getRawSQlResults(expiredSessions).length === 0, count: this.getRawSQlResults(sessionsToDelete).length };
   }
 
   async deleteById(sessionId: string) {

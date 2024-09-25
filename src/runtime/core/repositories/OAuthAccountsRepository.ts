@@ -28,6 +28,6 @@ export class OAuthAccountsRepository extends TableRepository<"oauthAccounts"> {
           eq(this.table.provider_user_id, providerUserId),
         ));
 
-    return rows.at(0);
+    return this.getRawSQlResults(rows).at(0);
   }
 }

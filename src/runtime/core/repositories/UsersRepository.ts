@@ -28,7 +28,7 @@ export class UsersRepository extends TableRepository<"users"> {
       .where(
         eq(this.table.id, userId),
       );
-    const user = rows.at(0);
+    const user = this.getRawSQlResults(rows).at(0);
 
     return user;
   }
@@ -40,7 +40,7 @@ export class UsersRepository extends TableRepository<"users"> {
       .where(
         eq(this.table.email, email),
       );
-    const user = rows.at(0);
+    const user = this.getRawSQlResults(rows).at(0);
 
     return user;
   }

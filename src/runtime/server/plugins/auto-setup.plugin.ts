@@ -14,8 +14,20 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
   const config: SlipModuleOptions = useRuntimeConfig().slipAuth;
   const db = useDatabase(config.database.nitroDatabaseName);
 
-  if (config.database.dialect === "sqlite" || config.database.dialect === "libsql" || config.database.dialect === "bun-sqlite") {
-    await db.prepare(`
+  // @ts-expect-error @nuxthub/core compatibility
+  if (typeof onHubReady !== "undefined") {
+    // @ts-expect-error @nuxthub/core compatibility
+    onHubReady(async () => {
+      await seedSqliteDatabase();
+    });
+  }
+  else {
+    await seedSqliteDatabase();
+  }
+
+  async function seedSqliteDatabase() {
+    if (config.database.dialect === "sqlite" || config.database.dialect === "libsql" || config.database.dialect === "bun-sqlite" || config.database.dialect === "cloudflare-d1") {
+      await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.users} (
         "id" TEXT NOT NULL PRIMARY KEY,
         "email" TEXT NOT NULL UNIQUE,
@@ -25,7 +37,7 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
         "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )`).run();
 
-    await db.prepare(`
+      await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.sessions} (
         "id" TEXT NOT NULL PRIMARY KEY,
         "expires_at" INTEGER NOT NULL,
@@ -36,7 +48,7 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
         FOREIGN KEY (user_id) REFERENCES ${config.tableNames.users}(id)
       )`).run();
 
-    await db.prepare(`
+      await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.oauthAccounts} (
         "provider_id" TEXT NOT NULL,
         "provider_user_id" TEXT NOT NULL,
@@ -47,7 +59,7 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
         FOREIGN KEY (user_id) REFERENCES ${config.tableNames.users}(id)
       )`).run();
 
-    await db.prepare(`
+      await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.emailVerificationCodes} (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         "user_id" TEXT NOT NULL UNIQUE,
@@ -59,8 +71,9 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
         FOREIGN KEY (user_id) REFERENCES ${config.tableNames.users}(id)
       )`).run();
 
-    nitro.hooks.hookOnce("request", () => {
-      useSlipAuth().checkDbAndTables(config.database.dialect);
-    });
+      nitro.hooks.hookOnce("request", () => {
+        useSlipAuth().checkDbAndTables(config.database.dialect);
+      });
+    }
   }
 });

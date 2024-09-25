@@ -36,7 +36,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
         eq(this.table.id, id),
       );
 
-    const code = rows.at(0);
+    const code = this.getRawSQlResults(rows).at(0);
 
     return code;
   }
@@ -57,7 +57,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
         eq(this.table.user_id, userId),
       );
 
-    const code = rows.at(0);
+    const code = this.getRawSQlResults(rows).at(0);
 
     return code;
   }

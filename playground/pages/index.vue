@@ -138,7 +138,7 @@ function loginToGithub() {
     <UTable
       v-if="usersInDb"
       class="mt-12"
-      :rows="usersInDb.rows"
+      :rows="usersInDb"
     />
   </main>
 </template>

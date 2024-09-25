@@ -24,8 +24,8 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0(@libsql/client@0.11.0)(better-sqlite3@11.3.0)
       drizzle-schema-checker:
-        specifier: ^1.1.0
-        version: 1.1.0(magicast@0.3.5)
+        specifier: ^1.2.0
+        version: 1.2.0(magicast@0.3.5)
       node-ipinfo:
         specifier: ^3.5.3
         version: 3.5.3
@@ -2611,8 +2611,8 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-schema-checker@1.1.0:
-    resolution: {integrity: sha512-B3ez1CL+FCPv/XSPynbNJMeouL8T10epfbpEMcWq6wa7gtnfYp/sdL0ozuqOKmYhAdkAUFGZVbgWOKrdYUeBsg==}
+  drizzle-schema-checker@1.2.0:
+    resolution: {integrity: sha512-YO7qB69nREeJvfHkgiWPvooizgSyquDRJZJLYXmfVbM9GaGsBOWBNiz6/NS7uEdiLjF25KJBDkagv2OzpaQKBQ==}
 
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
@@ -3356,6 +3356,7 @@ packages:
 
   libsql@0.4.5:
     resolution: {integrity: sha512-sorTJV6PNt94Wap27Sai5gtVLIea4Otb2LUiAUyr3p6BPOScGMKGt5F1b5X/XgkNtcsDKeX5qfeBDj+PdShclQ==}
+    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.2:
@@ -7514,7 +7515,7 @@ snapshots:
       '@libsql/client': 0.11.0
       better-sqlite3: 11.3.0
 
-  drizzle-schema-checker@1.1.0(magicast@0.3.5):
+  drizzle-schema-checker@1.2.0(magicast@0.3.5):
     dependencies:
       '@libsql/client': 0.11.0
       better-sqlite3: 11.3.0

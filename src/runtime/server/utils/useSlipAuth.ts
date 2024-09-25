@@ -17,7 +17,7 @@ export function useSlipAuth() {
   const slipAuthConfig = config.slipAuth;
 
   if (!instance) {
-    instance = new SlipAuthCore(useDatabase(), slipAuthConfig.tableNames, {
+    instance = new SlipAuthCore(useDatabase(slipAuthConfig.database.nitroDatabaseName), slipAuthConfig.tableNames, {
       sessionMaxAge: slipAuthConfig.sessionMaxAge,
     });
 

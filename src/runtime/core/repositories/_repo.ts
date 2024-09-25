@@ -14,4 +14,24 @@ export class TableRepository<T extends keyof SchemasMockValue> {
     this._hooks = hooks;
     this.table = this._schemas[name];
   }
+
+  isSqliteD1<T extends Array<unknown>>(sqlResult: T | { results: T, success: true, meta: object }): sqlResult is { results: T, success: true, meta: object } {
+    if (Array.isArray(sqlResult)) {
+      return false;
+    }
+
+    if (
+      sqlResult.success === true
+      && typeof sqlResult.meta === "object"
+      && Array.isArray(sqlResult.results)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  getRawSQlResults<T extends Array<unknown>>(sqlResult: T) {
+    return this.isSqliteD1(sqlResult) ? sqlResult.results : sqlResult;
+  }
 }

@@ -101,7 +101,7 @@ const main = defineCommand({
         }
         catch {
           logger.info("fetching github handler on github");
-          const githubFileRequest = await fetch("https://raw.githubusercontent.com/adrienZ/slip/refs/heads/master/playground/server/routes/auth/github.get.ts");          
+          const githubFileRequest = await fetch("https://raw.githubusercontent.com/adrienZ/slip/refs/heads/master/playground/server/routes/auth/github.get.ts");
           await createFile(githubHandlerFilePath, await githubFileRequest.text());
           logger.success("github demo route setup");
         }

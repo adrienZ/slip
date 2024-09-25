@@ -175,6 +175,10 @@ Sets a custom method for generating random session IDs.
 
 Sets a custom method for generating random email verification codes.
 
+##### `setPasswordHashingMethods(fn: () => string)`
+
+Sets a custom method for generating random email verification codes.
+
 ##### `getSession(sessionId: string)`
 
 Fetches a session by its session ID.

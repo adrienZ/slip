@@ -1,15 +1,14 @@
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema } from "../database/lib/sqlite/schema.sqlite";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
-import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
+import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, IPasswordHashingMethods, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
 import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
 import { EmailVerificationCodesRepository } from "./repositories/EmailVerificationCodesRepository";
 import type { SlipAuthPublicSession } from "../types";
-import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod } from "./email-and-password-utils";
-import { hashPassword, verifyPassword } from "./password";
+import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod } from "./email-and-password-utils";
 import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { isWithinExpirationDate } from "oslo";
@@ -29,6 +28,8 @@ export class SlipAuthCore {
   #createRandomUserId: () => string;
   #createRandomSessionId: () => string;
   #createRandomEmailVerificationCode: () => string;
+
+  #passwordHashingMethods: IPasswordHashingMethods;
 
   readonly schemas: SchemasMockValue;
   readonly hooks = createSlipHooks();
@@ -62,6 +63,11 @@ export class SlipAuthCore {
     this.#createRandomUserId = defaultIdGenerationMethod;
 
     this.#createRandomEmailVerificationCode = defaultEmailVerificationCodeGenerationMethod;
+
+    this.#passwordHashingMethods = {
+      hash: defaultHashPasswordMethod,
+      verify: defaultHashPasswordMethod,
+    };
   }
 
   public checkDbAndTables(dialect: supportedConnectors) {
@@ -105,7 +111,7 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("no password oauth user");
     }
 
-    const validPassword = await verifyPassword(existingUser.password, password);
+    const validPassword = await this.#passwordHashingMethods.verify(existingUser.password, password);
     if (!validPassword) {
       throw new InvalidEmailOrPasswordError("login invalid password");
     }
@@ -131,7 +137,7 @@ export class SlipAuthCore {
     }
 
     const userId = this.#createRandomUserId();
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await this.#passwordHashingMethods.hash(password);
 
     try {
       const user = await this.#repos.users.insert(userId, email, passwordHash);
@@ -252,6 +258,11 @@ export class SlipAuthCore {
 
   public setCreateRandomEmailVerificationCode(fn: () => string) {
     this.#createRandomEmailVerificationCode = fn;
+  }
+
+  public setPasswordHashingMethods(fn: () => IPasswordHashingMethods) {
+    const methods = fn();
+    this.#passwordHashingMethods = methods;
   }
 
   public getSession(sessionId: string) {

@@ -2,7 +2,10 @@
   "name": "nuxt-slip-auth",
   "version": "0.1.38",
   "description": "My new Nuxt module",
-  "repository": "https://github.com/adrienZ/slip",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrienZ/slip.git"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -19,7 +22,7 @@
     "bin"
   ],
   "bin": {
-    "nuxt-slip-auth": "./bin/cli.js"
+    "nuxt-slip-auth": "bin/cli.js"
   },
   "scripts": {
     "postinstall": "nuxt prepare",

@@ -163,6 +163,30 @@ Don't forget to re-login after verifying the email verification code.
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
 - **Returns**: A tuple containing the user ID and the created session details.
 
+##### `getSession(sessionId: string)`
+
+Fetches a session by its session ID.
+
+##### `deleteSession(sessionId: string)`
+
+Deletes a session by its session ID.
+
+##### `deleteExpiredSessions(timestamp: number)`
+
+Deletes sessions that have expired before the provided timestamp.
+
+#### `askPasswordReset(userId: string)`
+
+creates a reset password token for a specified user
+
+#### `askForgotPasswordReset(email: string)`
+
+Same as `askPasswordReset` but with email instead of userId.
+
+#### resetPasswordWithResetToken
+
+Resets the password using the reset token.
+
 ##### `setCreateRandomUserId(fn: () => string)`
 
 Sets a custom method for generating random user IDs.
@@ -179,17 +203,9 @@ Sets a custom method for generating random email verification codes.
 
 Sets custom methods for hashing and verifying passwords.
 
-##### `getSession(sessionId: string)`
+##### `setCreateResetPasswordTokenHashMethod(fn: (tokenId: string) => Promise<string>)`
 
-Fetches a session by its session ID.
-
-##### `deleteSession(sessionId: string)`
-
-Deletes a session by its session ID.
-
-##### `deleteExpiredSessions(timestamp: number)`
-
-Deletes sessions that have expired before the provided timestamp.
+Sets custom method for reset password token hashing.
 
 
 ## Hooks
@@ -204,6 +220,8 @@ The hooks property allows you to listen for and respond to events during the aut
 | **"sessions:create"**   | Triggered when a new session is created.    | (session: SlipAuthSession) => void          |
 | **"sessions:delete"**   | Triggered when a session is deleted.        | (session: SlipAuthSession) => void          |
 | **"emailVerificationCode:delete"**   | Triggered when a user email is validated.        | (code: SlipAuthEmailVerificationCode) => void          |
+| **"resetPasswordToken:create"**   | Triggered when a user passsword reset is asked.        | (token: SlipAuthPasswordResetToken) => void          |
+| **"resetPasswordToken:delete"**   | Triggered when a user passsword reset is validated or expired.        | (token: SlipAuthPasswordResetToken) => void          |
 
 ---
 
@@ -217,10 +235,11 @@ The hooks property allows you to listen for and respond to events during the aut
 - [x] Sqlite support
 - [x] Bun-sqlite support
 - [x] LibSQL support
+- [ ] PGlite support
 - [ ] Postgres support
 - [x] Email + Password
-  - [ ] forgot password
-  - [ ] reset password
+  - [x] forgot password
+  - [x] reset password
   - [ ] rate-limit login
   - [ ] rate-limit email verification
   - [ ] rate-limit forgot password
@@ -228,8 +247,8 @@ The hooks property allows you to listen for and respond to events during the aut
   - [ ] rate limit register
 - [ ] error message strategy (email already taken, etc)
 - [ ] oauth accounts linking
-- [ ] Ihavebeenpwnd plugin
-- [ ] handle sub-adressing
+- [ ] ~~Ihavebeenpwnd plugin~~
+- [ ] handle sub-adressing (register spam)
 - [ ] MFA plugin
 - [ ] CSRF plugin
 - [ ] organization plugin

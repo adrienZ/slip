@@ -44,4 +44,14 @@ export class UsersRepository extends TableRepository<"users"> {
 
     return user;
   }
+
+  updatePasswordByUserId = async (userId: string, password: string): Promise<void> => {
+    return await this._orm
+      .update(this.table)
+      .set({
+        password,
+      })
+      .where(eq(this.table.id, userId))
+      .run();
+  };
 }

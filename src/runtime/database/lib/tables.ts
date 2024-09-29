@@ -3,4 +3,5 @@ export interface tableNames {
   sessions: string
   oauthAccounts: string
   emailVerificationCodes: string
+  resetPasswordTokens: string
 }

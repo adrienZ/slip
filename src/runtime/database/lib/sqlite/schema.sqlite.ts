@@ -49,3 +49,12 @@ export const getEmailVerificationCodesTableSchema = (tableNames: tableNames) => 
   expires_at: integer("expires_at", { mode: "timestamp" }).notNull(),
   ...datesColumns,
 });
+
+export const getPasswordResetTokensTableSchema = (tableNames: tableNames) => sqliteTable(tableNames.resetPasswordTokens, {
+  token_hash: text("token_hash").primaryKey().notNull(),
+  user_id: text("user_id").unique()
+    .references(() => getUsersTableSchema(tableNames).id)
+    .notNull(),
+  expires_at: integer("expires_at", { mode: "timestamp" }).notNull(),
+  ...datesColumns,
+});

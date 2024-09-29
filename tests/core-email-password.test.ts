@@ -3,6 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import type { SlipAuthUser } from "~/src/runtime/core/types";
+import { testTablesNames } from "./test-helpers";
 
 const date = new Date(Date.UTC(1998, 11, 19));
 
@@ -52,12 +53,7 @@ describe("SlipAuthCore", () => {
 
     auth = new SlipAuthCore(
       db,
-      {
-        users: "slip_users",
-        sessions: "slip_sessions",
-        oauthAccounts: "slip_oauth_accounts",
-        emailVerificationCodes: "slip_auth_email_verification_codes",
-      },
+      testTablesNames,
       {
         sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
       },

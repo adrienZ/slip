@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.39
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.38...v0.1.39)
+
+### 🚀 Enhancements
+
+- **password:** Reset user password with reset token ([#33](https://github.com/adrienZ/slip/pull/33))
+
+### 💅 Refactors
+
+- **cli:** Fetch files from github instead of harcoding them in cli source code ([d4d636a](https://github.com/adrienZ/slip/commit/d4d636a))
+
+### 🏡 Chore
+
+- **release:** V0.1.38 ([c2f0610](https://github.com/adrienZ/slip/commit/c2f0610))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.38
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.38...v0.1.38)

@@ -1,5 +1,5 @@
 import { createHooks, type Hookable, type HookKeys } from "hookable";
-import type { SlipAuthSession, SlipAuthUser, SlipAuthOAuthAccount, SlipAuthEmailVerificationCode, EmailVerificationCodeTableInsert } from "./types";
+import type { SlipAuthSession, SlipAuthUser, SlipAuthOAuthAccount, SlipAuthEmailVerificationCode, EmailVerificationCodeTableInsert, SlipAuthPasswordResetToken } from "./types";
 
 interface ISlipAuthHooksMap {
   // users
@@ -12,6 +12,9 @@ interface ISlipAuthHooksMap {
   // emailVerificationCode
   "emailVerificationCode:create": (emailVerificationCodeValues: EmailVerificationCodeTableInsert) => void
   "emailVerificationCode:delete": (emailVerificationCode: SlipAuthEmailVerificationCode) => void
+  // resetPasswordToken
+  "resetPasswordToken:create": (resetPasswordToken: SlipAuthPasswordResetToken) => void
+  "resetPasswordToken:delete": (resetPasswordToken: SlipAuthPasswordResetToken) => void
 }
 
 export type ISlipAuthHooks = Hookable<ISlipAuthHooksMap, HookKeys<ISlipAuthHooksMap>>;

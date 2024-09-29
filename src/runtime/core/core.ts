@@ -1,5 +1,5 @@
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema } from "../database/lib/sqlite/schema.sqlite";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/lib/sqlite/schema.sqlite";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
 import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, IPasswordHashingMethods, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
@@ -7,11 +7,12 @@ import { UsersRepository } from "./repositories/UsersRepository";
 import { SessionsRepository } from "./repositories/SessionsRepository";
 import { OAuthAccountsRepository } from "./repositories/OAuthAccountsRepository";
 import { EmailVerificationCodesRepository } from "./repositories/EmailVerificationCodesRepository";
+import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
-import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod } from "./email-and-password-utils";
-import { InvalidEmailOrPasswordError, UnhandledError } from "./errors/SlipAuthError.js";
+import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
+import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
-import { isWithinExpirationDate } from "oslo";
+import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -23,11 +24,13 @@ export class SlipAuthCore {
     sessions: SessionsRepository
     oAuthAccounts: OAuthAccountsRepository
     emailVerificationCodes: EmailVerificationCodesRepository
+    resetPasswordTokens: ResetPasswordTokensRepository
   };
 
   #createRandomUserId: () => string;
   #createRandomSessionId: () => string;
   #createRandomEmailVerificationCode: () => string;
+  #createResetPasswordTokenHashMethod: (tokenId: string) => Promise<string>;
 
   #passwordHashingMethods: IPasswordHashingMethods;
 
@@ -50,6 +53,7 @@ export class SlipAuthCore {
       sessions: getSessionsTableSchema(tableNames),
       oauthAccounts: getOAuthAccountsTableSchema(tableNames),
       emailVerificationCodes: getEmailVerificationCodesTableSchema(tableNames),
+      resetPasswordTokens: getPasswordResetTokensTableSchema(tableNames),
     };
 
     this.#repos = {
@@ -57,12 +61,14 @@ export class SlipAuthCore {
       sessions: new SessionsRepository(this.#orm, this.schemas, this.hooks, "sessions"),
       oAuthAccounts: new OAuthAccountsRepository(this.#orm, this.schemas, this.hooks, "oauthAccounts"),
       emailVerificationCodes: new EmailVerificationCodesRepository(this.#orm, this.schemas, this.hooks, "emailVerificationCodes"),
+      resetPasswordTokens: new ResetPasswordTokensRepository(this.#orm, this.schemas, this.hooks, "resetPasswordTokens"),
     };
 
     this.#createRandomSessionId = defaultIdGenerationMethod;
     this.#createRandomUserId = defaultIdGenerationMethod;
 
     this.#createRandomEmailVerificationCode = defaultEmailVerificationCodeGenerationMethod;
+    this.#createResetPasswordTokenHashMethod = defaultResetPasswordTokenHashMethod;
 
     this.#passwordHashingMethods = {
       hash: defaultHashPasswordMethod,
@@ -87,7 +93,7 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("invalid email");
     }
     const password = values.password;
-    if (!password || typeof password !== "string" || password.length < 6) {
+    if (!password || typeof password !== "string") {
       throw new InvalidEmailOrPasswordError("invalid password");
     }
 
@@ -132,7 +138,7 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("invalid email");
     }
     const password = values.password;
-    if (!password || typeof password !== "string" || password.length < 6) {
+    if (!password || typeof password !== "string") {
       throw new InvalidEmailOrPasswordError("invalid password");
     }
 
@@ -154,7 +160,7 @@ export class SlipAuthCore {
     }
     catch (error) {
       if (error instanceof Error) {
-        if (error.stack?.startsWith(`SqliteError: UNIQUE constraint failed: ${this.#tableNames.users}.email`)) {
+        if (error.stack?.includes(`UNIQUE constraint failed: ${this.#tableNames.users}.email`)) {
           throw new InvalidEmailOrPasswordError(`email already taken: ${values.email}`);
         }
         throw new UnhandledError();
@@ -248,6 +254,78 @@ export class SlipAuthCore {
     return true;
   }
 
+  /**
+   * The token should be valid for at most few hours. The token should be hashed before storage as it essentially is a password.
+   * SHA-256 can be used here since the token is long and random, unlike user passwords.
+   */
+  public async askPasswordReset(userId: string) {
+    // optionally invalidate all existing tokens
+    // this.#repos.resetPasswordTokens.deleteAllByUserId(userId);
+    const tokenId = defaultResetPasswordTokenIdMethod();
+    const tokenHash = await this.#createResetPasswordTokenHashMethod(tokenId);
+    try {
+      await this.#repos.resetPasswordTokens.insert({
+        token_hash: tokenHash,
+        user_id: userId,
+        expires_at: createDate(new TimeSpan(2, "h")),
+      });
+
+      return tokenId;
+    }
+    catch (error) {
+      if (error instanceof Error && error.message.includes("FOREIGN KEY constraint failed")) {
+        throw new InvalidUserIdToResetPasswordError();
+      }
+
+      throw new UnhandledError();
+    }
+  }
+
+  // TODO: rate limit
+  public async askForgotPasswordReset(emailAddress: string): Promise<string> {
+    const user = await this.#repos.users.findByEmail(emailAddress);
+    if (!user) {
+      // If you want to avoid disclosing valid emails,
+      // this can be a normal 200 response.
+      throw new InvalidEmailToResetPasswordError();
+    }
+    return this.askPasswordReset(user.id);
+  }
+
+  /**
+   * Make sure to set the Referrer-Policy header of the password reset page to strict-origin to protect the token from referrer leakage.
+   * WARNING: WILL UN-LOG THE USER
+   */
+  public async resetPasswordWithResetToken(verificationToken: string, newPassword: string): Promise<true> {
+    if (typeof newPassword !== "string") {
+      throw new InvalidPasswordToResetError();
+    }
+
+    const tokenHash = await this.#createResetPasswordTokenHashMethod(verificationToken);
+    const token = await this.#repos.resetPasswordTokens.findByTokenHash(tokenHash);
+
+    if (!token) {
+      throw new ResetPasswordTokenExpiredError();
+    }
+
+    if (token) {
+      await this.#repos.resetPasswordTokens.deleteByTokenHash(tokenHash);
+    }
+
+    const expirationDate = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at);
+    const offset = expirationDate.getTimezoneOffset() * 60000; // Get local time zone offset in milliseconds
+    const localExpirationDate = new Date(expirationDate.getTime() - offset); // Adjust for local time zone
+    if (!isWithinExpirationDate(localExpirationDate)) {
+      throw new ResetPasswordTokenExpiredError();
+    }
+
+    await this.#repos.sessions.deleteAllByUserId(token.user_id);
+    const passwordHash = await this.#passwordHashingMethods.hash(newPassword);
+    await this.#repos.users.updatePasswordByUserId(token.user_id, passwordHash);
+
+    return true;
+  }
+
   public setCreateRandomUserId(fn: () => string) {
     this.#createRandomUserId = fn;
   }
@@ -258,6 +336,10 @@ export class SlipAuthCore {
 
   public setCreateRandomEmailVerificationCode(fn: () => string) {
     this.#createRandomEmailVerificationCode = fn;
+  }
+
+  public setCreateResetPasswordTokenHashMethod(fn: (tokenId: string) => Promise<string>) {
+    this.#createResetPasswordTokenHashMethod = fn;
   }
 
   public setPasswordHashingMethods(fn: () => IPasswordHashingMethods) {

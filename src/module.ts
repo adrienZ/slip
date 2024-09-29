@@ -21,6 +21,7 @@ export default defineNuxtModule<ModuleOptions>({
       users: "slip_auth_users",
       oauthAccounts: "slip_auth_oauth_accounts",
       emailVerificationCodes: "slip_auth_email_verification_codes",
+      resetPasswordTokens: "slip_auth_reset_password_tokens",
     },
   },
   async setup(options, nuxt) {

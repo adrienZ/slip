@@ -1,5 +1,5 @@
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema } from "../database/lib/sqlite/schema.sqlite";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/lib/sqlite/schema.sqlite";
 import type { tableNames } from "../database/lib/tables";
 
 export type { tableNames };
@@ -46,7 +46,7 @@ export type SlipAuthOAuthAccount = ReturnType<typeof getOAuthAccountsTableSchema
 
 export type EmailVerificationCodeTableInsert = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferInsert"];
 export type SlipAuthEmailVerificationCode = ReturnType<typeof getEmailVerificationCodesTableSchema>["$inferSelect"];
-
+export type SlipAuthPasswordResetToken = ReturnType<typeof getPasswordResetTokensTableSchema>["$inferSelect"];
 export interface IPasswordHashingMethods {
   hash: (rawPassword: string) => Promise<string>
   verify: (sourceHashedPassword: string, rawPassword: string) => Promise<boolean>
@@ -65,6 +65,7 @@ const fakeTableNames: tableNames = {
   sessions: "fakeSessions",
   oauthAccounts: "fakeOauthAccounts",
   emailVerificationCodes: "fakeEmailVerificationCodes",
+  resetPasswordTokens: "fakeResetPasswordTokens",
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -73,6 +74,7 @@ const schemasMockValue = {
   sessions: getSessionsTableSchema(fakeTableNames),
   oauthAccounts: getOAuthAccountsTableSchema(fakeTableNames),
   emailVerificationCodes: getEmailVerificationCodesTableSchema(fakeTableNames),
+  resetPasswordTokens: getPasswordResetTokensTableSchema(fakeTableNames),
 } satisfies Record<keyof tableNames, SQLiteTable>;
 export type SchemasMockValue = typeof schemasMockValue;
 // #endregion

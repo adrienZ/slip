@@ -22,3 +22,26 @@ export class InvalidEmailOrPasswordError extends SlipAuthError {
     this.#debugReason = reason;
   }
 }
+
+export class InvalidEmailToResetPasswordError extends SlipAuthError {
+  override name = "InvalidEmailToResetPasswordError";
+  override message = "InvalidEmailToResetPasswordError";
+  override slipError = SlipAuthErrorsCode.InvalidEmailToResetPassword;
+}
+
+export class InvalidUserIdToResetPasswordError extends SlipAuthError {
+  override name = "InvalidUserIdToResetPasswordError";
+  override message = "InvalidUserIdToResetPasswordError";
+  override slipError = SlipAuthErrorsCode.InvalidUserIdToResetPassword;
+}
+
+export class InvalidPasswordToResetError extends SlipAuthError {
+  override name = "InvalidPasswordToResetError";
+  override message = "InvalidPasswordToResetError";
+  override slipError = SlipAuthErrorsCode.InvalidPasswordToReset;
+}
+export class ResetPasswordTokenExpiredError extends SlipAuthError {
+  override name = "ResetPasswordTokenExpiredError";
+  override message = "ResetPasswordTokenExpiredError";
+  override slipError = SlipAuthErrorsCode.ResetPasswordTokenExpired;
+}

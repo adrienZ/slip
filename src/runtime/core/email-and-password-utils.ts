@@ -1,6 +1,7 @@
-import { generateRandomString, alphabet } from "oslo/crypto";
+import { generateRandomString, alphabet, sha256 } from "oslo/crypto";
 import type { Options as ArgonOptions } from "@node-rs/argon2";
 import { hash, verify } from "@node-rs/argon2";
+import { encodeHex } from "oslo/encoding";
 
 /**
   https://thecopenhagenbook.com/email-verification#input-validation
@@ -22,6 +23,8 @@ export function isValidEmail(email: string): boolean {
 export const defaultIdGenerationMethod = () => generateRandomString(15, alphabet("a-z", "A-Z", "0-9"));
 
 export const defaultEmailVerificationCodeGenerationMethod = () => generateRandomString(6, alphabet("0-9", "A-Z"));
+export const defaultResetPasswordTokenIdMethod = () => generateRandomString(40, alphabet("0-9", "A-Z"));
+export const defaultResetPasswordTokenHashMethod = async (tokenId: string) => encodeHex(await sha256(new TextEncoder().encode(tokenId)));
 
 const hashOptions: ArgonOptions = {
   // recommended minimum parameters
@@ -31,7 +34,6 @@ const hashOptions: ArgonOptions = {
   parallelism: 1,
 };
 
-// https://thecopenhagenbook.com/password-authentication#argon2id
 export async function defaultHashPasswordMethod(rawPassword: string): Promise<string> {
   return await hash(rawPassword, hashOptions);
 };

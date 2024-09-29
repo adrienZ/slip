@@ -40,6 +40,7 @@ describe("database", async () => {
         sessions: "slip_auth_sessions",
         users: "slip_auth_users",
         emailVerificationCodes: "slip_auth_email_verification_codes",
+        resetPasswordTokens: "slip_auth_reset_password_tokens",
       },
     });
   });

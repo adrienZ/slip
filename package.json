@@ -62,8 +62,8 @@
     "eslint": "^9.10.0",
     "hookable": "^5.5.3",
     "nuxt": "^3.13.2",
-    "nuxt-auth-utils": "^0.3.8",
-    "pkg-pr-new": "^0.0.24",
+    "nuxt-auth-utils": "^0.4.0",
+    "pkg-pr-new": "^0.0.28",
     "typescript": "latest",
     "vitest": "^2.1.1",
     "vue-tsc": "^2.1.6"

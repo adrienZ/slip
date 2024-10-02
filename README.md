@@ -236,10 +236,10 @@ By default, nuxt-slip-auth will create tables in your database for you !
 
 However, if you want to use exising table you can still use [`drizze-kit`](https://orm.drizzle.team/kit-docs/overview) to generate and run migrations
 
-create a schema.ts file
+create a server/schema.ts file
 
-```ts[schemas.ts]
-import { getNuxtSlipAuthSchemas } from "nuxt-slip-auth/dist/runtime/nuxt/drizzle";
+```ts[server/schemas.ts]
+import { getNuxtSlipAuthSchemas } from "nuxt-slip-auth/nuxt-drizzle";
 
 // getNuxtSlipAuthSchemas accepts a tableNames argument where you can provide your table names
 export const {
@@ -264,7 +264,7 @@ function getDbUrl() {
 export default defineConfig({
   dialect: "sqlite",
   out: "./migrations",
-  schema: "./server/schemas.playground.ts",
+  schema: "./server/schemas.ts",
   dbCredentials: {
     url: getDbUrl(),
   },

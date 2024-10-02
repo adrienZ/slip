@@ -1,3 +1,5 @@
+import { defineNuxtConfig } from "nuxt/config";
+
 export default defineNuxtConfig({
   modules: ["../src/module", "@nuxt/ui"],
   devtools: { enabled: true },
@@ -21,13 +23,15 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  // #region faster demo startup
   tailwindcss: {
     viewer: false,
-    // cssPath: false,
-    // and more...
   },
+  // #endregion
+
+  // #region - codesandbox config
   runtimeConfig: {
-    // added for codesandbox
     session: {
       cookie: {
         // Required when SameSite=None is set
@@ -39,4 +43,5 @@ export default defineNuxtConfig({
       },
     },
   },
+  // #endregion
 });

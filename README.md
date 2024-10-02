@@ -37,7 +37,7 @@ Authentication is like an underwear: you can you put it on, put it off and somet
 This module is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) and [db0](https://github.com/unjs/db0) and adds the following features:
 
 <!-- Highlight some of the features your module provide here -->
-- 💾 Automatic database setup
+- 💾 Automatic database setup + migrations
 - 🤝 100% type-safe schemas and utils
 - 🗑️ Delete expired and invalidate sessions
 - 💌 Email + password (+ email verification code)
@@ -230,6 +230,54 @@ The hooks property allows you to listen for and respond to events during the aut
 - `schemas`: Contains the database schemas for users, sessions, and OAuth accounts.
 - `hooks`: Provides hooks to extend and configure the authentication behavior.
 
+## Database migraions
+
+By default, nuxt-slip-auth will create tables in your database for you !
+
+However, if you want to use exising table you can still use [`drizze-kit`](https://orm.drizzle.team/kit-docs/overview) to generate and run migrations
+
+create a schema.ts file
+
+```ts[schemas.ts]
+import { getNuxtSlipAuthSchemas } from "nuxt-slip-auth/dist/runtime/nuxt/drizzle";
+
+// getNuxtSlipAuthSchemas accepts a tableNames argument where you can provide your table names
+export const {
+  users,
+  emailVerificationCodes,
+  oauthAccounts,
+  resetPasswordTokens,
+  sessions,
+} = getNuxtSlipAuthSchemas();
+```
+
+then create a drizzle.config.ts file
+
+```ts[drizzle.config.ts]
+import { defineConfig } from "drizzle-kit";
+import path from "node:path";
+
+function getDbUrl() {
+  return path.resolve(__dirname, ".data/db.sqlite3");
+}
+
+export default defineConfig({
+  dialect: "sqlite",
+  out: "./migrations",
+  schema: "./server/schemas.playground.ts",
+  dbCredentials: {
+    url: getDbUrl(),
+  },
+});
+```
+
+run
+
+```bash
+npx drizzle-kit generate
+```
+
+You should have your migrations in the migrations folder.
 
 ## Roadmap
 - [x] Sqlite support

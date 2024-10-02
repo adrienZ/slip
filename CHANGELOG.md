@@ -1,6 +1,32 @@
 # Changelog
 
 
+## v0.1.40
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.39...v0.1.40)
+
+### 🚀 Enhancements
+
+- **deps:** Bump nuxt-auth-utils and use his password hasing by default ([f943075](https://github.com/adrienZ/slip/commit/f943075))
+- **database:** Provide drizzle kit migrations ([67e2b2e](https://github.com/adrienZ/slip/commit/67e2b2e))
+
+### 🩹 Fixes
+
+- **exports:** Add nuxt-drizzle export ([e779f37](https://github.com/adrienZ/slip/commit/e779f37))
+- **docs:** Fix pathes for migrations demo in docs ([f8bfc41](https://github.com/adrienZ/slip/commit/f8bfc41))
+
+### 💅 Refactors
+
+- **cli:** Move cli into runtime folder ([79ef59c](https://github.com/adrienZ/slip/commit/79ef59c))
+
+### 🏡 Chore
+
+- **release:** V0.1.39 ([af813e2](https://github.com/adrienZ/slip/commit/af813e2))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.39
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.38...v0.1.39)

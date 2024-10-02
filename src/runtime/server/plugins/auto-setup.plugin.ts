@@ -14,8 +14,9 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
   const config: SlipModuleOptions = useRuntimeConfig().slipAuth;
   const db = useDatabase(config.database.nitroDatabaseName);
 
+  // https://hub.nuxt.com/docs/recipes/hooks#onhubready
   // @ts-expect-error @nuxthub/core compatibility
-  if (typeof onHubReady !== "undefined") {
+  if (typeof onHubReady !== "undefined" && import.meta.dev) {
     // @ts-expect-error @nuxthub/core compatibility
     onHubReady(async () => {
       await seedSqliteDatabase();

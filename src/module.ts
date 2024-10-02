@@ -1,5 +1,6 @@
 import { defineNuxtModule, createResolver, installModule, addServerScanDir, updateRuntimeConfig } from "@nuxt/kit";
 import type { SessionConfig, SlipModuleOptions } from "./runtime/types";
+import { defaultTableNames } from "./runtime/nuxt/defaults";
 
 // Module options TypeScript interface definition
 export type ModuleOptions = SlipModuleOptions;
@@ -16,13 +17,7 @@ export default defineNuxtModule<ModuleOptions>({
       nitroDatabaseName: "default",
     },
     sessionMaxAge: 60 * 60 * 24 * 7, // 7 days
-    tableNames: {
-      sessions: "slip_auth_sessions",
-      users: "slip_auth_users",
-      oauthAccounts: "slip_auth_oauth_accounts",
-      emailVerificationCodes: "slip_auth_email_verification_codes",
-      resetPasswordTokens: "slip_auth_reset_password_tokens",
-    },
+    tableNames: defaultTableNames,
   },
   async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url);

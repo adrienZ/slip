@@ -84,6 +84,7 @@ export class SlipAuthCore {
       checker.checkTableWithSchema(this.#tableNames.sessions, this.schemas.sessions),
       checker.checkTableWithSchema(this.#tableNames.oauthAccounts, this.schemas.oauthAccounts),
       checker.checkTableWithSchema(this.#tableNames.emailVerificationCodes, this.schemas.emailVerificationCodes),
+      checker.checkTableWithSchema(this.#tableNames.resetPasswordTokens, this.schemas.resetPasswordTokens),
     ]).then(results => results.every(Boolean));
   }
 

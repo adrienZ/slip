@@ -13,6 +13,11 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
+    },
+    "./nuxt-drizzle": {
+      "types": "./dist/runtime/nuxt/drizzle.d.ts",
+      "import": "./dist/runtime/nuxt/drizzle.js",
+      "require": "./dist/runtime/nuxt/drizzle.js"
     }
   },
   "main": "./dist/module.cjs",

@@ -1,7 +1,5 @@
 <script setup>
-const { loggedIn, user, session, clear } = useUserSession();
-
-const { data: usersInDb } = await useAsyncData("usersInDb", () => $fetch("/api/users"));
+const { loggedIn, session } = useUserSession();
 
 const tabs = [{
   label: "Register",
@@ -25,7 +23,7 @@ const selected = computed({
   },
   set(value) {
     // Hash is specified here to prevent the page from scrolling to the top
-    router.replace({ query: { tab: tabs[value].label }, hash: "#control-the-selected-index" });
+    router.replace({ query: { tab: tabs[value].label }, hash: "#tab" });
   },
 });
 
@@ -37,26 +35,14 @@ function loginToGithub() {
 </script>
 
 <template>
-  <main>
+  <UContainer>
     <div
       v-if="loggedIn"
-      class="mt-12 prose"
+      class="mt-8 prose"
     >
-      <h1 class="text-gray-900 dark:text-white mb-0">
-        Welcome {{ user.id }}!
-      </h1>
       <p class="text-gray-900 dark:text-white">
-        Logged in until {{ new Date(session.expires_at).toDateString() }}
+        Logged in until {{ new Date(session.expires_at).toLocaleDateString() }} {{ new Date(session.expires_at).toLocaleTimeString() }}
       </p>
-
-      <UDivider class="my-4" />
-
-      <UButton
-        color="red"
-        @click="clear"
-      >
-        Logout
-      </UButton>
     </div>
     <div v-else>
       <UTabs
@@ -134,11 +120,5 @@ function loginToGithub() {
         </template>
       </UTabs>
     </div>
-
-    <UTable
-      v-if="usersInDb"
-      class="mt-12"
-      :rows="usersInDb"
-    />
-  </main>
+  </UContainer>
 </template>

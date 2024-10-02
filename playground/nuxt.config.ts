@@ -1,7 +1,12 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
-  modules: ["../src/module", "@nuxt/ui"],
+  modules: [
+    "../src/module",
+    "@nuxt/ui",
+    // optional
+    "@nuxthub/core",
+  ],
   devtools: { enabled: true },
   compatibilityDate: "2024-07-27",
   slipAuth: {
@@ -21,12 +26,24 @@ export default defineNuxtConfig({
           url: "file:./.data/libsql.playground.db",
         },
       },
+      d1: {
+        connector: "cloudflare-d1",
+        options: {
+          bindingName: "DB",
+        },
+      },
     },
   },
 
   // #region faster demo startup
   tailwindcss: {
     viewer: false,
+  },
+  // #endregion
+
+  // #region nuxthub enable database
+  hub: {
+    database: true,
   },
   // #endregion
 

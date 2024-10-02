@@ -12,14 +12,14 @@ import { execSync } from "node:child_process";
  * @param {Map<string, string>} map - The map of environment variables.
  * @returns {string} - The formatted string for the .env file.
  */
-const mapToEnv = map => Array.from(map).map(([key, value]) => `${key}=${value}`).join("\n");
+const mapToEnv = (map: Map<unknown, unknown>) => Array.from(map).map(([key, value]) => `${key}=${value}`).join("\n");
 
 /**
  * Creates a file at the given path with the specified content. If the directory doesn't exist, it is created.
  * @param {string} filePath - The path where the file will be created.
  * @param {string} content - The content to write to the file.
  */
-const createFile = async (filePath, content) => {
+const createFile = async (filePath: string, content: string) => {
   try {
     // Get the directory path from the file path
     const dir = path.dirname(filePath);

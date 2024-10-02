@@ -18,11 +18,10 @@
   "main": "./dist/module.cjs",
   "types": "./dist/types.d.ts",
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "bin": {
-    "nuxt-slip-auth": "bin/cli.js"
+    "nuxt-slip-auth": "dist/runtime/cli/cli.js"
   },
   "scripts": {
     "postinstall": "nuxt prepare",

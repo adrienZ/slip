@@ -257,6 +257,9 @@ describe("SlipAuthCore", () => {
       const verification = await auth.verifyEmailVerificationCode(fakeUserData as SlipAuthUser, codes[0].code);
 
       expect(verification).toBe(true);
+
+      const dbUser = await auth.getUser(userId);
+      expect(dbUser?.email_verified).toBe(1);
     });
   });
 });

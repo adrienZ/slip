@@ -54,4 +54,14 @@ export class UsersRepository extends TableRepository<"users"> {
       .where(eq(this.table.id, userId))
       .run();
   };
+
+  updateEmailVerifiedByUserId = async (userId: string, value: boolean): Promise<void> => {
+    return await this._orm
+      .update(this.table)
+      .set({
+        email_verified: value,
+      })
+      .where(eq(this.table.id, userId))
+      .run();
+  };
 }

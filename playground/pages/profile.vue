@@ -21,31 +21,53 @@
         </h3>
 
         <div v-if="!user.email_verified">
-          <UFormGroup
-
-            label="Verification code"
-            class="max-w-full mt-2"
+          <form
+            ref="form"
+            novalidate
           >
-            <UInput
-              placeholder="XXXXXX"
-            />
-          </UFormGroup>
+            <UFormGroup
+              v-show="askEmailVerificationRequest.status.value === 'success'"
+              label="Verification code"
+              class="max-w-full mt-2"
+            >
+              <UInput
+                name="code"
+                placeholder="XXXXXX"
+              />
+            </UFormGroup>
+          </form>
 
           <UButton
+            v-if="askEmailVerificationRequest.status.value !== 'success'"
             class="mt-2 w-full"
-            color="amber"
-            :loading="true"
+            color="primary"
+            :loading="askEmailVerificationRequest.status.value === 'pending'"
+            @click="askEmailVerificationRequest.refresh"
           >
             Request email verification
           </UButton>
 
+          <UButton
+            v-else-if="
+              validateEmailVerificationRequest.status.value !== 'success'
+                || validateEmailVerificationRequest.data.value === false
+            "
+            class="mt-2 w-full"
+            color="black"
+            :loading="validateEmailVerificationRequest.status.value === 'pending'"
+            @click=" validateEmailVerificationRequest.execute"
+          >
+            Validate code
+          </UButton>
+
           <UAlert
+            v-if="askEmailVerificationRequest.status.value === 'success'"
             icon="i-heroicons-command-line"
             class="not-prose mt-2"
-            title="(check the terminal)"
+            title="Check the terminal !"
             variant="subtle"
             color="green"
-            description="You can add components to your app using the cli."
+            description="As email are not implemented, the code has been sended in your terminal"
           />
         </div>
       </UCard>
@@ -54,5 +76,36 @@
 </template>
 
 <script setup lang="ts">
-const { session, user } = useUserSession();
+const { session, user, fetch } = useUserSession();
+const askEmailVerificationRequest = await useLazyFetch("/api/ask-email-verification", {
+  immediate: false,
+  method: "POST",
+});
+
+function useFormData(form: Ref<HTMLFormElement | undefined>) {
+  const data = shallowRef(new FormData());
+
+  async function update(): Promise<void> {
+    data.value = new FormData(form.value);
+  }
+
+  onMounted(() => form.value?.addEventListener("input", update));
+
+  return {
+    data,
+    update,
+  };
+}
+
+const form = ref<HTMLFormElement>();
+const { data: formData } = useFormData(form);
+const validateEmailVerificationRequest = await useLazyFetch("/api/verify-email-verification", {
+  immediate: false,
+  method: "POST",
+  body: formData,
+  watch: false,
+  onResponse() {
+    fetch();
+  },
+});
 </script>

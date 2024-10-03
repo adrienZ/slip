@@ -31,7 +31,8 @@ declare module "nuxt/schema" {
 
 export type SlipAuthPublicSession = Pick<SlipAuthSession, "id" | "expires_at">;
 
-// @ts-expect-error #auth-utils is an alias from nuxt-auth-utils
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore #auth-utils is an alias from nuxt-auth-utils
 declare module "#auth-utils" {
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type

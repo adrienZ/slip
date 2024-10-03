@@ -1,6 +1,6 @@
 {
   "name": "nuxt-slip-auth",
-  "version": "0.1.40",
+  "version": "0.1.41",
   "description": "Plug and play authentication module for Nuxt",
   "repository": {
     "type": "git",

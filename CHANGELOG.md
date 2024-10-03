@@ -1,6 +1,32 @@
 # Changelog
 
 
+## v0.1.41
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.40...v0.1.41)
+
+### 🚀 Enhancements
+
+- **session:** Add email_verified in session's user ([871cdb8](https://github.com/adrienZ/slip/commit/871cdb8))
+
+### 🩹 Fixes
+
+- **nuxthub:** Use onHubReady hook only in dev ([94b9237](https://github.com/adrienZ/slip/commit/94b9237))
+- **database:** Add resetPasswordTokens schema validation in checkDbAndTables method ([d6066b9](https://github.com/adrienZ/slip/commit/d6066b9))
+- **email:** Fix email verification ([c325aea](https://github.com/adrienZ/slip/commit/c325aea))
+
+### 💅 Refactors
+
+- **core:** Group setters ([a5e736b](https://github.com/adrienZ/slip/commit/a5e736b))
+
+### 🏡 Chore
+
+- **release:** V0.1.40 ([83de8aa](https://github.com/adrienZ/slip/commit/83de8aa))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.40
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.39...v0.1.40)

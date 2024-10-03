@@ -192,26 +192,6 @@ Same as `askPasswordReset` but with email instead of userId.
 
 Resets the password using the reset token.
 
-##### `setCreateRandomUserId(fn: () => string)`
-
-Sets a custom method for generating random user IDs.
-
-##### `setCreateRandomSessionId(fn: () => string)`
-
-Sets a custom method for generating random session IDs.
-
-##### `setCreateRandomEmailVerificationCode(fn: () => string)`
-
-Sets a custom method for generating random email verification codes.
-
-##### `setPasswordHashingMethods(fn: () => IPasswordHashingMethods)`
-
-Sets custom methods for hashing and verifying passwords.
-
-##### `setCreateResetPasswordTokenHashMethod(fn: (tokenId: string) => Promise<string>)`
-
-Sets custom method for reset password token hashing.
-
 
 ## Hooks
 
@@ -234,6 +214,30 @@ The hooks property allows you to listen for and respond to events during the aut
 
 - `schemas`: Contains the database schemas for users, sessions, and OAuth accounts.
 - `hooks`: Provides hooks to extend and configure the authentication behavior.
+
+## Setters
+
+under auth.setters
+
+##### `setCreateRandomUserId(fn: () => string)`
+
+Sets a custom method for generating random user IDs.
+
+##### `setCreateRandomSessionId(fn: () => string)`
+
+Sets a custom method for generating random session IDs.
+
+##### `setCreateRandomEmailVerificationCode(fn: () => string)`
+
+Sets a custom method for generating random email verification codes.
+
+##### `setPasswordHashingMethods(fn: () => IPasswordHashingMethods)`
+
+Sets custom methods for hashing and verifying passwords.
+
+##### `setCreateResetPasswordTokenHashMethod(fn: (tokenId: string) => Promise<string>)`
+
+Sets custom method for reset password token hashing.
 
 ## Database migraions
 

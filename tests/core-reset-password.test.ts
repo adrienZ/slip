@@ -47,17 +47,17 @@ describe("Reset password", () => {
       },
     );
 
-    auth.setCreateRandomUserId(() => {
+    auth.setters.setCreateRandomUserId(() => {
       mocks.userCreatedCount++;
       return `user-id-${mocks.userCreatedCount}`;
     });
 
-    auth.setCreateRandomSessionId(() => {
+    auth.setters.setCreateRandomSessionId(() => {
       mocks.sessionCreatedCount++;
       return `session-id-${mocks.sessionCreatedCount}`;
     });
 
-    auth.setCreateResetPasswordTokenHashMethod(async () => {
+    auth.setters.setCreateResetPasswordTokenHashMethod(async () => {
       mocks.resetPasswordTokenCount++;
       return `reset-password-token-${mocks.resetPasswordTokenCount}`;
     });
@@ -65,7 +65,7 @@ describe("Reset password", () => {
     function sanitizePassword(str: string) {
       return str.replaceAll("$", "") + "$";
     }
-    auth.setPasswordHashingMethods(() => ({
+    auth.setters.setPasswordHashingMethods(() => ({
       hash: async (password: string) => sanitizePassword(password) + mocks.passwordCount,
       verify: async (sourceHashedPassword: string, rawPassword: string) => {
         const salt = sourceHashedPassword.split("$").at(-1);

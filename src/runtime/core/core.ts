@@ -27,12 +27,15 @@ export class SlipAuthCore {
     resetPasswordTokens: ResetPasswordTokensRepository
   };
 
-  #createRandomUserId: () => string;
-  #createRandomSessionId: () => string;
-  #createRandomEmailVerificationCode: () => string;
-  #createResetPasswordTokenHashMethod: (tokenId: string) => Promise<string>;
+  #createRandomUserId: () => string = defaultIdGenerationMethod;
+  #createRandomSessionId: () => string = defaultIdGenerationMethod;
+  #createRandomEmailVerificationCode: () => string = defaultEmailVerificationCodeGenerationMethod;
+  #createResetPasswordTokenHashMethod: (tokenId: string) => Promise<string> = defaultResetPasswordTokenHashMethod;
 
-  #passwordHashingMethods: IPasswordHashingMethods;
+  #passwordHashingMethods: IPasswordHashingMethods = {
+    hash: defaultHashPasswordMethod,
+    verify: defaultVerifyPasswordMethod,
+  };
 
   readonly schemas: SchemasMockValue;
   readonly hooks = createSlipHooks();
@@ -62,17 +65,6 @@ export class SlipAuthCore {
       oAuthAccounts: new OAuthAccountsRepository(this.#orm, this.schemas, this.hooks, "oauthAccounts"),
       emailVerificationCodes: new EmailVerificationCodesRepository(this.#orm, this.schemas, this.hooks, "emailVerificationCodes"),
       resetPasswordTokens: new ResetPasswordTokensRepository(this.#orm, this.schemas, this.hooks, "resetPasswordTokens"),
-    };
-
-    this.#createRandomSessionId = defaultIdGenerationMethod;
-    this.#createRandomUserId = defaultIdGenerationMethod;
-
-    this.#createRandomEmailVerificationCode = defaultEmailVerificationCodeGenerationMethod;
-    this.#createResetPasswordTokenHashMethod = defaultResetPasswordTokenHashMethod;
-
-    this.#passwordHashingMethods = {
-      hash: defaultHashPasswordMethod,
-      verify: defaultVerifyPasswordMethod,
     };
   }
 
@@ -334,26 +326,28 @@ export class SlipAuthCore {
     return true;
   }
 
-  public setCreateRandomUserId(fn: () => string) {
-    this.#createRandomUserId = fn;
-  }
+  public setters = {
+    setCreateRandomUserId: (fn: () => string) => {
+      this.#createRandomUserId = fn;
+    },
 
-  public setCreateRandomSessionId(fn: () => string) {
-    this.#createRandomSessionId = fn;
-  }
+    setCreateRandomSessionId: (fn: () => string) => {
+      this.#createRandomSessionId = fn;
+    },
 
-  public setCreateRandomEmailVerificationCode(fn: () => string) {
-    this.#createRandomEmailVerificationCode = fn;
-  }
+    setCreateRandomEmailVerificationCode: (fn: () => string) => {
+      this.#createRandomEmailVerificationCode = fn;
+    },
 
-  public setCreateResetPasswordTokenHashMethod(fn: (tokenId: string) => Promise<string>) {
-    this.#createResetPasswordTokenHashMethod = fn;
-  }
+    setCreateResetPasswordTokenHashMethod: (fn: (tokenId: string) => Promise<string>) => {
+      this.#createResetPasswordTokenHashMethod = fn;
+    },
 
-  public setPasswordHashingMethods(fn: () => IPasswordHashingMethods) {
-    const methods = fn();
-    this.#passwordHashingMethods = methods;
-  }
+    setPasswordHashingMethods: (fn: () => IPasswordHashingMethods) => {
+      const methods = fn();
+      this.#passwordHashingMethods = methods;
+    },
+  };
 
   public getUser(userId: string) {
     return this.#repos.users.findById(userId);

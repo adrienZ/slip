@@ -8,7 +8,7 @@ export default defineNitroPlugin(() => {
   const auth = useSlipAuth();
 
   if (typeof hashPassword !== "undefined" && typeof verifyPassword !== "undefined") {
-    auth.setPasswordHashingMethods(() => {
+    auth.setters.setPasswordHashingMethods(() => {
       return {
         hash: hashPassword,
         verify: verifyPassword,

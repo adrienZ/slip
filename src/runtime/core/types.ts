@@ -1,8 +1,5 @@
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/lib/sqlite/schema.sqlite";
-import type { tableNames } from "../database/lib/tables";
-
-export type { tableNames };
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/sqlite/schema.sqlite";
 
 interface ISessionCreateMetada {
   ip?: string
@@ -78,3 +75,11 @@ const schemasMockValue = {
 } satisfies Record<keyof tableNames, SQLiteTable>;
 export type SchemasMockValue = typeof schemasMockValue;
 // #endregion
+
+export interface tableNames {
+  users: string
+  sessions: string
+  oauthAccounts: string
+  emailVerificationCodes: string
+  resetPasswordTokens: string
+}

@@ -1,4 +1,4 @@
-import type { tableNames } from "../database/lib/tables";
+import type { tableNames } from "../core/types";
 
 export const defaultTableNames: tableNames = {
   sessions: "slip_auth_sessions",

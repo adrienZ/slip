@@ -1,5 +1,5 @@
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
-import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/lib/sqlite/schema.sqlite";
+import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/sqlite/schema.sqlite";
 import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
 import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, IPasswordHashingMethods, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
@@ -226,10 +226,11 @@ export class SlipAuthCore {
   public async askEmailVerificationCode(user: SlipAuthUser): Promise<void> {
     await this.#repos.emailVerificationCodes.deleteAllByUserId(user.id);
     await this.#repos.emailVerificationCodes.insert(user.id, user.email, this.#createRandomEmailVerificationCode());
+    // send mail to user
   }
 
   // TODO: use transactions
-  // should recreate session if true
+  // TODO: rate limit
   public async verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean> {
     const databaseCode = await this.#repos.emailVerificationCodes.findByUserId(user.id);
     if (!databaseCode || databaseCode.code !== code) {
@@ -250,7 +251,7 @@ export class SlipAuthCore {
     }
 
     await this.#repos.users.updateEmailVerifiedByUserId(databaseCode.user_id, true);
-
+    // should recreate session if true
     return true;
   }
 

@@ -148,7 +148,7 @@ export class SlipAuthCore {
 
     try {
       const user = await this.#repos.users.insert(userId, email, passwordHash);
-      await this.#repos.emailVerificationCodes.insert(user.id, user.email, this.#createRandomEmailVerificationCode());
+      this.askEmailVerificationCode(user);
       const sessionToLoginId = this.#createRandomSessionId();
       const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
         userId: user.id,
@@ -231,6 +231,11 @@ export class SlipAuthCore {
     throw new Error("could not find oauth user");
   }
 
+  public async askEmailVerificationCode(user: SlipAuthUser): Promise<void> {
+    await this.#repos.emailVerificationCodes.deleteAllByUserId(user.id);
+    await this.#repos.emailVerificationCodes.insert(user.id, user.email, this.#createRandomEmailVerificationCode());
+  }
+
   // TODO: use transactions
   // should recreate session if true
   public async verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean> {
@@ -251,6 +256,8 @@ export class SlipAuthCore {
     if (databaseCode.email !== user.email) {
       return false;
     }
+
+    await this.#repos.users.updateEmailVerifiedByUserId(databaseCode.user_id, true);
 
     return true;
   }
@@ -346,6 +353,10 @@ export class SlipAuthCore {
   public setPasswordHashingMethods(fn: () => IPasswordHashingMethods) {
     const methods = fn();
     this.#passwordHashingMethods = methods;
+  }
+
+  public getUser(userId: string) {
+    return this.#repos.users.findById(userId);
   }
 
   public getSession(sessionId: string) {

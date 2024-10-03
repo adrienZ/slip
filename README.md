@@ -151,8 +151,9 @@ Registers a new user in the database if they don’t already exist, email + pass
 
 ##### `login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]>`
 
-Email + password login. Creates a session in database
+##### `askEmailVerificationCode(user: SlipAuthUser): Promise<void>`
 
+Ask the email verification code for a user.
 ##### `verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean>`
 
 Checks the email verification code. Returns a boolean.
@@ -162,6 +163,10 @@ Don't forget to re-login after verifying the email verification code.
 
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
 - **Returns**: A tuple containing the user ID and the created session details.
+
+##### `getUser(userId: string)`
+
+Fetches a user by its user ID.
 
 ##### `getSession(sessionId: string)`
 

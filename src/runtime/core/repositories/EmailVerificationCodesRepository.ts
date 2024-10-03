@@ -62,6 +62,15 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
     return code;
   }
 
+  async deleteAllByUserId(userId: string): Promise<void> {
+    await this._orm
+      .delete(this.table)
+      .where(
+        eq(this.table.user_id, userId),
+      )
+      .run();
+  }
+
   async deleteById(codeId: number) {
     const codeToDelete = await this.findById(codeId);
 

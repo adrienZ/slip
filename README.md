@@ -75,12 +75,15 @@ npx nuxt-slip-auth demo
 Example: `~/server/routes/auth/github.get.ts`
 
 ```ts
-export default oauthGitHubEventHandler({
+import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
+
+export default defineOAuthGitHubEventHandler({
   config: {
     emailRequired: true,
   },
   async onSuccess(event, { user }) {
     const auth = useSlipAuth();
+    const db = drizzleIntegration(useDatabase());
 
     const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
@@ -90,19 +93,25 @@ export default oauthGitHubEventHandler({
       ip: getRequestIP(event),
     });
 
+    const userDb = await db
+      .select()
+      .from(auth.schemas.users)
+      .get();
+
     await setUserSession(event, {
       expires_at: sessionFromDb.expires_at,
       id: sessionFromDb.id,
       user: {
         id: userId,
+        email_verified: userDb?.email_verified || false,
       },
     });
-    return sendRedirect(event, "/");
+    return sendRedirect(event, "/profile");
   },
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {
     console.error("GitHub OAuth error:", error);
-    return sendRedirect(event, "/");
+    return sendRedirect(event, "/?authError=" + error);
   },
 });
 ```
@@ -122,11 +131,24 @@ Example: `~/app.vue`
 
 ```vue
 <script setup lang="ts">
-const { loggedIn, user, session, clear } = useUserSession();
+const { loggedIn, user, session, clear, fetch: fetchSession } = useUserSession();
+
+const authClient = getSlipAuthClient();
+async function seedUser() {
+  const email = `user-${Math.random()}@email.com`;
+  const password = "password";
+
+  await authClient.register({
+    email,
+    password,
+  });
+
+  await fetchSession();
+}
 </script>
 
 <template>
-  <div v-if="loggedIn">
+  <div v-if="loggedIn && user">
     <h1>Welcome {{ user.id }}!</h1>
     <p>Logged in until {{ new Date(session.expires_at).toDateString() }}</p>
     <button @click="clear">
@@ -135,6 +157,7 @@ const { loggedIn, user, session, clear } = useUserSession();
   </div>
   <div v-else>
     <h1>Not logged in</h1>
+    <button @click="seedUser">Create email + password user</button>
     <a href="/auth/github">Login with GitHub</a>
   </div>
 </template>

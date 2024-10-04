@@ -24,6 +24,9 @@ importers:
       '@iconify-json/heroicons':
         specifier: ^1.2.0
         version: 1.2.0
+      '@iconify-json/heroicons-solid':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@iconify-json/simple-icons':
         specifier: ^1.2.1
         version: 1.2.4
@@ -1111,6 +1114,9 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       vue: ^3.2.0
+
+  '@iconify-json/heroicons-solid@1.2.0':
+    resolution: {integrity: sha512-o+PjtMXPr4wk0veDS7Eh6H1BnTJT1vD7HcKl+I7ixdYQC8i1P2zdtk0C2v7C9OjJBMsiwJSCxT4qQ3OzONgyjw==}
 
   '@iconify-json/heroicons@1.2.0':
     resolution: {integrity: sha512-EmvGN0L9EUJCmQ82rkLGZ4tkz0YGQfZV7ugKT6UvHni/bxNitQrD0gLj6NJj2W9zsSoXyNHyCX236+EJmO4pmA==}
@@ -5086,6 +5092,10 @@ snapshots:
     dependencies:
       '@tanstack/vue-virtual': 3.10.8(vue@3.5.8)
       vue: 3.5.8
+
+  '@iconify-json/heroicons-solid@1.2.0':
+    dependencies:
+      '@iconify/types': 2.0.0
 
   '@iconify-json/heroicons@1.2.0':
     dependencies:

@@ -1,5 +1,7 @@
 <template>
   <div class="pb-4">
+    {{route.fullPath}}
+
     <UTable
       v-if="usersInDb"
       class="mt-12"
@@ -9,5 +11,10 @@
 </template>
 
 <script setup lang="ts">
-const { data: usersInDb } = await useAsyncData("usersInDb", () => $fetch("/api/users"));
+const { data: usersInDb, refresh } = await useAsyncData("usersInDb", () => $fetch("/api/users"));
+const route = useRoute();
+
+watch(() => route.fullPath, () => {
+  refresh();
+});
 </script>

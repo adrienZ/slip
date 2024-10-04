@@ -61,6 +61,8 @@ async function handleSubmit() {
 
   if (data.value) {
     await fetchSession();
+    // triggernavifation
+    await navigateTo("/?auth=success");
   }
   else {
     alert(action + " failed");

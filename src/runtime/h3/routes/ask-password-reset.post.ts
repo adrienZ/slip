@@ -1,4 +1,4 @@
-import { useSlipAuth } from "../server/utils/useSlipAuth";
+import { useSlipAuth } from "../../server/utils/useSlipAuth";
 import { defineEventHandler, createError } from "h3";
 
 export default defineEventHandler(async (event) => {

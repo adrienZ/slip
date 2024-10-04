@@ -1,5 +1,5 @@
-import { SlipAuthError } from "../core/errors/SlipAuthError";
-import { useSlipAuth } from "../server/utils/useSlipAuth";
+import { SlipAuthError } from "../../core/errors/SlipAuthError";
+import { useSlipAuth } from "../../server/utils/useSlipAuth";
 import { defineEventHandler, readBody, createError } from "h3";
 
 export default defineEventHandler(async (event) => {

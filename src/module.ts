@@ -1,7 +1,7 @@
-import { defineNuxtModule, createResolver, installModule, addServerScanDir, updateRuntimeConfig } from "@nuxt/kit";
+import { defineNuxtModule, createResolver, installModule, addServerScanDir, updateRuntimeConfig, addServerHandler, addImportsDir } from "@nuxt/kit";
 import type { SessionConfig, SlipModuleOptions } from "./runtime/types";
 import { defaultTableNames } from "./runtime/nuxt/defaults";
-
+import { routerRecord } from "./runtime/h3/routerRecord";
 // Module options TypeScript interface definition
 export type ModuleOptions = SlipModuleOptions;
 
@@ -63,5 +63,23 @@ export default defineNuxtModule<ModuleOptions>({
       // nitro.plugins.push(resolver.resolve("runtime/server/plugins/sessions.plugin"));
       // nitro.plugins.push(resolver.resolve("runtime/server/plugins/auto-setup.plugin"));
     });
+
+    addServerHandler({
+      route: routerRecord.register,
+      handler: resolver.resolve("./runtime/h3/routes/register.post.ts"),
+    });
+    addServerHandler({
+      route: routerRecord.login,
+      handler: resolver.resolve("./runtime/h3/routes/login.post.ts"),
+    });
+    addServerHandler({
+      route: routerRecord.askEmailVerificationCode,
+      handler: resolver.resolve("./runtime/h3/routes/ask-email-verification.post.ts"),
+    });
+    addServerHandler({
+      route: routerRecord.verifyEmailVerificationCode,
+      handler: resolver.resolve("./runtime/h3/routes/verify-email-verification.post.ts"),
+    });
+    addImportsDir(resolver.resolve("./runtime/nuxt/app/utils"));
   },
 });

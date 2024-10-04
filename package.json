@@ -39,7 +39,7 @@
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
     "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
     "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && pnpm i && pnpm exec nuxt prepare && vue-tsc --noEmit"
+    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
     "@node-rs/argon2": "^1.8.3",

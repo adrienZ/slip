@@ -1,3 +1,6 @@
+import { useSlipAuth } from "../../server/utils/useSlipAuth";
+import { defineEventHandler, createError } from "h3";
+
 export default defineEventHandler(async (event) => {
   const auth = useSlipAuth();
   const session = await requireUserSession(event);
@@ -9,11 +12,6 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       throw new Error("no user");
     }
-
-    // ONLY FOR DEMO PURPOSE, UNSAFE TO USE IN PRODUCTION!
-    auth.hooks.hookOnce("resetPasswordToken:create", (token) => {
-      console.log(`PASSWORD TOKEN FOR EMAIL ${user.email} : ${token.token_hash}`);
-    });
 
     const tokenId = await auth.askPasswordReset(user.id);
 

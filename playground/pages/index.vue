@@ -1,5 +1,5 @@
-<script setup>
-const { loggedIn, session } = useUserSession();
+<script setup lang="ts">
+const { loggedIn, session, fetch: fetchSession } = useUserSession();
 
 const tabs = [{
   label: "Register",
@@ -32,6 +32,40 @@ function loginToGithub() {
     external: true,
   });
 }
+
+const formData = reactive({
+  email: "",
+  password: "",
+});
+
+const authClient = getSlipAuthClient();
+
+const registerRequest = await useLazyAsyncData(() => authClient.register(formData), {
+  immediate: false,
+});
+
+const loginRequest = await useLazyAsyncData(() => authClient.login(formData), {
+  immediate: false,
+});
+
+async function handleSubmit() {
+  const action = selected.value === 0 ? "register" : "login";
+  const request = action === "register" ? registerRequest : loginRequest;
+  await request.execute();
+
+  const { data, error } = request;
+
+  if (error.value) {
+    return alert(error.value);
+  }
+
+  if (data.value) {
+    await fetchSession();
+  }
+  else {
+    alert(action + " failed");
+  }
+}
 </script>
 
 <template>
@@ -51,9 +85,8 @@ function loginToGithub() {
       >
         <template #item="{ item }">
           <form
-            method="post"
-            :action="item.label === 'Register' ? '/auth/register' : '/auth/login'"
             class="w-full max-w-sm space-y-6 mx-auto mt-12 register"
+            @submit.prevent="handleSubmit"
           >
             <p class="text-2xl text-gray-900 dark:text-white font-bold">
               {{ item.label }}
@@ -64,6 +97,7 @@ function loginToGithub() {
                 label="Email"
               >
                 <UInput
+                  v-model="formData.email"
                   placeholder="Enter your email"
                   name="email"
                   type="email"
@@ -78,6 +112,8 @@ function loginToGithub() {
                 class="space-yy-6"
               >
                 <UInput
+                  v-model="formData.password"
+
                   placeholder="Enter your password"
                   name="password"
                   type="password"

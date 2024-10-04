@@ -3,7 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import type { SlipAuthUser } from "~/src/runtime/core/types";
-import { testTablesNames } from "./test-helpers";
+import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
 
 const date = new Date(Date.UTC(1998, 11, 19));
 
@@ -12,15 +12,7 @@ const db = createDatabase(sqlite({
 }));
 
 beforeEach(async () => {
-  await db.sql`DROP TABLE IF EXISTS slip_oauth_accounts`;
-  await db.sql`DROP TABLE IF EXISTS slip_sessions`;
-  await db.sql`DROP TABLE IF EXISTS slip_auth_email_verification_codes`;
-  await db.sql`DROP TABLE IF EXISTS slip_users`;
-
-  await db.sql`CREATE TABLE IF NOT EXISTS slip_users ("id" TEXT NOT NULL PRIMARY KEY, "email" TEXT NOT NULL UNIQUE, "email_verified" BOOLEAN DEFAULT FALSE, "password" TEXT, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`;
-  await db.sql`CREATE TABLE IF NOT EXISTS slip_sessions ("id" TEXT NOT NULL PRIMARY KEY, "expires_at" INTEGER NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "ip" TEXT, "ua" TEXT, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
-  await db.sql`CREATE TABLE IF NOT EXISTS slip_oauth_accounts ("provider_id" TEXT NOT NULL, "provider_user_id" TEXT NOT NULL, "user_id" TEXT NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (provider_id, provider_user_id), FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
-  await db.sql`CREATE TABLE IF NOT EXISTS slip_auth_email_verification_codes ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" TEXT NOT NULL UNIQUE, "email" TEXT NOT NULL, "code" TEXT NOT NULL, "expires_at" TIMESTAMP NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
+  await autoSetupTestsDatabase(db);
 });
 
 const defaultInsert = {
@@ -92,8 +84,8 @@ describe("SlipAuthCore", () => {
     });
 
     it("should throw an error when registering a user with an email in the database and a different provider", async () => {
-      const [_, inserted] = await auth.register(defaultInsert);
-      const inserted2 = auth.register({
+      const [_, inserted] = await auth.register(createH3Event(), defaultInsert);
+      const inserted2 = auth.register(createH3Event(), {
         email: defaultInsert.email,
         password: "password",
       });
@@ -105,8 +97,8 @@ describe("SlipAuthCore", () => {
     });
 
     it("should insert twice when database users have different emails", async () => {
-      const [_, inserted] = await auth.register(defaultInsert);
-      const [__, inserted2] = await auth.register({
+      const [_, inserted] = await auth.register(createH3Event(), defaultInsert);
+      const [__, inserted2] = await auth.register(createH3Event(), {
         email: "email2@test.com",
         password: "password",
       });
@@ -147,7 +139,7 @@ describe("SlipAuthCore", () => {
         auth.hooks.hookOnce("emailVerificationCode:create", values => resolve(values));
       });
 
-      const [_, inserted] = await auth.register(defaultInsert);
+      const [_, inserted] = await auth.register(createH3Event(), defaultInsert);
 
       expect(userCreatedHookPromise).resolves.toMatchObject({
         email: defaultInsert.email,
@@ -167,9 +159,9 @@ describe("SlipAuthCore", () => {
 
     it("should only hook \"sessions:create\" when login an existing user", async () => {
       // register
-      const [_, registerSession] = await auth.register(defaultInsert);
+      const [_, registerSession] = await auth.register(createH3Event(), defaultInsert);
       // logout
-      auth.deleteSession(registerSession.id);
+      auth.deleteSession({ sessionId: registerSession.id });
 
       const userCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 2000);
@@ -186,7 +178,7 @@ describe("SlipAuthCore", () => {
       });
 
       // login
-      const [__, loginSession] = await auth.login(defaultInsert);
+      const [__, loginSession] = await auth.login(createH3Event(), defaultInsert);
 
       expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
       expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
@@ -201,9 +193,9 @@ describe("SlipAuthCore", () => {
       });
 
       // register
-      const [_, registerSession] = await auth.register(defaultInsert);
+      const [_, registerSession] = await auth.register(createH3Event(), defaultInsert);
       // logout
-      auth.deleteSession(registerSession.id);
+      auth.deleteSession({ sessionId: registerSession.id });
 
       expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
@@ -224,8 +216,8 @@ describe("SlipAuthCore", () => {
         email: defaultInsert.email + "2",
       };
 
-      const [userId1] = await auth.register(defaultInsert);
-      const [userId2] = await auth.register(defaultInsert2);
+      const [userId1] = await auth.register(createH3Event(), defaultInsert);
+      const [userId2] = await auth.register(createH3Event(), defaultInsert2);
 
       expect(codes).toHaveLength(2);
 
@@ -233,14 +225,14 @@ describe("SlipAuthCore", () => {
         id: userId2,
         email: defaultInsert2.email,
       };
-      const verification1 = await auth.verifyEmailVerificationCode(fakeUser2Data as SlipAuthUser, codes[0].code);
+      const verification1 = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser2Data as SlipAuthUser, code: codes[0].code });
       expect(verification1).toBe(false);
 
       const fakeUser1Data = {
         id: userId1,
         email: defaultInsert.email,
       };
-      const verification2 = await auth.verifyEmailVerificationCode(fakeUser1Data as SlipAuthUser, codes[1].code);
+      const verification2 = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser1Data as SlipAuthUser, code: codes[1].code });
       expect(verification2).toBe(false);
     });
 
@@ -249,16 +241,16 @@ describe("SlipAuthCore", () => {
 
       auth.hooks.hook("emailVerificationCode:create", values => codes.push(values));
 
-      const [userId] = await auth.register(defaultInsert);
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
       const fakeUserData = {
         id: userId,
         email: defaultInsert.email,
       };
-      const verification = await auth.verifyEmailVerificationCode(fakeUserData as SlipAuthUser, codes[0].code);
+      const verification = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUserData as SlipAuthUser, code: codes[0].code });
 
       expect(verification).toBe(true);
 
-      const dbUser = await auth.getUser(userId);
+      const dbUser = await auth.getUser({ userId });
       expect(dbUser?.email_verified).toBe(1);
     });
   });

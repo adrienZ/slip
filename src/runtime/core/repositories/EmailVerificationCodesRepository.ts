@@ -3,7 +3,7 @@ import { TableRepository } from "./_repo";
 import { TimeSpan, createDate } from "oslo";
 
 export class EmailVerificationCodesRepository extends TableRepository<"emailVerificationCodes"> {
-  async insert(userId: string, email: string, code: string): Promise<void> {
+  async insert({ userId, email, code }: { userId: string, email: string, code: string }): Promise<void> {
     const values: typeof this.table.$inferInsert = {
       user_id: userId,
       email,
@@ -20,7 +20,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
     this._hooks.callHookParallel("emailVerificationCode:create", values);
   }
 
-  async findById(id: number): Promise<typeof this.table.$inferSelect | undefined> {
+  async findById({ id }: { id: number }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select({
         id: this.table.id,
@@ -41,7 +41,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
     return code;
   }
 
-  async findByUserId(userId: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findByUserId({ userId }: { userId: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select({
         id: this.table.id,
@@ -72,7 +72,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
   }
 
   async deleteById(codeId: number) {
-    const codeToDelete = await this.findById(codeId);
+    const codeToDelete = await this.findById({ id: codeId });
 
     if (!codeToDelete) {
       throw new Error(`Unable to delete email verification code with id ${codeId}`);
@@ -87,7 +87,7 @@ export class EmailVerificationCodesRepository extends TableRepository<"emailVeri
 
     // TODO: fix typings in db0 / drizzle
     // as the delete from drizzle returns any we do an extra query to check if the deletion went fine
-    const deletedCode = await this.findById(codeId);
+    const deletedCode = await this.findById({ id: codeId });
 
     if (deletedCode) {
       return { success: false };

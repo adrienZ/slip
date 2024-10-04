@@ -132,9 +132,9 @@ describe("SlipAuthCore", () => {
     it("should delete an existant session", async () => {
       const [_, session] = await auth.OAuthLoginUser(defaultInsert);
 
-      await auth.deleteSession(session.id);
+      await auth.deleteSession({ sessionId: session.id });
 
-      const notASession = await auth.getSession(session.id);
+      const notASession = await auth.getSession({ sessionId: session.id });
 
       expect(notASession).toBe(undefined);
     });
@@ -142,7 +142,7 @@ describe("SlipAuthCore", () => {
     it("should throw when trying to delete an non existant session", async () => {
       await auth.OAuthLoginUser(defaultInsert);
 
-      const deletion = auth.deleteSession("notInDB");
+      const deletion = auth.deleteSession({ sessionId: "notInDB" });
       expect(deletion).rejects.toThrowError(
         "Unable to delete session with id notInDB",
       );
@@ -158,7 +158,7 @@ describe("SlipAuthCore", () => {
         providerUserId: `another-${defaultInsert.providerUserId}`,
       });
 
-      const deletions = await auth.deleteExpiredSessions(Date.now());
+      const deletions = await auth.deleteExpiredSessions({ timestamp: Date.now() });
       expect(deletions).toStrictEqual({ success: true, count: 1 });
     });
   });
@@ -210,7 +210,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
       // logout
-      auth.deleteSession(registerSession.id);
+      auth.deleteSession({ sessionId: registerSession.id });
 
       const userCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 2000);
@@ -253,7 +253,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
       // logout
-      auth.deleteSession(registerSession.id);
+      auth.deleteSession({ sessionId: registerSession.id });
 
       expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });

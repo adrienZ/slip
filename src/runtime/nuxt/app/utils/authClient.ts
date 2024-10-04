@@ -14,11 +14,11 @@ export function getSlipAuthClient() {
   });
 
   return {
-    login: (body: Parameters<SlipAuthCore["login"]>[0]) => httpClient(routerRecord.login, {
+    login: (body: Parameters<SlipAuthCore["login"]>[1]) => httpClient(routerRecord.login, {
       method: "POST",
       body,
     }) as ReturnType<typeof loginHandler>,
-    register: (body: Parameters<SlipAuthCore["register"]>[0]) => httpClient(routerRecord.register, {
+    register: (body: Parameters<SlipAuthCore["register"]>[1]) => httpClient(routerRecord.register, {
       method: "POST",
       body,
     }) as ReturnType<typeof registerHandler>,

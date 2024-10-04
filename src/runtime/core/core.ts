@@ -13,6 +13,7 @@ import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGe
 import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
+import type { H3Event } from "h3";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -80,7 +81,7 @@ export class SlipAuthCore {
     ]).then(results => results.every(Boolean));
   }
 
-  public async login(values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {
+  public async login(h3Event: H3Event, values: ILoginUserParams): Promise<[ string, SlipAuthPublicSession]> {
     const email = values.email;
     if (!email || typeof email !== "string" || !isValidEmail(email)) {
       throw new InvalidEmailOrPasswordError("invalid email");
@@ -90,7 +91,7 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("invalid password");
     }
 
-    const existingUser = await this.#repos.users.findByEmail(email);
+    const existingUser = await this.#repos.users.findByEmail({ email });
 
     if (!existingUser) {
       // NOTE:
@@ -115,7 +116,8 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("login invalid password");
     }
     const sessionToLoginId = this.#createRandomSessionId();
-    const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
+    const sessionToLogin = await this.#repos.sessions.insert({
+      sessionId: sessionToLoginId,
       userId: existingUser.id,
       expiresAt: Date.now() + this.#sessionMaxAge,
       ip: values.ip,
@@ -125,7 +127,7 @@ export class SlipAuthCore {
     return [existingUser.id, sessionToLogin];
   }
 
-  public async register(values: ICreateUserParams): Promise<[ string, SlipAuthPublicSession]> {
+  public async register(h3Event: H3Event, values: ICreateUserParams): Promise<[ string, SlipAuthPublicSession]> {
     const email = values.email;
     if (!email || typeof email !== "string" || !isValidEmail(email)) {
       throw new InvalidEmailOrPasswordError("invalid email");
@@ -139,10 +141,15 @@ export class SlipAuthCore {
     const passwordHash = await this.#passwordHashingMethods.hash(password);
 
     try {
-      const user = await this.#repos.users.insert(userId, email, passwordHash);
-      this.askEmailVerificationCode(user);
+      const user = await this.#repos.users.insert({
+        userId,
+        email,
+        password: passwordHash,
+      });
+      this.askEmailVerificationCode(h3Event, { user });
       const sessionToLoginId = this.#createRandomSessionId();
-      const sessionToLogin = await this.#repos.sessions.insert(sessionToLoginId, {
+      const sessionToLogin = await this.#repos.sessions.insert({
+        sessionId: sessionToLoginId,
         userId: user.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ip: values.ip,
@@ -175,21 +182,23 @@ export class SlipAuthCore {
   public async OAuthLoginUser(
     params: ICreateOrLoginParams,
   ): Promise<[ string, SlipAuthPublicSession]> {
-    const existingUser = await this.#repos.users.findByEmail(params.email);
+    const existingUser = await this.#repos.users.findByEmail({ email: params.email });
 
     if (!existingUser) {
       const userId = this.#createRandomUserId();
 
-      await this.#repos.users.insert(userId, params.email);
+      await this.#repos.users.insert({ userId: userId, email: params.email });
 
-      const _insertedOAuthAccount = await this.#repos.oAuthAccounts.insert(params.email, {
+      const _insertedOAuthAccount = await this.#repos.oAuthAccounts.insert({
+        email: params.email,
         provider_id: params.providerId,
         provider_user_id: params.providerUserId,
         user_id: userId,
       });
 
       const sessionFromRegistrationId = this.#createRandomSessionId();
-      const sessionFromRegistration = await this.#repos.sessions.insert(sessionFromRegistrationId, {
+      const sessionFromRegistration = await this.#repos.sessions.insert({
+        sessionId: sessionFromRegistrationId,
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ip: params.ip,
@@ -199,9 +208,10 @@ export class SlipAuthCore {
       return [userId, sessionFromRegistration];
     }
 
-    const existingAccount = await this.#repos.oAuthAccounts.findByProviderData(
-      params.providerId, params.providerUserId,
-    );
+    const existingAccount = await this.#repos.oAuthAccounts.findByProviderData({
+      providerId: params.providerId,
+      providerUserId: params.providerUserId,
+    });
 
     if (existingUser && existingAccount?.provider_id !== params.providerId) {
       throw new Error("user already have an account with another provider");
@@ -209,7 +219,8 @@ export class SlipAuthCore {
 
     if (existingAccount) {
       const sessionFromLoginId = this.#createRandomSessionId();
-      const sessionFromLogin = await this.#repos.sessions.insert(sessionFromLoginId, {
+      const sessionFromLogin = await this.#repos.sessions.insert({
+        sessionId: sessionFromLoginId,
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ua: params.ua,
@@ -223,17 +234,21 @@ export class SlipAuthCore {
     throw new Error("could not find oauth user");
   }
 
-  public async askEmailVerificationCode(user: SlipAuthUser): Promise<void> {
+  public async askEmailVerificationCode(event: H3Event, { user }: { user: SlipAuthUser }): Promise<void> {
     await this.#repos.emailVerificationCodes.deleteAllByUserId(user.id);
-    await this.#repos.emailVerificationCodes.insert(user.id, user.email, this.#createRandomEmailVerificationCode());
+    await this.#repos.emailVerificationCodes.insert({
+      userId: user.id,
+      email: user.email,
+      code: this.#createRandomEmailVerificationCode(),
+    });
     // send mail to user
   }
 
   // TODO: use transactions
   // TODO: rate limit
-  public async verifyEmailVerificationCode(user: SlipAuthUser, code: string): Promise<boolean> {
-    const databaseCode = await this.#repos.emailVerificationCodes.findByUserId(user.id);
-    if (!databaseCode || databaseCode.code !== code) {
+  public async verifyEmailVerificationCode(h3Event: H3Event, params: { user: SlipAuthUser, code: string }): Promise<boolean> {
+    const databaseCode = await this.#repos.emailVerificationCodes.findByUserId({ userId: params.user.id });
+    if (!databaseCode || databaseCode.code !== params.code) {
       return false;
     }
 
@@ -246,11 +261,11 @@ export class SlipAuthCore {
     if (!isWithinExpirationDate(localExpirationDate)) {
       return false;
     }
-    if (databaseCode.email !== user.email) {
+    if (databaseCode.email !== params.user.email) {
       return false;
     }
 
-    await this.#repos.users.updateEmailVerifiedByUserId(databaseCode.user_id, true);
+    await this.#repos.users.updateEmailVerifiedByUserId({ userId: databaseCode.user_id, value: true });
     // should recreate session if true
     return true;
   }
@@ -259,7 +274,7 @@ export class SlipAuthCore {
    * The token should be valid for at most few hours. The token should be hashed before storage as it essentially is a password.
    * SHA-256 can be used here since the token is long and random, unlike user passwords.
    */
-  public async askPasswordReset(userId: string) {
+  public async askPasswordReset(h3Event: H3Event, params: { userId: string }) {
     // optionally invalidate all existing tokens
     // this.#repos.resetPasswordTokens.deleteAllByUserId(userId);
     const tokenId = defaultResetPasswordTokenIdMethod();
@@ -267,7 +282,7 @@ export class SlipAuthCore {
     try {
       await this.#repos.resetPasswordTokens.insert({
         token_hash: tokenHash,
-        user_id: userId,
+        user_id: params.userId,
         expires_at: createDate(new TimeSpan(2, "h")),
       });
 
@@ -283,34 +298,34 @@ export class SlipAuthCore {
   }
 
   // TODO: rate limit
-  public async askForgotPasswordReset(emailAddress: string): Promise<string> {
-    const user = await this.#repos.users.findByEmail(emailAddress);
+  public async askForgotPasswordReset(h3Event: H3Event, params: { emailAddress: string }): Promise<string> {
+    const user = await this.#repos.users.findByEmail({ email: params.emailAddress });
     if (!user) {
       // If you want to avoid disclosing valid emails,
       // this can be a normal 200 response.
       throw new InvalidEmailToResetPasswordError();
     }
-    return this.askPasswordReset(user.id);
+    return this.askPasswordReset(h3Event, { userId: user.id });
   }
 
   /**
    * Make sure to set the Referrer-Policy header of the password reset page to strict-origin to protect the token from referrer leakage.
    * WARNING: WILL UN-LOG THE USER
    */
-  public async resetPasswordWithResetToken(verificationToken: string, newPassword: string): Promise<true> {
-    if (typeof newPassword !== "string") {
+  public async resetPasswordWithResetToken(h3Event: H3Event, params: { verificationToken: string, newPassword: string }): Promise<true> {
+    if (typeof params.newPassword !== "string") {
       throw new InvalidPasswordToResetError();
     }
 
-    const tokenHash = await this.#createResetPasswordTokenHashMethod(verificationToken);
-    const token = await this.#repos.resetPasswordTokens.findByTokenHash(tokenHash);
+    const tokenHash = await this.#createResetPasswordTokenHashMethod(params.verificationToken);
+    const token = await this.#repos.resetPasswordTokens.findByTokenHash({ tokenHash });
 
     if (!token) {
       throw new ResetPasswordTokenExpiredError();
     }
 
     if (token) {
-      await this.#repos.resetPasswordTokens.deleteByTokenHash(tokenHash);
+      await this.#repos.resetPasswordTokens.deleteByTokenHash({ tokenHash });
     }
 
     const expirationDate = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at);
@@ -321,8 +336,8 @@ export class SlipAuthCore {
     }
 
     await this.#repos.sessions.deleteAllByUserId(token.user_id);
-    const passwordHash = await this.#passwordHashingMethods.hash(newPassword);
-    await this.#repos.users.updatePasswordByUserId(token.user_id, passwordHash);
+    const passwordHash = await this.#passwordHashingMethods.hash(params.newPassword);
+    await this.#repos.users.updatePasswordByUserId({ userId: token.user_id, password: passwordHash });
 
     return true;
   }
@@ -350,19 +365,19 @@ export class SlipAuthCore {
     },
   };
 
-  public getUser(userId: string) {
-    return this.#repos.users.findById(userId);
+  public getUser({ userId }: { userId: string }) {
+    return this.#repos.users.findById({ userId });
   }
 
-  public getSession(sessionId: string) {
-    return this.#repos.sessions.findById(sessionId);
+  public getSession({ sessionId }: { sessionId: string }) {
+    return this.#repos.sessions.findById({ sessionId });
   }
 
-  public deleteSession(sessionId: string) {
-    return this.#repos.sessions.deleteById(sessionId);
+  public deleteSession({ sessionId }: { sessionId: string }) {
+    return this.#repos.sessions.deleteById({ sessionId });
   }
 
-  public deleteExpiredSessions(timestamp: number) {
-    return this.#repos.sessions.deleteExpired(timestamp);
+  public deleteExpiredSessions({ timestamp }: { timestamp: number }) {
+    return this.#repos.sessions.deleteExpired({ timestamp });
   }
 }

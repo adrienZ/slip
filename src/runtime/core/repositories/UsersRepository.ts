@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { TableRepository } from "./_repo";
 
 export class UsersRepository extends TableRepository<"users"> {
-  async insert(userId: string, email: string, password?: string): Promise<typeof this.table.$inferSelect> {
+  async insert({ userId, email, password }: { userId: string, email: string, password?: string }): Promise<typeof this.table.$inferSelect> {
     await this._orm
       .insert(this.table)
       .values({
@@ -11,7 +11,7 @@ export class UsersRepository extends TableRepository<"users"> {
         password,
       }).run();
 
-    const user = await this.findById(userId);
+    const user = await this.findById({ userId });
     if (!user) {
       throw new Error(`User ${userId} not found after insert`);
     }
@@ -21,7 +21,7 @@ export class UsersRepository extends TableRepository<"users"> {
     return user;
   }
 
-  async findById(userId: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findById({ userId }: { userId: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select()
       .from(this.table)
@@ -33,7 +33,7 @@ export class UsersRepository extends TableRepository<"users"> {
     return user;
   }
 
-  async findByEmail(email: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findByEmail({ email }: { email: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select()
       .from(this.table)
@@ -45,7 +45,7 @@ export class UsersRepository extends TableRepository<"users"> {
     return user;
   }
 
-  updatePasswordByUserId = async (userId: string, password: string): Promise<void> => {
+  updatePasswordByUserId = async ({ userId, password }: { userId: string, password: string }): Promise<void> => {
     return await this._orm
       .update(this.table)
       .set({
@@ -55,7 +55,7 @@ export class UsersRepository extends TableRepository<"users"> {
       .run();
   };
 
-  updateEmailVerifiedByUserId = async (userId: string, value: boolean): Promise<void> => {
+  updateEmailVerifiedByUserId = async ({ userId, value }: { userId: string, value: boolean }): Promise<void> => {
     return await this._orm
       .update(this.table)
       .set({

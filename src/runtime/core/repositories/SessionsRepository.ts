@@ -3,7 +3,7 @@ import { TableRepository } from "./_repo";
 import type { ICreateSessionsParams } from "../types";
 
 export class SessionsRepository extends TableRepository<"sessions"> {
-  async insert(sessionId: string, { userId, expiresAt, ip, ua }: ICreateSessionsParams): Promise<typeof this.table.$inferSelect> {
+  async insert({ sessionId, userId, expiresAt, ip, ua }: ICreateSessionsParams): Promise<typeof this.table.$inferSelect> {
     await this._orm
       .insert(this.table)
       .values({
@@ -14,7 +14,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
         ua,
       }).run();
 
-    const sessionInserted = await this.findById(sessionId);
+    const sessionInserted = await this.findById({ sessionId });
     if (!sessionInserted) {
       throw new Error(`Session ${sessionId} not found after insert`);
     }
@@ -24,7 +24,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     return sessionInserted;
   }
 
-  async findById(sessionId: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findById({ sessionId }: { sessionId: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select()
       .from(this.table)
@@ -36,7 +36,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     return user;
   }
 
-  async deleteExpired(timestamp: number) {
+  async deleteExpired({ timestamp }: { timestamp: number }) {
     const sessionsToDelete = await this._orm.select().from(this.table).where(sql`${this.table.expires_at} < ${timestamp}`);
 
     await this._orm
@@ -66,8 +66,8 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     return { success: this.getRawSQlResults(deletedSessions).length === 0, count: this.getRawSQlResults(sessionsToDelete).length };
   }
 
-  async deleteById(sessionId: string) {
-    const sessionToDelete = await this.findById(sessionId);
+  async deleteById({ sessionId }: { sessionId: string }) {
+    const sessionToDelete = await this.findById({ sessionId });
 
     if (!sessionToDelete) {
       throw new Error(`Unable to delete session with id ${sessionId}`);
@@ -82,7 +82,7 @@ export class SessionsRepository extends TableRepository<"sessions"> {
 
     // TODO: fix typings in db0 / drizzle
     // as the delete from drizzle returns any we do an extra query to check if the deletion went fine
-    const expiredSession = await this.findById(sessionId);
+    const expiredSession = await this.findById({ sessionId });
 
     if (expiredSession) {
       return { success: false };

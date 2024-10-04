@@ -3,7 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { drizzle } from "db0/integrations/drizzle/index";
 import { SlipAuthCore } from "../src/runtime/core/core";
-import { autoSetupTestsDatabase, testTablesNames } from "./test-helpers";
+import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
 import { eq } from "drizzle-orm";
 
 const date = new Date(Date.UTC(1998, 11, 19));
@@ -85,7 +85,7 @@ describe("Reset password", () => {
     });
 
     it("should throw an error when asking password reset of non-existant user", async () => {
-      const askResetPasswordPromise = auth.askPasswordReset("notexisting");
+      const askResetPasswordPromise = auth.askPasswordReset(createH3Event(), { userId: "notexisting" });
 
       expect(askResetPasswordPromise).rejects.toThrowError(
         "InvalidUserIdToResetPasswordError",
@@ -93,7 +93,7 @@ describe("Reset password", () => {
     });
 
     it("should create a token and hook when asking password reset of user", async () => {
-      const [userId] = await auth.register(defaultInsert);
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
 
       const resetPasswordTokenCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 1000);
@@ -102,7 +102,7 @@ describe("Reset password", () => {
         });
       });
 
-      const askResetPasswordPromise = auth.askPasswordReset(userId);
+      const askResetPasswordPromise = auth.askPasswordReset(createH3Event(), { userId });
 
       expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
         user_id: "user-id-1",
@@ -116,7 +116,7 @@ describe("Reset password", () => {
 
   describe("ask forgotten password", () => {
     it("should throw an error when asking forgotten password of non-existant user", async () => {
-      const askForgottenPasswordPromise = auth.askForgotPasswordReset("notexisting@mail");
+      const askForgottenPasswordPromise = auth.askForgotPasswordReset(createH3Event(), { emailAddress: "notexisting@mail" });
 
       expect(askForgottenPasswordPromise).rejects.toThrowError(
         "InvalidEmailToResetPasswordError",
@@ -124,7 +124,7 @@ describe("Reset password", () => {
     });
 
     it("should create a token and hook when asking forgot password of user", async () => {
-      await auth.register(defaultInsert);
+      await auth.register(createH3Event(), defaultInsert);
 
       const resetPasswordTokenCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 1000);
@@ -133,7 +133,7 @@ describe("Reset password", () => {
         });
       });
 
-      const askForgottenPasswordPromise = auth.askForgotPasswordReset(defaultInsert.email);
+      const askForgottenPasswordPromise = auth.askForgotPasswordReset(createH3Event(), { emailAddress: defaultInsert.email });
 
       expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
         user_id: "user-id-1",
@@ -148,29 +148,29 @@ describe("Reset password", () => {
   describe("validate reset password token", () => {
     it("should throw error with invalid password value", () => {
       // @ts-expect-error testing value
-      const checkPassword = auth.resetPasswordWithResetToken(new Date());
+      const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: Date() });
       expect(checkPassword).rejects.toThrowError("InvalidPasswordToResetError");
     });
 
     it("should throw error with not-existing token", async () => {
-      const checkPassword = auth.resetPasswordWithResetToken("okokok", defaultInsert.password);
+      const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: "okokok", newPassword: defaultInsert.password });
       expect(checkPassword).rejects.toThrowError("ResetPasswordTokenExpiredError");
     });
 
     it("should throw error with expired token", async () => {
-      const [userId] = await auth.register(defaultInsert);
-      const token = await auth.askPasswordReset(userId);
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
+      const token = await auth.askPasswordReset(createH3Event(), { userId });
 
       // jump in time to expire token
       vi.setSystemTime(new Date(date.getTime() + date.getTime()));
 
-      const checkPassword = auth.resetPasswordWithResetToken(token, defaultInsert.password);
+      const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: token, newPassword: defaultInsert.password });
       expect(checkPassword).rejects.toThrowError("ResetPasswordTokenExpiredError");
     });
 
     it("should delete all previous tokens and sessions of requested user", async () => {
-      await auth.register(defaultInsert);
-      const [userId] = await auth.login(defaultInsert);
+      await auth.register(createH3Event(), defaultInsert);
+      const [userId] = await auth.login(createH3Event(), defaultInsert);
 
       const resetPasswordTokenDeleteddHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 1000);
@@ -182,12 +182,12 @@ describe("Reset password", () => {
       let tokenCatchedByHooks = {};
       auth.hooks.hookOnce("resetPasswordToken:create", token => tokenCatchedByHooks = token);
 
-      const token = await auth.askPasswordReset(userId);
+      const token = await auth.askPasswordReset(createH3Event(), { userId });
       const orm = drizzle(db);
 
       // decrement to match previously generated token
       mocks.resetPasswordTokenCount--;
-      const checkPassword = auth.resetPasswordWithResetToken(token, defaultInsert.password);
+      const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: token, newPassword: defaultInsert.password });
       await expect(checkPassword).resolves.toBe(true);
 
       await expect(resetPasswordTokenDeleteddHookPromise).resolves.toStrictEqual(tokenCatchedByHooks);

@@ -9,13 +9,13 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
   try {
-    const user = await auth.getUser(userId);
+    const user = await auth.getUser({ userId });
 
     if (!user) {
       throw new Error("no user");
     }
 
-    const validation = await auth.verifyEmailVerificationCode(user, body.code);
+    const validation = await auth.verifyEmailVerificationCode(event, { user, code: body.code });
 
     // update user session
     await setUserSession(event, {

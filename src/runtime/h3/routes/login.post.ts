@@ -2,16 +2,17 @@ import { SlipAuthError } from "../../core/errors/SlipAuthError";
 import { useSlipAuth } from "../../server/utils/useSlipAuth";
 import { defineEventHandler, readBody, getHeader, createError } from "h3";
 
+// TODO: prevent login when user is already logged
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const auth = useSlipAuth();
 
   try {
-    const [userId, session] = await auth.login({
+    const [userId, session] = await auth.login(event, {
       ...body,
       ua: getHeader(event, "User-Agent"),
     });
-    const user = await auth.getUser(userId);
+    const user = await auth.getUser({ userId });
 
     if (!user) {
       return false;

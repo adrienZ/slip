@@ -7,13 +7,13 @@ export default defineEventHandler(async (event) => {
   const userId = session.user.id;
 
   try {
-    const user = await auth.getUser(userId);
+    const user = await auth.getUser({ userId });
 
     if (!user) {
       throw new Error("no user");
     }
 
-    const tokenId = await auth.askPasswordReset(user.id);
+    const tokenId = await auth.askPasswordReset(event, { userId: user.id });
 
     return Boolean(tokenId);
   }

@@ -2,15 +2,15 @@ import { eq, and } from "drizzle-orm";
 import { TableRepository } from "./_repo";
 
 export class OAuthAccountsRepository extends TableRepository<"oauthAccounts"> {
-  async insert(email: string, values: typeof this.table.$inferInsert): Promise<typeof this.table.$inferSelect> {
+  async insert(values: { email: string } & typeof this.table.$inferInsert): Promise<typeof this.table.$inferSelect> {
     await this._orm
       .insert(this.table)
       .values(values)
       .run();
 
-    const oAuthAccountInserted = await this.findByProviderData(values.provider_id, values.provider_user_id);
+    const oAuthAccountInserted = await this.findByProviderData({ providerId: values.provider_id, providerUserId: values.provider_user_id });
     if (!oAuthAccountInserted) {
-      throw new Error(`oAuthAccount ${email} not found after insert`);
+      throw new Error(`oAuthAccount ${values.email} not found after insert`);
     }
 
     this._hooks.callHookParallel("oAuthAccount:create", oAuthAccountInserted);
@@ -18,7 +18,7 @@ export class OAuthAccountsRepository extends TableRepository<"oauthAccounts"> {
     return oAuthAccountInserted;
   }
 
-  async findByProviderData(providerId: string, providerUserId: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findByProviderData({ providerId, providerUserId }: { providerId: string, providerUserId: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select()
       .from(this.table)

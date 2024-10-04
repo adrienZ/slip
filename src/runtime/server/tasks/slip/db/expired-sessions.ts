@@ -13,7 +13,7 @@ export default defineTask({
     const scheduledTime = payload.scheduledTime as number;
     console.log("Running SLIP expired sessions task...", scheduledTime);
     const auth = useSlipAuth();
-    const deletions = await auth.deleteExpiredSessions(scheduledTime);
+    const deletions = await auth.deleteExpiredSessions({ timestamp: scheduledTime });
     console.log("Ending SLIP expired sessions task...", deletions);
     return { result: deletions };
   },

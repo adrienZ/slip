@@ -9,7 +9,7 @@ export class ResetPasswordTokensRepository extends TableRepository<"resetPasswor
         expires_at, token_hash, user_id,
       }).run();
 
-    const tokenInserted = await this.findByTokenHash(token_hash);
+    const tokenInserted = await this.findByTokenHash({ tokenHash: token_hash });
     if (!tokenInserted) {
       throw new Error(`Reset password token ${token_hash} not found after insert`);
     }
@@ -19,7 +19,7 @@ export class ResetPasswordTokensRepository extends TableRepository<"resetPasswor
     return tokenInserted;
   }
 
-  async findByTokenHash(tokenHash: string): Promise<typeof this.table.$inferSelect | undefined> {
+  async findByTokenHash({ tokenHash }: { tokenHash: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select({
         token_hash: this.table.token_hash,
@@ -37,7 +37,7 @@ export class ResetPasswordTokensRepository extends TableRepository<"resetPasswor
     return token;
   }
 
-  async findByAllByUserId(userId: string): Promise<typeof this.table.$inferSelect[]> {
+  async findByAllByUserId({ userId }: { userId: string }): Promise<typeof this.table.$inferSelect[]> {
     const rows = await this._orm
       .select({
         token_hash: this.table.token_hash,
@@ -55,8 +55,8 @@ export class ResetPasswordTokensRepository extends TableRepository<"resetPasswor
     return tokens;
   }
 
-  async deleteByTokenHash(tokenHash: string) {
-    const tokenToDelete = await this.findByTokenHash(tokenHash);
+  async deleteByTokenHash({ tokenHash }: { tokenHash: string }) {
+    const tokenToDelete = await this.findByTokenHash({ tokenHash });
 
     if (!tokenToDelete) {
       throw new Error(`Unable to delete session with id ${tokenHash}`);
@@ -71,7 +71,7 @@ export class ResetPasswordTokensRepository extends TableRepository<"resetPasswor
 
     // TODO: fix typings in db0 / drizzle
     // as the delete from drizzle returns any we do an extra query to check if the deletion went fine
-    const validatedToken = await this.findByTokenHash(tokenHash);
+    const validatedToken = await this.findByTokenHash({ tokenHash });
 
     if (validatedToken) {
       return { success: false };

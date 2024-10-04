@@ -1,5 +1,8 @@
 import type { Database } from "db0";
 import type { tableNames } from "../src/runtime/core/types";
+import { H3Event } from "h3";
+import { IncomingMessage, OutgoingMessage } from "node:http";
+import { Socket } from "node:net";
 
 export const testTablesNames: tableNames = {
   users: "slip_users",
@@ -22,3 +25,11 @@ export async function autoSetupTestsDatabase(db: Database) {
   await db.sql`CREATE TABLE IF NOT EXISTS slip_auth_email_verification_codes ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "user_id" TEXT NOT NULL UNIQUE, "email" TEXT NOT NULL, "code" TEXT NOT NULL, "expires_at" TIMESTAMP NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
   await db.sql`CREATE TABLE IF NOT EXISTS slip_auth_reset_password_tokens ("token_hash" TEXT PRIMARY KEY, "user_id" TEXT NOT NULL UNIQUE, "expires_at" TIMESTAMP NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES slip_users(id))`;
 };
+
+export function createH3Event(): H3Event {
+  const req = new IncomingMessage(new Socket());
+  const res = new OutgoingMessage();
+  const fakeH3Event = new H3Event(req, res);
+
+  return fakeH3Event;
+}

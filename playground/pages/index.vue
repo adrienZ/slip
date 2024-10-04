@@ -96,8 +96,8 @@ async function handleSubmit() {
               <UFormGroup
                 label="Email"
               >
-              <UInput
-              v-model="formData.email"
+                <UInput
+                  v-model="formData.email"
                   placeholder="Enter your email"
                   name="email"
                   type="email"
@@ -112,7 +112,7 @@ async function handleSubmit() {
                 class="space-yy-6"
               >
                 <UInput
-                              v-model="formData.password"
+                  v-model="formData.password"
 
                   placeholder="Enter your password"
                   name="password"

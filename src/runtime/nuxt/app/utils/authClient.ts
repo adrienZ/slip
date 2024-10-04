@@ -1,6 +1,7 @@
 import type { SlipAuthCore } from "../../../core/core";
 import { routerRecord } from "../../../h3/routerRecord";
 import { ofetch } from "ofetch";
+import { useRequestURL } from "#imports";
 
 import type loginHandler from "../../../h3/routes/login.post";
 import type registerHandler from "../../../h3/routes/register.post";

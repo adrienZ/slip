@@ -1,3 +1,7 @@
+import { SlipAuthError } from "../core/errors/SlipAuthError";
+import { useSlipAuth } from "../server/utils/useSlipAuth";
+import { defineEventHandler, createError } from "h3";
+
 export default defineEventHandler(async (event) => {
   const auth = useSlipAuth();
   const session = await requireUserSession(event);
@@ -10,19 +14,14 @@ export default defineEventHandler(async (event) => {
       throw new Error("no user");
     }
 
-    // ONLY FOR DEMO PURPOSE, UNSAFE TO USE IN PRODUCTION!
-    auth.hooks.hookOnce("emailVerificationCode:create", (code) => {
-      console.log(`VERIFICATION CODE FOR EMAIL ${user.email} : ${code.code}`);
-    });
-
     await auth.askEmailVerificationCode(user);
 
     return true;
   }
-  catch {
+  catch (error) {
     throw createError({
-      message: "Not authorized",
-      statusCode: 403,
+      ...(error instanceof Error ? error : {}),
+      data: error instanceof SlipAuthError ? error : undefined,
     });
   }
 });

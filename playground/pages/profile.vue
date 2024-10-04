@@ -31,6 +31,7 @@
               class="max-w-full mt-2"
             >
               <UInput
+                v-model="formData.code"
                 name="code"
                 placeholder="XXXXXX"
               />
@@ -55,7 +56,7 @@
             class="mt-2 w-full"
             color="black"
             :loading="validateEmailVerificationRequest.status.value === 'pending'"
-            @click=" validateEmailVerificationRequest.execute"
+            @click="validateCode"
           >
             Validate code
           </UButton>
@@ -76,36 +77,34 @@
 </template>
 
 <script setup lang="ts">
-const { session, user, fetch } = useUserSession();
-const askEmailVerificationRequest = await useLazyFetch("/api/ask-email-verification", {
+const { session, user, fetch: fetchSession } = useUserSession();
+const authClient = getSlipAuthClient();
+
+const askEmailVerificationRequest = await useLazyAsyncData(() => authClient.askEmailVerificationCode(), {
   immediate: false,
-  method: "POST",
 });
 
-function useFormData(form: Ref<HTMLFormElement | undefined>) {
-  const data = shallowRef(new FormData());
-
-  async function update(): Promise<void> {
-    data.value = new FormData(form.value);
-  }
-
-  onMounted(() => form.value?.addEventListener("input", update));
-
-  return {
-    data,
-    update,
-  };
-}
+const formData = reactive({
+  code: "",
+});
 
 const form = ref<HTMLFormElement>();
-const { data: formData } = useFormData(form);
-const validateEmailVerificationRequest = await useLazyFetch("/api/verify-email-verification", {
+const validateEmailVerificationRequest = await useLazyAsyncData(() => authClient.verifyEmailVerificationCode(formData), {
   immediate: false,
-  method: "POST",
-  body: formData,
-  watch: false,
-  onResponse() {
-    fetch();
-  },
 });
+
+async function validateCode() {
+  await validateEmailVerificationRequest.execute();
+  const { error, data } = validateEmailVerificationRequest;
+  if (error.value) {
+    return alert(error.value);
+  }
+
+  if (data.value) {
+    await fetchSession();
+  }
+  else {
+    alert("validation failed");
+  }
+}
 </script>

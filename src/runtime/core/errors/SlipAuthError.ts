@@ -1,6 +1,6 @@
 import { SlipAuthErrorsCode } from "./SlipAuthErrorsCode";
 
-class SlipAuthError extends Error {
+export class SlipAuthError extends Error {
   slipError!: SlipAuthErrorsCode;
 };
 

@@ -1,7 +1,5 @@
 <template>
   <div class="pb-4">
-    {{route.fullPath}}
-
     <UTable
       v-if="usersInDb"
       class="mt-12"

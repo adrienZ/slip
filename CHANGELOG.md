@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.1.42
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.41...v0.1.42)
+
+### 🚀 Enhancements
+
+- **auth-client:** Provide a typesafe getSlipAuthClient on the front-end ([#38](https://github.com/adrienZ/slip/pull/38))
+
+### 💅 Refactors
+
+- **plugin:** Moved ipInfo plugin in a separate file ([1fea643](https://github.com/adrienZ/slip/commit/1fea643))
+
+### 🏡 Chore
+
+- **release:** V0.1.41 ([a0801ca](https://github.com/adrienZ/slip/commit/a0801ca))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.41
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.40...v0.1.41)

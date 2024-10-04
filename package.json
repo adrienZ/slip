@@ -52,13 +52,13 @@
     "oslo": "^1.2.1"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^1.4.2",
+    "@nuxt/devtools": "^1.5.2",
     "@nuxt/eslint-config": "^0.5.7",
     "@nuxt/module-builder": "^0.8.4",
     "@nuxt/schema": "^3.13.1",
     "@nuxt/test-utils": "^3.14.2",
     "@types/node": "^20.16.5",
-    "@vitest/coverage-v8": "^2.1.1",
+    "@vitest/coverage-v8": "^2.1.2",
     "better-sqlite3": "^11.3.0",
     "changelogen": "^0.5.5",
     "citty": "^0.1.6",
@@ -66,10 +66,10 @@
     "eslint": "^9.10.0",
     "hookable": "^5.5.3",
     "nuxt": "^3.13.2",
-    "nuxt-auth-utils": "^0.4.0",
-    "pkg-pr-new": "^0.0.28",
+    "nuxt-auth-utils": "^0.4.2",
+    "pkg-pr-new": "^0.0.29",
     "typescript": "latest",
-    "vitest": "^2.1.1",
+    "vitest": "^2.1.2",
     "vue-tsc": "^2.1.6"
   },
   "peerDependencies": {

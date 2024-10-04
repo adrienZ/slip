@@ -38,6 +38,8 @@ const formData = reactive({
   password: "",
 });
 
+const authClient = getSlipAuthClient();
+
 const registerRequest = await useLazyAsyncData(() => authClient.register(formData), {
   immediate: false,
 });
@@ -45,8 +47,6 @@ const registerRequest = await useLazyAsyncData(() => authClient.register(formDat
 const loginRequest = await useLazyAsyncData(() => authClient.login(formData), {
   immediate: false,
 });
-
-const authClient = getSlipAuthClient();
 
 async function handleSubmit() {
   const action = selected.value === 0 ? "register" : "login";

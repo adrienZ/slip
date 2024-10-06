@@ -1,4 +1,4 @@
-import { SlipAuthError } from "../../core/errors/SlipAuthError";
+import { SlipAuthRateLimiterError } from "../../core/errors/SlipAuthError";
 import { useSlipAuth } from "../../server/utils/useSlipAuth";
 import { defineEventHandler, readBody, getHeader, createError } from "h3";
 
@@ -32,7 +32,9 @@ export default defineEventHandler(async (event) => {
   catch (error) {
     throw createError({
       ...(error instanceof Error ? error : {}),
-      data: error instanceof SlipAuthError ? error : undefined,
+      data: {
+        ...(error instanceof SlipAuthRateLimiterError ? error.data : {}),
+      },
     });
   }
 });

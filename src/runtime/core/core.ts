@@ -10,10 +10,11 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
+import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitLoginError, ResetPasswordTokenExpiredError, SlipAuthRateLimiterError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
+import { SlipAuthRateLimiters } from "./rate-limit/SlipAuthRateLimiters";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -37,6 +38,8 @@ export class SlipAuthCore {
     hash: defaultHashPasswordMethod,
     verify: defaultVerifyPasswordMethod,
   };
+
+  #rateLimiters = new SlipAuthRateLimiters();
 
   readonly schemas: SchemasMockValue;
   readonly hooks = createSlipHooks();
@@ -111,10 +114,17 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("no password oauth user");
     }
 
+    const rateLimitRes = await this.#rateLimiters.login.consumeIncremental(existingUser.id);
+    if (rateLimitRes instanceof SlipAuthRateLimiterError) {
+      throw new RateLimitLoginError(rateLimitRes.data);
+    }
+
     const validPassword = await this.#passwordHashingMethods.verify(existingUser.password, password);
     if (!validPassword) {
       throw new InvalidEmailOrPasswordError("login invalid password");
     }
+
+    await this.#rateLimiters.login.delete(existingUser.id);
     const sessionToLoginId = this.#createRandomSessionId();
     const sessionToLogin = await this.#repos.sessions.insert({
       sessionId: sessionToLoginId,

@@ -5,4 +5,5 @@ export enum SlipAuthErrorsCode {
   InvalidUserIdToResetPassword = "InvalidUserIdToResetPassword",
   InvalidPasswordToReset = "InvalidPasswordToReset",
   ResetPasswordTokenExpired = "ResetPasswordTokenExpired",
+  RateLimitLogin = "RateLimitLogin",
 }

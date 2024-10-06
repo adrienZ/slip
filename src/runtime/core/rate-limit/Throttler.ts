@@ -1,53 +1,69 @@
-import { RateLimiterMemory, RateLimiterRes, type IRateLimiterOptions } from "rate-limiter-flexible";
 import { createStorage, type Storage } from "unstorage";
-import fsDriver from "unstorage/drivers/fs";
-import { SlipAuthRateLimiterError } from "../errors/SlipAuthError";
+import memoryDriver from "unstorage/drivers/memory";
 
-export function createThrottlerStorage(base: string = "./.data/cache/ratelimit"): Storage<number> {
-  return createStorage<number>({
-    driver: fsDriver({ base }),
+export function createThrottlerStorage(): Storage<ThrottlingCounter> {
+  return createStorage<ThrottlingCounter>({
+    driver: memoryDriver(),
   });
 }
 
-export class Throttler extends RateLimiterMemory {
-  storage: Storage<number>;
-  initialBlockDurationSeconds = 5;
-  #incrementFactor = 2;
+/**
+ * @see https://github.com/pilcrowOnPaper/astro-email-password-2fa/blob/main/src/lib/server/rate-limit.ts
+ *
+ * added suport for unstorage
+ */
+export class Throttler {
+  public timeoutSeconds: number[];
 
-  constructor(depOptions: IRateLimiterOptions, options: { storage: Storage<number>, initialBlockDurationSeconds?: number }) {
-    super(depOptions);
-    this.storage = options.storage;
-    this.initialBlockDurationSeconds = options.initialBlockDurationSeconds ?? this.initialBlockDurationSeconds;
+  public storage: Storage<ThrottlingCounter>;
+
+  constructor({ timeoutSeconds, storage }: { timeoutSeconds: number[], storage: Storage }) {
+    this.timeoutSeconds = timeoutSeconds;
+    this.storage = storage;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async consumeIncremental(key: string | number, pointsToConsume?: number, options?: { [key: string]: any }): Promise<RateLimiterRes | SlipAuthRateLimiterError> {
-    const strKey = key.toString();
-    const cachedBlockDuration = await this.storage.getItem(strKey) ?? (this.initialBlockDurationSeconds / this.#incrementFactor);
+  public async check(key: string): Promise<
+      [true] | [false, ThrottlingCounter]
+  > {
+    const counter = await this.storage.getItem(key) ?? null;
+    const now = Date.now();
+    if (counter === null) {
+      return [true];
+    }
 
-    return super.consume(strKey, pointsToConsume, options)
-      .then((res) => {
-        this.storage.setItem(strKey, cachedBlockDuration);
+    const valid = now - counter.updatedAt >= this.timeoutSeconds[counter.timeout] * 1000;
 
-        if (res.remainingPoints <= 0) {
-          this.block(strKey, cachedBlockDuration);
-        }
-
-        return res;
-      })
-      .catch((error) => {
-        let msBeforeNext;
-
-        if (error instanceof RateLimiterRes && error.remainingPoints === 0) {
-          // Increase block duration and ensure it stays within the 32-bit signed integer range
-          const newBlockDuration = Math.min(cachedBlockDuration * 2, Number.MAX_SAFE_INTEGER);
-          this.storage.setItem(strKey, newBlockDuration);
-          msBeforeNext = newBlockDuration * 1000;
-        }
-
-        return new SlipAuthRateLimiterError({
-          msBeforeNext: msBeforeNext,
-        });
-      });
+    if (valid) {
+      return [true];
+    }
+    else {
+      return [false, counter];
+    }
   }
+
+  public async increment(key: string): Promise<void> {
+    let counter = await this.storage.getItem(key) ?? null;
+
+    const now = Date.now();
+    if (counter === null) {
+      counter = {
+        timeout: 0,
+        updatedAt: now,
+      };
+      await this.storage.setItem(key, counter);
+      return;
+    }
+    counter.updatedAt = now;
+    counter.timeout = Math.min(counter.timeout + 1, this.timeoutSeconds.length - 1);
+    await this.storage.setItem(key, counter);
+  }
+
+  public async reset(key: string): Promise<void> {
+    await this.storage.removeItem(key);
+  }
+}
+
+interface ThrottlingCounter {
+  timeout: number
+  updatedAt: number
 }

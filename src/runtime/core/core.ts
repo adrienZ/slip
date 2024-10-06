@@ -10,11 +10,12 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitLoginError, ResetPasswordTokenExpiredError, SlipAuthRateLimiterError, UnhandledError } from "./errors/SlipAuthError.js";
+import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitLoginError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
 import { SlipAuthRateLimiters } from "./rate-limit/SlipAuthRateLimiters";
+import type { Storage } from "unstorage";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -114,17 +115,20 @@ export class SlipAuthCore {
       throw new InvalidEmailOrPasswordError("no password oauth user");
     }
 
-    const rateLimitRes = await this.#rateLimiters.login.consumeIncremental(existingUser.id);
-    if (rateLimitRes instanceof SlipAuthRateLimiterError) {
-      throw new RateLimitLoginError(rateLimitRes.data);
+    const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.login.check(existingUser.id);
+    if (!isNotRateLimited) {
+      throw new RateLimitLoginError({
+        msBeforeNext: (rateLimitResult.updatedAt + rateLimitResult.timeout * 1000) - Date.now(),
+      });
     }
 
     const validPassword = await this.#passwordHashingMethods.verify(existingUser.password, password);
     if (!validPassword) {
+      await this.#rateLimiters.login.increment(existingUser.id);
       throw new InvalidEmailOrPasswordError("login invalid password");
     }
 
-    await this.#rateLimiters.login.delete(existingUser.id);
+    await this.#rateLimiters.login.reset(existingUser.id);
     const sessionToLoginId = this.#createRandomSessionId();
     const sessionToLogin = await this.#repos.sessions.insert({
       sessionId: sessionToLoginId,
@@ -372,6 +376,10 @@ export class SlipAuthCore {
     setPasswordHashingMethods: (fn: () => IPasswordHashingMethods) => {
       const methods = fn();
       this.#passwordHashingMethods = methods;
+    },
+
+    setLoginRateLimiter: (fn: () => Storage) => {
+      this.#rateLimiters.login.storage = fn();
     },
   };
 

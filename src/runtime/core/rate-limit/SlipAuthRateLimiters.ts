@@ -5,11 +5,8 @@ export class SlipAuthRateLimiters {
 
   constructor() {
     this.login = new Throttler({
-      points: 5,
-      duration: 0,
-    },
-    {
-      storage: createThrottlerStorage("./data/ratelimiter/login"),
+      timeoutSeconds: [0, 1, 2, 4, 8, 16, 30, 60, 180, 300],
+      storage: createThrottlerStorage(),
     });
   }
 }

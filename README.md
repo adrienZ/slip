@@ -371,7 +371,7 @@ You should have your migrations in the migrations folder.
 [npm-version-href]: https://npmjs.com/package/nuxt-slip-auth
 
 [npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-slip-auth.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npmjs.com/package/nuxt-slip-auth
+[npm-downloads-href]: https://npm.chart.dev/nuxt-slip-auth
 
 [license-src]: https://img.shields.io/npm/l/nuxt-slip-auth.svg?style=flat&colorA=020420&colorB=00DC82
 [license-href]: https://npmjs.com/package/nuxt-slip-auth

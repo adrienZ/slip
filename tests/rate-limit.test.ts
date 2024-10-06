@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
-import type { SlipAuthUser } from "~/src/runtime/core/types";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
+import { RateLimitLoginError, SlipAuthRateLimiterError } from "../src/runtime/core/errors/SlipAuthError";
 
 const db = createDatabase(sqlite({
-  name: "core-email-password.test",
+  name: "rate-limit.test",
 }));
 
 let auth: SlipAuthCore;
@@ -14,6 +14,11 @@ let auth: SlipAuthCore;
 beforeEach(async () => {
   await autoSetupTestsDatabase(db);
 });
+
+const defaultInsert = {
+  email: "email@test.com",
+  password: "pa$$word",
+};
 
 const mocks = vi.hoisted(() => {
   return {
@@ -63,9 +68,44 @@ describe("rate limit", () => {
   });
 
   describe("login", () => {
-    it("should work", async () => {
-      auth.login(createH3Event(), { email: "test@test.com", password: "password" });
-      auth.login(createH3Event(), { email: "test@tsest.com", password: "password" });
+    it.only("should allow 5 failed tries", async () => {
+      await auth.register(createH3Event(), defaultInsert);
+      const doAttempt = () => auth.login(createH3Event(), {
+        email: defaultInsert.email,
+        password: defaultInsert.password + "123",
+      });
+
+      const results = await Promise.all([
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+      ]);
+
+      expect(results.every(res => res instanceof SlipAuthRateLimiterError)).toBe(false);
+    });
+
+    it("should rate-limit 6 failed tries", async () => {
+      await auth.register(createH3Event(), defaultInsert);
+      const doAttempt = () => auth.login(createH3Event(), {
+        email: defaultInsert.email,
+        password: defaultInsert.password + "123",
+      }).catch(e => e);
+
+      const results = await Promise.all([
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+        doAttempt(),
+      ]);
+
+      console.log(results);
+      
+
+      expect(results.every(res => res instanceof RateLimitLoginError)).toBe(false);
     });
   });
 });

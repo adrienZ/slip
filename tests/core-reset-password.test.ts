@@ -88,7 +88,9 @@ describe("Reset password", () => {
       const askResetPasswordPromise = auth.askPasswordReset(createH3Event(), { userId: "notexisting" });
 
       expect(askResetPasswordPromise).rejects.toThrowError(
-        "InvalidUserIdToResetPasswordError",
+        expect.objectContaining({
+          slipErrorName: "InvalidUserIdToResetPasswordError",
+        }),
       );
     });
 
@@ -119,7 +121,9 @@ describe("Reset password", () => {
       const askForgottenPasswordPromise = auth.askForgotPasswordReset(createH3Event(), { emailAddress: "notexisting@mail" });
 
       expect(askForgottenPasswordPromise).rejects.toThrowError(
-        "InvalidEmailToResetPasswordError",
+        expect.objectContaining({
+          slipErrorName: "InvalidEmailToResetPasswordError",
+        }),
       );
     });
 
@@ -149,12 +153,20 @@ describe("Reset password", () => {
     it("should throw error with invalid password value", () => {
       // @ts-expect-error testing value
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: Date() });
-      expect(checkPassword).rejects.toThrowError("InvalidPasswordToResetError");
+      expect(checkPassword).rejects.toThrowError(
+        expect.objectContaining({
+          slipErrorName: "InvalidPasswordToResetError",
+        }),
+      );
     });
 
     it("should throw error with not-existing token", async () => {
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: "okokok", newPassword: defaultInsert.password });
-      expect(checkPassword).rejects.toThrowError("ResetPasswordTokenExpiredError");
+      expect(checkPassword).rejects.toThrowError(
+        expect.objectContaining({
+          slipErrorName: "ResetPasswordTokenExpiredError",
+        }),
+      );
     });
 
     it("should throw error with expired token", async () => {
@@ -165,7 +177,11 @@ describe("Reset password", () => {
       vi.setSystemTime(new Date(date.getTime() + date.getTime()));
 
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: token, newPassword: defaultInsert.password });
-      expect(checkPassword).rejects.toThrowError("ResetPasswordTokenExpiredError");
+      expect(checkPassword).rejects.toThrowError(
+        expect.objectContaining({
+          slipErrorName: "ResetPasswordTokenExpiredError",
+        }),
+      );
     });
 
     it("should delete all previous tokens and sessions of requested user", async () => {

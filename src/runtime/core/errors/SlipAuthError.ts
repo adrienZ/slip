@@ -76,3 +76,7 @@ export class RateLimitVerifyEmailVerificationError extends SlipAuthRateLimiterEr
   override slipErrorName = "RateLimitVerifyEmailVerificationError";
   override slipErrorCode = SlipAuthErrorsCode.RateLimitVerifyEmailVerification;
 }
+export class RateLimitAskResetPasswordError extends SlipAuthRateLimiterError {
+  override slipErrorName = "RateLimitAskResetPasswordError";
+  override slipErrorCode = SlipAuthErrorsCode.RateLimitAskResetPassword;
+}

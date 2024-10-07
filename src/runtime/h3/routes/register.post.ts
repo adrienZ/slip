@@ -2,7 +2,7 @@ import { SlipAuthError } from "../../core/errors/SlipAuthError";
 import { useSlipAuth } from "../../server/utils/useSlipAuth";
 import { defineEventHandler, readBody, getHeader, createError } from "h3";
 
-// TODO: prevent login when user is already logged
+// TODO: prevent register when user is already logged
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const auth = useSlipAuth();

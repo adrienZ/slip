@@ -3,7 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
-import { EmailVerificationCodeExpired, EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, RateLimitAskEmailVerificationError, RateLimitLoginError, RateLimitVerifyEmailVerificationError } from "../src/runtime/core/errors/SlipAuthError";
+import { EmailVerificationFailedError, InvalidEmailOrPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError } from "../src/runtime/core/errors/SlipAuthError";
 import { createThrottlerStorage } from "../src/runtime/core/rate-limit/Throttler";
 
 const db = createDatabase(sqlite({
@@ -176,7 +176,7 @@ describe("rate limit", () => {
     });
   });
 
-  describe("verify email verification", () => {
+  describe("verify reset password", () => {
     const verifyEmailVerificationTestStorage = createThrottlerStorage();
     const askEmailVerificationTestStorage = createThrottlerStorage();
 
@@ -226,6 +226,43 @@ describe("rate limit", () => {
       expect(t5).toMatchObject({
         data: {
           msBeforeNext: 2000,
+        },
+      });
+    });
+  });
+
+  describe("ask reset password", () => {
+    const askResetPasswordTestStorage = createThrottlerStorage();
+
+    beforeEach(async () => {
+      await askResetPasswordTestStorage.clear();
+      auth.setters.setAskResetPasswordRateLimiter(() => askResetPasswordTestStorage);
+    });
+
+    it("should rate-limit", async () => {
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
+      const doAttempt = () => auth.askPasswordReset(createH3Event(), { userId });
+
+      vi.useFakeTimers();
+
+      const t1 = await doAttempt();
+      expect(t1).not.toBeInstanceOf(Error);
+
+      const t2 = await doAttempt();
+      expect(t2).not.toBeInstanceOf(Error);
+
+      const t3 = doAttempt();
+      await expect(t3).rejects.toBeInstanceOf(RateLimitAskResetPasswordError);
+
+      vi.advanceTimersByTime(2000);
+
+      const t4 = await doAttempt();
+      expect(t4).not.toBeInstanceOf(Error);
+
+      const t5 = await doAttempt().catch(e => JSON.parse(JSON.stringify(e)));
+      expect(t5).toMatchObject({
+        data: {
+          msBeforeNext: 4000,
         },
       });
     });

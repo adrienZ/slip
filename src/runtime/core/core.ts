@@ -10,7 +10,7 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
+import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
@@ -304,7 +304,7 @@ export class SlipAuthCore {
     }
 
     await this.#repos.users.updateEmailVerifiedByUserId({ userId: databaseCode.user_id, value: true });
-    // All sessions should be invalidated when the email is verified (and create a new one for the current user so they stay signed in).
+    // TODO: All sessions should be invalidated when the email is verified (and create a new one for the current user so they stay signed in).
     return true;
   }
 
@@ -313,6 +313,15 @@ export class SlipAuthCore {
    * SHA-256 can be used here since the token is long and random, unlike user passwords.
    */
   public async askPasswordReset(h3Event: H3Event, params: { userId: string }) {
+    // rate limit any function that leads to send email
+    const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.askResetPassword.check(params.userId);
+    if (!isNotRateLimited) {
+      throw new RateLimitAskResetPasswordError({
+        msBeforeNext: (rateLimitResult.updatedAt + rateLimitResult.timeout * 1000) - Date.now(),
+      });
+    }
+
+    await this.#rateLimiters.askResetPassword.increment(params.userId);
     // optionally invalidate all existing tokens
     // this.#repos.resetPasswordTokens.deleteAllByUserId(userId);
     const tokenId = defaultResetPasswordTokenIdMethod();
@@ -329,6 +338,10 @@ export class SlipAuthCore {
     catch (error) {
       if (error instanceof Error && error.message.includes("FOREIGN KEY constraint failed")) {
         throw new InvalidUserIdToResetPasswordError();
+      }
+
+      if (error instanceof RateLimitAskResetPasswordError) {
+        throw error;
       }
 
       throw new UnhandledError();
@@ -411,6 +424,9 @@ export class SlipAuthCore {
     },
     setVerifyEmailRateLimiter: (fn: () => Storage) => {
       this.#rateLimiters.verifyEmailVerification.storage = fn();
+    },
+    setAskResetPasswordRateLimiter: (fn: () => Storage) => {
+      this.#rateLimiters.askResetPassword.storage = fn();
     },
   };
 

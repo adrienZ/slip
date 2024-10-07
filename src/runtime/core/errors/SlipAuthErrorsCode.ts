@@ -10,4 +10,5 @@ export enum SlipAuthErrorsCode {
   RateLimitLogin = "RateLimitLogin",
   RateLimitAskEmailVerification = "RateLimitAskEmailVerification",
   RateLimitVerifyEmailVerification = "RateLimitVerifyEmailVerification",
+  RateLimitAskResetPassword = "RateLimitAskResetPassword",
 }

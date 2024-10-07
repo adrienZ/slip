@@ -322,7 +322,7 @@ You should have your migrations in the migrations folder.
   - [x] reset password
   - [x] rate-limit login
   - [x] rate-limit email verification
-  - [ ] rate-limit forgot password
+  - [x] rate-limit forgot password
   - [ ] rate-limit reset password
   - [x] ~~rate limit register~~ (rate-limit ask email verification)
 - [ ] error message strategy (email already taken, etc)

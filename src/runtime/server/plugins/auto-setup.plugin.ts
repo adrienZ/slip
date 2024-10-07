@@ -75,7 +75,7 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
       await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.resetPasswordTokens} (
         "token_hash" TEXT NOT NULL PRIMARY KEY,
-        "user_id" TEXT NOT NULL UNIQUE,
+        "user_id" TEXT NOT NULL,
         "expires_at" TIMESTAMP NOT NULL,
         "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

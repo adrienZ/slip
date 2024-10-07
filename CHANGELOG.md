@@ -1,6 +1,25 @@
 # Changelog
 
 
+## v0.1.43
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.42...v0.1.43)
+
+### 🚀 Enhancements
+
+- **login:** Add rate-limit ([0c285f8](https://github.com/adrienZ/slip/commit/0c285f8))
+- **email-verification:** Rate-limit ([58ed8e9](https://github.com/adrienZ/slip/commit/58ed8e9))
+- **ask-reset-password:** Add rate limit ([b4c26e8](https://github.com/adrienZ/slip/commit/b4c26e8))
+- **reset-password:** Rate-limit resetPasswordWithResetToken ([ceaeb98](https://github.com/adrienZ/slip/commit/ceaeb98))
+
+### 🏡 Chore
+
+- **release:** V0.1.42 ([96a2732](https://github.com/adrienZ/slip/commit/96a2732))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.42
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.41...v0.1.42)

@@ -38,6 +38,7 @@ This module is build on top of [nuxt-auth-utils](https://github.com/atinux/nuxt-
 
 <!-- Highlight some of the features your module provide here -->
 - 💾 Automatic database setup + migrations
+- ⏰ Rate-limiting
 - 🤝 100% type-safe schemas and utils
 - 🗑️ Delete expired and invalidate sessions
 - 💌 Email + password (+ email verification code)

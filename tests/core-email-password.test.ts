@@ -4,6 +4,7 @@ import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import type { SlipAuthUser } from "~/src/runtime/core/types";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
+import { EmailVerificationFailedError } from "../src/runtime/core/errors/SlipAuthError";
 
 const date = new Date(Date.UTC(1998, 11, 19));
 
@@ -92,7 +93,9 @@ describe("SlipAuthCore", () => {
 
       expect(inserted).toMatchObject(mockedCreateSession);
       expect(inserted2).rejects.toThrowError(
-        "InvalidEmailOrPasswordError",
+        expect.objectContaining({
+          slipErrorName: "InvalidEmailOrPasswordError",
+        }),
       );
     });
 
@@ -225,15 +228,15 @@ describe("SlipAuthCore", () => {
         id: userId2,
         email: defaultInsert2.email,
       };
-      const verification1 = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser2Data as SlipAuthUser, code: codes[0].code });
-      expect(verification1).toBe(false);
+      const verification1 = auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser2Data as SlipAuthUser, code: codes[0].code });
+      await expect(verification1).rejects.toBeInstanceOf(EmailVerificationFailedError);
 
       const fakeUser1Data = {
         id: userId1,
         email: defaultInsert.email,
       };
-      const verification2 = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser1Data as SlipAuthUser, code: codes[1].code });
-      expect(verification2).toBe(false);
+      const verification2 = auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUser1Data as SlipAuthUser, code: codes[1].code });
+      await expect(verification2).rejects.toBeInstanceOf(EmailVerificationFailedError);
     });
 
     it("should validate token from intended user", async () => {
@@ -246,6 +249,7 @@ describe("SlipAuthCore", () => {
         id: userId,
         email: defaultInsert.email,
       };
+
       const verification = await auth.verifyEmailVerificationCode(createH3Event(), { user: fakeUserData as SlipAuthUser, code: codes[0].code });
 
       expect(verification).toBe(true);

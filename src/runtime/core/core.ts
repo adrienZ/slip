@@ -160,7 +160,7 @@ export class SlipAuthCore {
         email,
         password: passwordHash,
       });
-      this.askEmailVerificationCode(h3Event, { user });
+      await this.askEmailVerificationCode(h3Event, { user });
       const sessionToLoginId = this.#createRandomSessionId();
       const sessionToLogin = await this.#repos.sessions.insert({
         sessionId: sessionToLoginId,

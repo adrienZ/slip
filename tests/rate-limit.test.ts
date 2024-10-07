@@ -151,7 +151,7 @@ describe("rate limit", () => {
 
     it("should rate-limit", async () => {
       const [userId] = await auth.register(createH3Event(), defaultInsert);
-      const user = (await auth.getUser({ userId }))!;
+      const user = (await auth.getUser({ id: userId }))!;
       const doAttempt = () => auth.askEmailVerificationCode(createH3Event(), { user });
 
       vi.useFakeTimers();
@@ -192,7 +192,7 @@ describe("rate limit", () => {
       vi.useFakeTimers();
 
       const [userId] = await auth.register(createH3Event(), defaultInsert);
-      const user = (await auth.getUser({ userId }))!;
+      const user = (await auth.getUser({ id: userId }))!;
       const doAttempt = async () => {
         await askEmailVerificationTestStorage.clear();
         await auth.askEmailVerificationCode(createH3Event(), { user });
@@ -284,7 +284,7 @@ describe("rate limit", () => {
       vi.useFakeTimers();
 
       const [userId] = await auth.register(createH3Event(), defaultInsert);
-      const user = (await auth.getUser({ userId }))!;
+      const user = (await auth.getUser({ id: userId }))!;
       const doAttempt = async () => {
         await askPasswordResetTestStorage.clear();
         await auth.askForgotPasswordReset(createH3Event(), { emailAddress: user.email });

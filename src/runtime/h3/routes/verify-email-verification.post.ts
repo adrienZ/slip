@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
   try {
-    const user = await auth.getUser({ userId });
+    const user = await auth.getUser({ id: userId });
 
     if (!user) {
       throw new Error("no user");

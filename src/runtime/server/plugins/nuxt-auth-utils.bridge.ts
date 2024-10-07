@@ -19,14 +19,14 @@ export default defineNitroPlugin(() => {
   if (typeof sessionHooks !== "undefined") {
     sessionHooks.hook("fetch", async (session: SlipAuthPublicSession) => {
       // invalid session if not in database
-      const databaseSession = await auth.getSession({ sessionId: session.id });
+      const databaseSession = await auth.getSession({ id: session.id });
       if (!databaseSession) {
         throw createError("invalidate session");
       }
     });
 
     sessionHooks.hook("clear", async (session: SlipAuthPublicSession) => {
-      auth.deleteSession({ sessionId: session.id });
+      auth.deleteSession({ id: session.id });
     });
   }
 });

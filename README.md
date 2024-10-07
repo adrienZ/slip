@@ -187,15 +187,15 @@ Don't forget to re-login after verifying the email verification code.
 Registers a new user in the database if they don’t already exist. It handles OAuth authentication by registering the OAuth account, creating a session, and linking the user’s details.
 - **Returns**: A tuple containing the user ID and the created session details.
 
-##### `getUser(userId: string)`
+##### `getUser(id: string)`
 
 Fetches a user by its user ID.
 
-##### `getSession(sessionId: string)`
+##### `getSession(id: string)`
 
 Fetches a session by its session ID.
 
-##### `deleteSession(sessionId: string)`
+##### `deleteSession(id: string)`
 
 Deletes a session by its session ID.
 
@@ -262,6 +262,12 @@ Sets custom methods for hashing and verifying passwords.
 
 Sets custom method for reset password token hashing.
 
+##### `setLoginRateLimiter(fn: () => Storage)`
+##### `setAskEmailRateLimiter(fn: () => Storage)`
+##### `setVerifyEmailRateLimiter(fn: () => Storage)`
+##### `setAskResetPasswordRateLimiter(fn: () => Storage)`
+##### `setVerifyResetPasswordRateLimiter(fn: () => Storage)`
+
 ## Database migraions
 
 By default, nuxt-slip-auth will create tables in your database for you !
@@ -323,7 +329,7 @@ You should have your migrations in the migrations folder.
   - [x] rate-limit login
   - [x] rate-limit email verification
   - [x] rate-limit forgot password
-  - [ ] rate-limit reset password
+  - [x] rate-limit reset password
   - [x] ~~rate limit register~~ (rate-limit ask email verification)
 - [ ] error message strategy (email already taken, etc)
 - [ ] oauth accounts linking

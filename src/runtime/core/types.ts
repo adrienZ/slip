@@ -19,7 +19,7 @@ export interface ICreateSessionsParams extends ISessionCreateMetada {
   expiresAt: number
   ip?: string
   ua?: string
-  sessionId: string
+  id: string
 }
 
 export interface ICreateUserParams extends ISessionCreateMetada {

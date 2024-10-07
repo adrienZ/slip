@@ -131,7 +131,7 @@ export class SlipAuthCore {
     await this.#rateLimiters.login.reset(existingUser.id);
     const sessionToLoginId = this.#createRandomSessionId();
     const sessionToLogin = await this.#repos.sessions.insert({
-      sessionId: sessionToLoginId,
+      id: sessionToLoginId,
       userId: existingUser.id,
       expiresAt: Date.now() + this.#sessionMaxAge,
       ip: values.ip,
@@ -156,14 +156,14 @@ export class SlipAuthCore {
 
     try {
       const user = await this.#repos.users.insert({
-        userId,
+        id: userId,
         email,
         password: passwordHash,
       });
       await this.askEmailVerificationCode(h3Event, { user });
       const sessionToLoginId = this.#createRandomSessionId();
       const sessionToLogin = await this.#repos.sessions.insert({
-        sessionId: sessionToLoginId,
+        id: sessionToLoginId,
         userId: user.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ip: values.ip,
@@ -201,7 +201,7 @@ export class SlipAuthCore {
     if (!existingUser) {
       const userId = this.#createRandomUserId();
 
-      await this.#repos.users.insert({ userId: userId, email: params.email });
+      await this.#repos.users.insert({ id: userId, email: params.email });
 
       const _insertedOAuthAccount = await this.#repos.oAuthAccounts.insert({
         email: params.email,
@@ -212,7 +212,7 @@ export class SlipAuthCore {
 
       const sessionFromRegistrationId = this.#createRandomSessionId();
       const sessionFromRegistration = await this.#repos.sessions.insert({
-        sessionId: sessionFromRegistrationId,
+        id: sessionFromRegistrationId,
         userId,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ip: params.ip,
@@ -234,7 +234,7 @@ export class SlipAuthCore {
     if (existingAccount) {
       const sessionFromLoginId = this.#createRandomSessionId();
       const sessionFromLogin = await this.#repos.sessions.insert({
-        sessionId: sessionFromLoginId,
+        id: sessionFromLoginId,
         userId: existingUser.id,
         expiresAt: Date.now() + this.#sessionMaxAge,
         ua: params.ua,
@@ -303,7 +303,7 @@ export class SlipAuthCore {
       throw new EmailVerificationFailedError();
     }
 
-    await this.#repos.users.updateEmailVerifiedByUserId({ userId: databaseCode.user_id, value: true });
+    await this.#repos.users.updateEmailVerifiedByUserId({ id: databaseCode.user_id, value: true });
     // TODO: All sessions should be invalidated when the email is verified (and create a new one for the current user so they stay signed in).
     return true;
   }
@@ -397,7 +397,7 @@ export class SlipAuthCore {
 
     await this.#repos.sessions.deleteAllByUserId(token.user_id);
     const passwordHash = await this.#passwordHashingMethods.hash(params.newPassword);
-    await this.#repos.users.updatePasswordByUserId({ userId: token.user_id, password: passwordHash });
+    await this.#repos.users.updatePasswordByUserId({ id: token.user_id, password: passwordHash });
 
     // await this.#rateLimiters.verifyResetPassword.reset(token.user_id);
     return true;
@@ -428,7 +428,6 @@ export class SlipAuthCore {
     setLoginRateLimiter: (fn: () => Storage) => {
       this.#rateLimiters.login.storage = fn();
     },
-
     setAskEmailRateLimiter: (fn: () => Storage) => {
       this.#rateLimiters.askEmailVerification.storage = fn();
     },
@@ -443,16 +442,16 @@ export class SlipAuthCore {
     },
   };
 
-  public getUser({ userId }: { userId: string }) {
-    return this.#repos.users.findById({ userId });
+  public getUser({ id }: { id: string }) {
+    return this.#repos.users.findById({ id });
   }
 
-  public getSession({ sessionId }: { sessionId: string }) {
-    return this.#repos.sessions.findById({ sessionId });
+  public getSession({ id }: { id: string }) {
+    return this.#repos.sessions.findById({ id: id });
   }
 
-  public deleteSession({ sessionId }: { sessionId: string }) {
-    return this.#repos.sessions.deleteById({ sessionId });
+  public deleteSession({ id }: { id: string }) {
+    return this.#repos.sessions.deleteById({ id });
   }
 
   public deleteExpiredSessions({ timestamp }: { timestamp: number }) {

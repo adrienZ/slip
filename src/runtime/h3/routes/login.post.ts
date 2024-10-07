@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       ...body,
       ua: getHeader(event, "User-Agent"),
     });
-    const user = await auth.getUser({ userId });
+    const user = await auth.getUser({ id: userId });
 
     if (!user) {
       return false;

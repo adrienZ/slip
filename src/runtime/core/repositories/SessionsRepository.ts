@@ -3,20 +3,20 @@ import { TableRepository } from "./_repo";
 import type { ICreateSessionsParams } from "../types";
 
 export class SessionsRepository extends TableRepository<"sessions"> {
-  async insert({ sessionId, userId, expiresAt, ip, ua }: ICreateSessionsParams): Promise<typeof this.table.$inferSelect> {
+  async insert({ id, userId, expiresAt, ip, ua }: ICreateSessionsParams): Promise<typeof this.table.$inferSelect> {
     await this._orm
       .insert(this.table)
       .values({
-        id: sessionId,
+        id: id,
         expires_at: expiresAt,
         user_id: userId,
         ip,
         ua,
       }).run();
 
-    const sessionInserted = await this.findById({ sessionId });
+    const sessionInserted = await this.findById({ id: id });
     if (!sessionInserted) {
-      throw new Error(`Session ${sessionId} not found after insert`);
+      throw new Error(`Session ${id} not found after insert`);
     }
 
     this._hooks.callHookParallel("sessions:create", sessionInserted);
@@ -24,12 +24,12 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     return sessionInserted;
   }
 
-  async findById({ sessionId }: { sessionId: string }): Promise<typeof this.table.$inferSelect | undefined> {
+  async findById({ id }: { id: string }): Promise<typeof this.table.$inferSelect | undefined> {
     const rows = await this._orm
       .select()
       .from(this.table)
       .where(
-        eq(this.table.id, sessionId),
+        eq(this.table.id, id),
       );
     const user = this.getRawSQlResults(rows).at(0);
 
@@ -66,23 +66,23 @@ export class SessionsRepository extends TableRepository<"sessions"> {
     return { success: this.getRawSQlResults(deletedSessions).length === 0, count: this.getRawSQlResults(sessionsToDelete).length };
   }
 
-  async deleteById({ sessionId }: { sessionId: string }) {
-    const sessionToDelete = await this.findById({ sessionId });
+  async deleteById({ id }: { id: string }) {
+    const sessionToDelete = await this.findById({ id: id });
 
     if (!sessionToDelete) {
-      throw new Error(`Unable to delete session with id ${sessionId}`);
+      throw new Error(`Unable to delete session with id ${id}`);
     }
 
     await this._orm
       .delete(this.table)
       .where(
-        eq(this.table.id, sessionId),
+        eq(this.table.id, id),
       )
       .run();
 
     // TODO: fix typings in db0 / drizzle
     // as the delete from drizzle returns any we do an extra query to check if the deletion went fine
-    const expiredSession = await this.findById({ sessionId });
+    const expiredSession = await this.findById({ id: id });
 
     if (expiredSession) {
       return { success: false };

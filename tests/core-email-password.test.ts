@@ -164,7 +164,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.register(createH3Event(), defaultInsert);
       // logout
-      auth.deleteSession({ sessionId: registerSession.id });
+      auth.deleteSession({ id: registerSession.id });
 
       const userCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 2000);
@@ -198,7 +198,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.register(createH3Event(), defaultInsert);
       // logout
-      auth.deleteSession({ sessionId: registerSession.id });
+      auth.deleteSession({ id: registerSession.id });
 
       expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
@@ -254,7 +254,7 @@ describe("SlipAuthCore", () => {
 
       expect(verification).toBe(true);
 
-      const dbUser = await auth.getUser({ userId });
+      const dbUser = await auth.getUser({ id: userId });
       expect(dbUser?.email_verified).toBe(1);
     });
   });

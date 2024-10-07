@@ -132,9 +132,9 @@ describe("SlipAuthCore", () => {
     it("should delete an existant session", async () => {
       const [_, session] = await auth.OAuthLoginUser(defaultInsert);
 
-      await auth.deleteSession({ sessionId: session.id });
+      await auth.deleteSession({ id: session.id });
 
-      const notASession = await auth.getSession({ sessionId: session.id });
+      const notASession = await auth.getSession({ id: session.id });
 
       expect(notASession).toBe(undefined);
     });
@@ -142,7 +142,7 @@ describe("SlipAuthCore", () => {
     it("should throw when trying to delete an non existant session", async () => {
       await auth.OAuthLoginUser(defaultInsert);
 
-      const deletion = auth.deleteSession({ sessionId: "notInDB" });
+      const deletion = auth.deleteSession({ id: "notInDB" });
       expect(deletion).rejects.toThrowError(
         "Unable to delete session with id notInDB",
       );
@@ -210,7 +210,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
       // logout
-      auth.deleteSession({ sessionId: registerSession.id });
+      auth.deleteSession({ id: registerSession.id });
 
       const userCreatedHookPromise = new Promise((resolve, reject) => {
         setTimeout(() => reject("TIMEOUT"), 2000);
@@ -253,7 +253,7 @@ describe("SlipAuthCore", () => {
       // register
       const [_, registerSession] = await auth.OAuthLoginUser(defaultInsert);
       // logout
-      auth.deleteSession({ sessionId: registerSession.id });
+      auth.deleteSession({ id: registerSession.id });
 
       expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });

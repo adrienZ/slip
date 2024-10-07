@@ -3,7 +3,7 @@ import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
-import { EmailVerificationFailedError, InvalidEmailOrPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError } from "../src/runtime/core/errors/SlipAuthError";
+import { EmailVerificationFailedError, InvalidEmailOrPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, RateLimitVerifyResetPasswordError } from "../src/runtime/core/errors/SlipAuthError";
 import { createThrottlerStorage } from "../src/runtime/core/rate-limit/Throttler";
 
 const db = createDatabase(sqlite({
@@ -176,7 +176,7 @@ describe("rate limit", () => {
     });
   });
 
-  describe("verify reset password", () => {
+  describe("verify email verification", () => {
     const verifyEmailVerificationTestStorage = createThrottlerStorage();
     const askEmailVerificationTestStorage = createThrottlerStorage();
 
@@ -263,6 +263,55 @@ describe("rate limit", () => {
       expect(t5).toMatchObject({
         data: {
           msBeforeNext: 4000,
+        },
+      });
+    });
+  });
+
+  describe("verify password reset", () => {
+    const verifyResetPasswordTestStorage = createThrottlerStorage();
+    const askPasswordResetTestStorage = createThrottlerStorage();
+
+    beforeEach(async () => {
+      await verifyResetPasswordTestStorage.clear();
+      await askPasswordResetTestStorage.clear();
+      auth.setters.setAskResetPasswordRateLimiter(() => askPasswordResetTestStorage);
+      auth.setters.setVerifyResetPasswordRateLimiter(() => verifyResetPasswordTestStorage);
+    });
+
+    it("should rate-limit", async () => {
+      auth.setters.setCreateResetPasswordTokenHashMethod(async () => "123456");
+      vi.useFakeTimers();
+
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
+      const user = (await auth.getUser({ userId }))!;
+      const doAttempt = async () => {
+        await askPasswordResetTestStorage.clear();
+        await auth.askForgotPasswordReset(createH3Event(), { emailAddress: user.email });
+        await askPasswordResetTestStorage.clear();
+        return auth.resetPasswordWithResetToken(createH3Event(), {
+          verificationToken: "123456",
+          newPassword: "123456",
+        });
+      };
+
+      await doAttempt();
+
+      // will not rate-limit because timeout is 0
+      await doAttempt();
+
+      const t3 = doAttempt();
+      await expect(t3).rejects.toBeInstanceOf(RateLimitVerifyResetPasswordError);
+
+      vi.advanceTimersByTime(1000);
+
+      // will not rate-limit timeout is expired
+      await doAttempt();
+
+      const t5 = await doAttempt().catch(e => JSON.parse(JSON.stringify(e)));
+      expect(t5).toMatchObject({
+        data: {
+          msBeforeNext: 2000,
         },
       });
     });

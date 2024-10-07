@@ -6,6 +6,7 @@ export class SlipAuthRateLimiters {
   askEmailVerification: Throttler;
   verifyEmailVerification: Throttler;
   askResetPassword: Throttler;
+  verifyResetPassword: Throttler;
 
   constructor() {
     this.login = new Throttler({
@@ -17,6 +18,7 @@ export class SlipAuthRateLimiters {
       timeoutSeconds: [0, 2, 4, 8, 32, 60, 180, 240, 480, 720],
       storage: prefixStorage(createThrottlerStorage(), "slip:rate:ask-email-verification"),
     });
+
     this.askResetPassword = new Throttler({
       timeoutSeconds: [0, 2, 4, 8, 32, 60, 180, 240, 480, 720],
       storage: prefixStorage(createThrottlerStorage(), "slip:rate:ask-reset-password"),
@@ -25,6 +27,11 @@ export class SlipAuthRateLimiters {
     this.verifyEmailVerification = new Throttler({
       timeoutSeconds: [0, 1, 2, 4, 8, 16, 30, 60, 180, 300],
       storage: prefixStorage(createThrottlerStorage(), "slip:rate:verify-email-verification"),
+    });
+
+    this.verifyResetPassword = new Throttler({
+      timeoutSeconds: [0, 1, 2, 4, 8, 16, 30, 60, 180, 300],
+      storage: prefixStorage(createThrottlerStorage(), "slip:rate:verify-reset-password"),
     });
   }
 }

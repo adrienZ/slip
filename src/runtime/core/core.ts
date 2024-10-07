@@ -10,7 +10,7 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
+import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, RateLimitVerifyResetPasswordError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
@@ -314,6 +314,7 @@ export class SlipAuthCore {
    */
   public async askPasswordReset(h3Event: H3Event, params: { userId: string }) {
     // rate limit any function that leads to send email
+    // TODO: "Make sure to implement rate limiting based on IP addresses." https://lucia-auth.com/guides/email-and-password/password-reset#:~:text=Make%20sure%20to,Verify%20token
     const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.askResetPassword.check(params.userId);
     if (!isNotRateLimited) {
       throw new RateLimitAskResetPasswordError({
@@ -348,7 +349,6 @@ export class SlipAuthCore {
     }
   }
 
-  // TODO: rate limit
   public async askForgotPasswordReset(h3Event: H3Event, params: { emailAddress: string }): Promise<string> {
     const user = await this.#repos.users.findByEmail({ email: params.emailAddress });
     if (!user) {
@@ -379,6 +379,15 @@ export class SlipAuthCore {
       await this.#repos.resetPasswordTokens.deleteByTokenHash({ tokenHash });
     }
 
+    // rate limit any function that leads to send email
+    const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.verifyResetPassword.check(token.user_id);
+    if (!isNotRateLimited) {
+      throw new RateLimitVerifyResetPasswordError({
+        msBeforeNext: (rateLimitResult.updatedAt + rateLimitResult.timeout * 1000) - Date.now(),
+      });
+    }
+
+    await this.#rateLimiters.verifyResetPassword.increment(token.user_id);
     const expirationDate = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at);
     const offset = expirationDate.getTimezoneOffset() * 60000; // Get local time zone offset in milliseconds
     const localExpirationDate = new Date(expirationDate.getTime() - offset); // Adjust for local time zone
@@ -390,6 +399,7 @@ export class SlipAuthCore {
     const passwordHash = await this.#passwordHashingMethods.hash(params.newPassword);
     await this.#repos.users.updatePasswordByUserId({ userId: token.user_id, password: passwordHash });
 
+    // await this.#rateLimiters.verifyResetPassword.reset(token.user_id);
     return true;
   }
 
@@ -427,6 +437,9 @@ export class SlipAuthCore {
     },
     setAskResetPasswordRateLimiter: (fn: () => Storage) => {
       this.#rateLimiters.askResetPassword.storage = fn();
+    },
+    setVerifyResetPasswordRateLimiter: (fn: () => Storage) => {
+      this.#rateLimiters.verifyResetPassword.storage = fn();
     },
   };
 

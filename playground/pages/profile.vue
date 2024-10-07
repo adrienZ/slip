@@ -49,9 +49,8 @@
           </UButton>
 
           <UButton
-            v-else-if="
+            v-if="
               validateEmailVerificationRequest.status.value !== 'success'
-                || validateEmailVerificationRequest.data.value === false
             "
             class="mt-2 w-full"
             color="black"

@@ -29,6 +29,7 @@ export async function autoSetupTestsDatabase(db: Database) {
 export function createH3Event(): H3Event {
   const req = new IncomingMessage(new Socket());
   const res = new OutgoingMessage();
+  // @ts-expect-error TODO: FIXME
   const fakeH3Event = new H3Event(req, res);
 
   return fakeH3Event;

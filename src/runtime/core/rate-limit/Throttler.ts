@@ -37,7 +37,7 @@ export class Throttler {
       return [true];
     }
     else {
-      return [false, counter];
+      return [false, { updatedAt: counter.updatedAt, timeout: this.timeoutSeconds[counter.timeout] }];
     }
   }
 

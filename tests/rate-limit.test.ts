@@ -1,12 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
-import { InvalidEmailOrPasswordError, RateLimitLoginError } from "../src/runtime/core/errors/SlipAuthError";
+import { EmailVerificationCodeExpired, EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, RateLimitAskEmailVerificationError, RateLimitLoginError, RateLimitVerifyEmailVerificationError } from "../src/runtime/core/errors/SlipAuthError";
 import { createThrottlerStorage } from "../src/runtime/core/rate-limit/Throttler";
-
-const testStorage = createThrottlerStorage();
 
 const db = createDatabase(sqlite({
   name: "rate-limit.test",
@@ -31,21 +29,10 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-describe.sequential("rate limit", () => {
-  afterAll(
-    async () => {
-    // await testStorage.clear();
-      await testStorage.dispose();
-    });
-
+describe("rate limit", () => {
   beforeEach(async () => {
     mocks.userCreatedCount = 0;
     mocks.sessionCreatedCount = 0;
-    await testStorage.clear();
 
     auth = new SlipAuthCore(
       db,
@@ -65,8 +52,6 @@ describe.sequential("rate limit", () => {
       return `session-id-${mocks.sessionCreatedCount}`;
     });
 
-    auth.setters.setLoginRateLimiter(() => testStorage);
-
     function sanitizePassword(str: string) {
       return str.replaceAll("$", "") + "$";
     }
@@ -84,6 +69,13 @@ describe.sequential("rate limit", () => {
   });
 
   describe("login", () => {
+    const loginTestStorage = createThrottlerStorage();
+
+    beforeEach(async () => {
+      await loginTestStorage.clear();
+      auth.setters.setLoginRateLimiter(() => loginTestStorage);
+    });
+
     it("should allow 2 failed tries", async () => {
       await auth.register(createH3Event(), defaultInsert);
       const doAttempt = () => auth.login(createH3Event(), {
@@ -107,6 +99,7 @@ describe.sequential("rate limit", () => {
 
       const t1 = doAttempt();
       await expect(t1).rejects.toBeInstanceOf(InvalidEmailOrPasswordError);
+
       // will not rate-limit because timeout is 0
       const t2 = doAttempt();
       await expect(t2).rejects.toBeInstanceOf(InvalidEmailOrPasswordError);
@@ -145,6 +138,96 @@ describe.sequential("rate limit", () => {
       vi.advanceTimersByTime(500);
       const t6 = await doAttempt().catch(e => JSON.parse(JSON.stringify(e)));
       expect(t6).toMatchObject({ data: { msBeforeNext: 1500 } });
+    });
+  });
+
+  describe("ask email verification", () => {
+    const askEmailVerificationTestStorage = createThrottlerStorage();
+
+    beforeEach(async () => {
+      await askEmailVerificationTestStorage.clear();
+      auth.setters.setAskEmailRateLimiter(() => askEmailVerificationTestStorage);
+    });
+
+    it("should rate-limit", async () => {
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
+      const user = (await auth.getUser({ userId }))!;
+      const doAttempt = () => auth.askEmailVerificationCode(createH3Event(), { user });
+
+      vi.useFakeTimers();
+
+      const t1 = await doAttempt();
+      expect(t1).not.toBeInstanceOf(Error);
+
+      const t2 = doAttempt();
+      await expect(t2).rejects.toBeInstanceOf(RateLimitAskEmailVerificationError);
+
+      vi.advanceTimersByTime(2000);
+
+      const t3 = await doAttempt();
+      expect(t3).not.toBeInstanceOf(Error);
+
+      const t4 = await doAttempt().catch(e => JSON.parse(JSON.stringify(e)));
+      expect(t4).toMatchObject({
+        data: {
+          msBeforeNext: 4000,
+        },
+      });
+    });
+  });
+
+  describe("verify email verification", () => {
+    const verifyEmailVerificationTestStorage = createThrottlerStorage();
+    const askEmailVerificationTestStorage = createThrottlerStorage();
+
+    beforeEach(async () => {
+      await verifyEmailVerificationTestStorage.clear();
+      await askEmailVerificationTestStorage.clear();
+      auth.setters.setAskEmailRateLimiter(() => askEmailVerificationTestStorage);
+      auth.setters.setVerifyEmailRateLimiter(() => verifyEmailVerificationTestStorage);
+    });
+
+    it("should rate-limit", async () => {
+      auth.setters.setCreateRandomEmailVerificationCode(() => "123456");
+      vi.useFakeTimers();
+
+      const [userId] = await auth.register(createH3Event(), defaultInsert);
+      const user = (await auth.getUser({ userId }))!;
+      const doAttempt = async () => {
+        await askEmailVerificationTestStorage.clear();
+        await auth.askEmailVerificationCode(createH3Event(), { user });
+        await askEmailVerificationTestStorage.clear();
+        return auth.verifyEmailVerificationCode(createH3Event(), {
+          user: {
+            ...user,
+            email: "wrong-email",
+          },
+          code: "123456",
+        });
+      };
+
+      const t1 = doAttempt();
+      await expect(t1).rejects.toBeInstanceOf(EmailVerificationFailedError);
+
+      // will not rate-limit because timeout is 0
+      const t2 = doAttempt();
+      await expect(t2).rejects.toBeInstanceOf(EmailVerificationFailedError);
+
+      const t3 = doAttempt();
+      await expect(t3).rejects.toBeInstanceOf(RateLimitVerifyEmailVerificationError);
+
+      vi.advanceTimersByTime(1000);
+
+      // will not rate-limit timeout is expired
+      const t4 = doAttempt();
+      await expect(t4).rejects.toBeInstanceOf(EmailVerificationFailedError);
+
+      const t5 = await doAttempt().catch(e => JSON.parse(JSON.stringify(e)));
+      expect(t5).toMatchObject({
+        data: {
+          msBeforeNext: 2000,
+        },
+      });
     });
   });
 });

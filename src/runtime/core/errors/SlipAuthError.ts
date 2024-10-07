@@ -1,7 +1,8 @@
 import { SlipAuthErrorsCode } from "./SlipAuthErrorsCode";
 
 export class SlipAuthError extends Error {
-  slipError!: SlipAuthErrorsCode;
+  slipErrorCode!: SlipAuthErrorsCode;
+  slipErrorName!: string;
 };
 
 export class SlipAuthRateLimiterError extends SlipAuthError {
@@ -16,13 +17,13 @@ export class SlipAuthRateLimiterError extends SlipAuthError {
 }
 
 export class UnhandledError extends SlipAuthError {
-  override name = "InvalidEmailOrPasswordError";
-  override slipError = SlipAuthErrorsCode.Unhandled;
+  override slipErrorName = "UnhandledError";
+  override slipErrorCode = SlipAuthErrorsCode.Unhandled;
 }
 
 export class InvalidEmailOrPasswordError extends SlipAuthError {
-  override slipError = SlipAuthErrorsCode.InvalidEmailOrPassword;
-  override name = "InvalidEmailOrPasswordError";
+  override slipErrorCode = SlipAuthErrorsCode.InvalidEmailOrPassword;
+  override slipErrorName = "InvalidEmailOrPasswordError";
   // eslint-disable-next-line no-unused-private-class-members
   #debugReason: string;
 
@@ -33,25 +34,45 @@ export class InvalidEmailOrPasswordError extends SlipAuthError {
 }
 
 export class InvalidEmailToResetPasswordError extends SlipAuthError {
-  override name = "InvalidEmailToResetPasswordError";
-  override slipError = SlipAuthErrorsCode.InvalidEmailToResetPassword;
+  override slipErrorName = "InvalidEmailToResetPasswordError";
+  override slipErrorCode = SlipAuthErrorsCode.InvalidEmailToResetPassword;
+}
+
+export class EmailVerificationFailedError extends SlipAuthError {
+  override slipErrorName = "EmailVerificationFailedError";
+  override slipErrorCode = SlipAuthErrorsCode.EmailVerificationFailedError;
+}
+
+export class EmailVerificationCodeExpiredError extends SlipAuthError {
+  override slipErrorName = "EmailVerificationCodeExpiredError";
+  override slipErrorCode = SlipAuthErrorsCode.EmailVerificationCodeExpired;
 }
 
 export class InvalidUserIdToResetPasswordError extends SlipAuthError {
-  override name = "InvalidUserIdToResetPasswordError";
-  override slipError = SlipAuthErrorsCode.InvalidUserIdToResetPassword;
+  override slipErrorName = "InvalidUserIdToResetPasswordError";
+  override slipErrorCode = SlipAuthErrorsCode.InvalidUserIdToResetPassword;
 }
 
 export class InvalidPasswordToResetError extends SlipAuthError {
-  override name = "InvalidPasswordToResetError";
-  override slipError = SlipAuthErrorsCode.InvalidPasswordToReset;
+  override slipErrorName = "InvalidPasswordToResetError";
+  override slipErrorCode = SlipAuthErrorsCode.InvalidPasswordToReset;
 }
 export class ResetPasswordTokenExpiredError extends SlipAuthError {
-  override name = "ResetPasswordTokenExpiredError";
-  override slipError = SlipAuthErrorsCode.ResetPasswordTokenExpired;
+  override slipErrorName = "ResetPasswordTokenExpiredError";
+  override slipErrorCode = SlipAuthErrorsCode.ResetPasswordTokenExpired;
 }
 
 export class RateLimitLoginError extends SlipAuthRateLimiterError {
-  override name = "RateLimitLoginError";
-  override slipError = SlipAuthErrorsCode.RateLimitLogin;
+  override slipErrorName = "RateLimitLoginError";
+  override slipErrorCode = SlipAuthErrorsCode.RateLimitLogin;
+}
+
+export class RateLimitAskEmailVerificationError extends SlipAuthRateLimiterError {
+  override slipErrorName = "RateLimitAskEmailVerificationError";
+  override slipErrorCode = SlipAuthErrorsCode.RateLimitAskEmailVerification;
+}
+
+export class RateLimitVerifyEmailVerificationError extends SlipAuthRateLimiterError {
+  override slipErrorName = "RateLimitVerifyEmailVerificationError";
+  override slipErrorCode = SlipAuthErrorsCode.RateLimitVerifyEmailVerification;
 }

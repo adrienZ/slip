@@ -50,7 +50,7 @@
 
           <UButton
             v-if="
-              validateEmailVerificationRequest.status.value !== 'success'
+              askEmailVerificationRequest.status.value === 'success'
             "
             class="mt-2 w-full"
             color="black"

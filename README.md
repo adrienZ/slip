@@ -320,11 +320,11 @@ You should have your migrations in the migrations folder.
 - [x] Email + Password
   - [x] forgot password
   - [x] reset password
-  - [ ] rate-limit login
-  - [ ] rate-limit email verification
+  - [x] rate-limit login
+  - [x] rate-limit email verification
   - [ ] rate-limit forgot password
   - [ ] rate-limit reset password
-  - [ ] rate limit register
+  - [x] ~~rate limit register~~ (rate-limit ask email verification)
 - [ ] error message strategy (email already taken, etc)
 - [ ] oauth accounts linking
 - [ ] ~~Ihavebeenpwnd plugin~~

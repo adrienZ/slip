@@ -10,7 +10,7 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitLoginError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
+import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
@@ -248,7 +248,19 @@ export class SlipAuthCore {
     throw new Error("could not find oauth user");
   }
 
+  /**
+   * Make sure to set the Referrer Policy tag to strict-origin (or equivalent) for any path that includes tokens to protect the tokens from referer leakage.
+   */
   public async askEmailVerificationCode(event: H3Event, { user }: { user: SlipAuthUser }): Promise<void> {
+    // rate limit any function that leads to send email
+    const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.askEmailVerification.check(user.id);
+    if (!isNotRateLimited) {
+      throw new RateLimitAskEmailVerificationError({
+        msBeforeNext: (rateLimitResult.updatedAt + rateLimitResult.timeout * 1000) - Date.now(),
+      });
+    }
+
+    await this.#rateLimiters.askEmailVerification.increment(user.id);
     await this.#repos.emailVerificationCodes.deleteAllByUserId(user.id);
     await this.#repos.emailVerificationCodes.insert({
       userId: user.id,
@@ -259,28 +271,40 @@ export class SlipAuthCore {
   }
 
   // TODO: use transactions
-  // TODO: rate limit
-  public async verifyEmailVerificationCode(h3Event: H3Event, params: { user: SlipAuthUser, code: string }): Promise<boolean> {
+  public async verifyEmailVerificationCode(h3Event: H3Event, params: { user: SlipAuthUser, code: string }): Promise<true> {
+    // TODO add where clause with code
+    // TODO add where clause with email ?
     const databaseCode = await this.#repos.emailVerificationCodes.findByUserId({ userId: params.user.id });
     if (!databaseCode || databaseCode.code !== params.code) {
-      return false;
+      throw new EmailVerificationFailedError();
+    }
+
+    // rate limit any function that leads to send email
+    const [isNotRateLimited, rateLimitResult] = await this.#rateLimiters.verifyEmailVerification.check(databaseCode.user_id);
+
+    if (!isNotRateLimited) {
+      throw new RateLimitVerifyEmailVerificationError({
+        msBeforeNext: (rateLimitResult.updatedAt + rateLimitResult.timeout * 1000) - Date.now(),
+      });
     }
 
     this.#repos.emailVerificationCodes.deleteById(databaseCode.id);
-
     const expirationDate = databaseCode.expires_at instanceof Date ? databaseCode.expires_at : new Date(databaseCode.expires_at);
     const offset = expirationDate.getTimezoneOffset() * 60000; // Get local time zone offset in milliseconds
     const localExpirationDate = new Date(expirationDate.getTime() - offset); // Adjust for local time zone
 
     if (!isWithinExpirationDate(localExpirationDate)) {
-      return false;
+      await this.#rateLimiters.verifyEmailVerification.increment(databaseCode.user_id);
+      throw new EmailVerificationCodeExpiredError();
     }
+
     if (databaseCode.email !== params.user.email) {
-      return false;
+      await this.#rateLimiters.verifyEmailVerification.increment(databaseCode.user_id);
+      throw new EmailVerificationFailedError();
     }
 
     await this.#repos.users.updateEmailVerifiedByUserId({ userId: databaseCode.user_id, value: true });
-    // should recreate session if true
+    // All sessions should be invalidated when the email is verified (and create a new one for the current user so they stay signed in).
     return true;
   }
 
@@ -380,6 +404,13 @@ export class SlipAuthCore {
 
     setLoginRateLimiter: (fn: () => Storage) => {
       this.#rateLimiters.login.storage = fn();
+    },
+
+    setAskEmailRateLimiter: (fn: () => Storage) => {
+      this.#rateLimiters.askEmailVerification.storage = fn();
+    },
+    setVerifyEmailRateLimiter: (fn: () => Storage) => {
+      this.#rateLimiters.verifyEmailVerification.storage = fn();
     },
   };
 

@@ -6,6 +6,7 @@ export class SlipAuthError extends Error {
 };
 
 export class SlipAuthRateLimiterError extends SlipAuthError {
+  statusCode = 429;
   data: {
     msBeforeNext?: number
   };
@@ -14,11 +15,6 @@ export class SlipAuthRateLimiterError extends SlipAuthError {
     super();
     this.data = data;
   }
-}
-
-export class UnhandledError extends SlipAuthError {
-  override slipErrorName = "UnhandledError";
-  override slipErrorCode = SlipAuthErrorsCode.Unhandled;
 }
 
 export class InvalidEmailOrPasswordError extends SlipAuthError {

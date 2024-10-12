@@ -1,27 +1,18 @@
-import { SlipAuthError } from "../../core/errors/SlipAuthError";
 import { useSlipAuth } from "../../server/utils/useSlipAuth";
-import { defineEventHandler, createError } from "h3";
+import { defineEventHandler } from "h3";
 
 export default defineEventHandler(async (event) => {
   const auth = useSlipAuth();
   const session = await requireUserSession(event);
   const userId = session.user.id;
 
-  try {
-    const user = await auth.getUser({ id: userId });
+  const user = await auth.getUser({ id: userId });
 
-    if (!user) {
-      throw new Error("no user");
-    }
-
-    await auth.askEmailVerificationCode(event, { user });
-
-    return true;
+  if (!user) {
+    throw new Error("no user");
   }
-  catch (error) {
-    throw createError({
-      ...(error instanceof Error ? error : {}),
-      data: error instanceof SlipAuthError ? error : undefined,
-    });
-  }
+
+  await auth.askEmailVerificationCode(event, { user });
+
+  return true;
 });

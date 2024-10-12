@@ -10,7 +10,7 @@ import { EmailVerificationCodesRepository } from "./repositories/EmailVerificati
 import { ResetPasswordTokensRepository } from "./repositories/ResetPasswordTokensRepository";
 import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
-import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, RateLimitVerifyResetPasswordError, ResetPasswordTokenExpiredError, UnhandledError } from "./errors/SlipAuthError.js";
+import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, RateLimitVerifyResetPasswordError, ResetPasswordTokenExpiredError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
 import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
@@ -173,14 +173,11 @@ export class SlipAuthCore {
       return [user.id, sessionToLogin];
     }
     catch (error) {
-      if (error instanceof Error) {
-        if (error.stack?.includes(`UNIQUE constraint failed: ${this.#tableNames.users}.email`)) {
-          throw new InvalidEmailOrPasswordError(`email already taken: ${values.email}`);
-        }
-        throw new UnhandledError();
+      if (error instanceof Error && error.stack?.includes(`UNIQUE constraint failed: ${this.#tableNames.users}.email`)) {
+        throw new InvalidEmailOrPasswordError(`email already taken: ${values.email}`);
       }
 
-      throw new UnhandledError();
+      throw error;
     }
   }
 
@@ -341,11 +338,7 @@ export class SlipAuthCore {
         throw new InvalidUserIdToResetPasswordError();
       }
 
-      if (error instanceof RateLimitAskResetPasswordError) {
-        throw error;
-      }
-
-      throw new UnhandledError();
+      throw error;
     }
   }
 

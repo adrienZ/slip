@@ -1,5 +1,4 @@
 export enum SlipAuthErrorsCode {
-  Unhandled = "Unhandled",
   InvalidEmailOrPassword = "InvalidEmailOrPassword",
   EmailVerificationFailedError = "EmailVerificationFailed",
   EmailVerificationCodeExpired = "EmailVerificationCodeExpired",

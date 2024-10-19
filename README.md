@@ -17,6 +17,9 @@ Find and replace all on all files (CMD+SHIFT+F):
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 [![Codecov][codecov-src]][codecov-href]
+[![Snyk Code Quality][snyk-score-src]][snyk-score-href]
+[![Known Vulnerabilities][snyk-status-src]][snyk-status-href]
+
 
 # nuxt-slip-auth 🩲
 > Plug and play authentication module for Nuxt
@@ -391,3 +394,9 @@ You should have your migrations in the migrations folder.
 
 [codecov-src]:https://codecov.io/gh/adrienZ/slip/graph/badge.svg?token=GMTZW7C5S7
 [codecov-href]: https://codecov.io/gh/adrienZ/slip
+
+[snyk-status-src]: https://snyk.io/test/github/adrienZ/slip/badge.svg
+[snyk-status-href]: https://snyk.io/test/github/adrienZ/slip
+
+[snyk-score-src]: https://snyk.io/advisor/npm-package/nuxt-slip-auth/badge.svg
+[snyk-score-href]: https://snyk.io/advisor/npm-package/nuxt-slip-auth

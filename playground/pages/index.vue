@@ -38,7 +38,9 @@ const formData = reactive({
   password: "",
 });
 
-const authClient = getSlipAuthClient();
+const authClient = getSlipAuthClient({
+  baseURL: useRequestURL().origin,
+});
 
 const registerRequest = await useLazyAsyncData(() => authClient.register(formData), {
   immediate: false,

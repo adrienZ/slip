@@ -1,16 +1,15 @@
 import type { SlipAuthCore } from "../../../core/core";
 import { routerRecord } from "../../../h3/routerRecord";
 import { ofetch } from "ofetch";
-import { useRequestURL } from "#imports";
 
 import type loginHandler from "../../../h3/routes/login.post";
 import type registerHandler from "../../../h3/routes/register.post";
 import type askEmailVerificationCodeHandler from "../../../h3/routes/ask-email-verification.post";
 import type verifyEmailVerificationCodeHandler from "../../../h3/routes/verify-email-verification.post";
 
-export function getSlipAuthClient() {
+export function getSlipAuthClient(config: { baseURL: string }) {
   const httpClient = ofetch.create({
-    baseURL: useRequestURL().origin,
+    baseURL: config.baseURL,
   });
 
   return {

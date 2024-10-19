@@ -134,7 +134,10 @@ Example: `~/app.vue`
 <script setup lang="ts">
 const { loggedIn, user, session, clear, fetch: fetchSession } = useUserSession();
 
-const authClient = getSlipAuthClient();
+const authClient = getSlipAuthClient({
+  baseURL: useRequestURL().origin,
+});
+
 async function seedUser() {
   const email = `user-${Math.random()}@email.com`;
   const password = "password";

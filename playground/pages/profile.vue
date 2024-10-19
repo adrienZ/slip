@@ -77,7 +77,9 @@
 
 <script setup lang="ts">
 const { session, user, fetch: fetchSession } = useUserSession();
-const authClient = getSlipAuthClient();
+const authClient = getSlipAuthClient({
+  baseURL: useRequestURL().origin,
+});
 
 const askEmailVerificationRequest = await useLazyAsyncData(() => authClient.askEmailVerificationCode(), {
   immediate: false,

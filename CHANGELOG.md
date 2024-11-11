@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v0.1.44
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.43...v0.1.44)
+
+### 💅 Refactors
+
+- **errors:** Simplify returned error by endpoints ([271b68b](https://github.com/adrienZ/slip/commit/271b68b))
+- **client:** Configurable baseURL ([3846919](https://github.com/adrienZ/slip/commit/3846919))
+
+### 🏡 Chore
+
+- **release:** V0.1.43 ([d497063](https://github.com/adrienZ/slip/commit/d497063))
+- **readme:** Add snyk badges ([eebac95](https://github.com/adrienZ/slip/commit/eebac95))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.43
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.42...v0.1.43)

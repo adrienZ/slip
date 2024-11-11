@@ -7,14 +7,21 @@ export default defineNuxtConfig({
     // optional
     "@nuxthub/core",
   ],
-  devtools: { enabled: true },
-  compatibilityDate: "2024-07-27",
-  slipAuth: {
-    database: {
-      nitroDatabaseName: "default",
-      dialect: "sqlite",
+
+  // #region - codesandbox config
+  runtimeConfig: {
+    session: {
+      cookie: {
+        // Required when SameSite=None is set
+        secure: true,
+        // This allows the cookie to be used in iframes
+        sameSite: "None",
+        // Ensures cookie is accessible across the whole domain
+        path: "/",
+      },
     },
   },
+  compatibilityDate: "2024-07-27",
   nitro: {
     database: {
       default: {
@@ -34,11 +41,6 @@ export default defineNuxtConfig({
       },
     },
   },
-
-  // #region faster demo startup
-  tailwindcss: {
-    viewer: false,
-  },
   // #endregion
 
   // #region nuxthub enable database
@@ -47,18 +49,16 @@ export default defineNuxtConfig({
   },
   // #endregion
 
-  // #region - codesandbox config
-  runtimeConfig: {
-    session: {
-      cookie: {
-        // Required when SameSite=None is set
-        secure: true,
-        // This allows the cookie to be used in iframes
-        sameSite: "None",
-        // Ensures cookie is accessible across the whole domain
-        path: "/",
-      },
+  slipAuth: {
+    database: {
+      nitroDatabaseName: "default",
+      dialect: "sqlite",
     },
+  },
+
+  // #region faster demo startup
+  tailwindcss: {
+    viewer: false,
   },
   // #endregion
 });

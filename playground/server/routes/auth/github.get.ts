@@ -1,4 +1,4 @@
-import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
+import { drizzle as drizzleIntegration } from "db0/integrations/drizzle";
 
 export default defineOAuthGitHubEventHandler({
   config: {

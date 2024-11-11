@@ -1,4 +1,4 @@
-import type { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
+import type { drizzle as drizzleIntegration } from "db0/integrations/drizzle";
 import type { SchemasMockValue } from "../types";
 import type { ISlipAuthHooks } from "../hooks";
 

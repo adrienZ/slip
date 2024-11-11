@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import sqlite from "db0/connectors/better-sqlite3";
 import { createDatabase } from "db0";
-import { drizzle } from "db0/integrations/drizzle/index";
+import { drizzle } from "db0/integrations/drizzle";
 import { SlipAuthCore } from "../src/runtime/core/core";
 import { autoSetupTestsDatabase, createH3Event, testTablesNames } from "./test-helpers";
 import { eq } from "drizzle-orm";

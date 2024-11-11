@@ -1,5 +1,5 @@
 import { useSlipAuth } from "../utils/useSlipAuth";
-import type { NitroApp } from "nitropack";
+import type { NitroApp } from "nitropack/types";
 import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore yolo the DX is not great

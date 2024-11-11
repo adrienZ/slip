@@ -1,6 +1,6 @@
 import { createChecker, type supportedConnectors } from "drizzle-schema-checker";
 import { getOAuthAccountsTableSchema, getSessionsTableSchema, getUsersTableSchema, getEmailVerificationCodesTableSchema, getPasswordResetTokensTableSchema } from "../database/sqlite/schema.sqlite";
-import { drizzle as drizzleIntegration } from "db0/integrations/drizzle/index";
+import { drizzle as drizzleIntegration } from "db0/integrations/drizzle";
 import type { ICreateOrLoginParams, ICreateUserParams, ILoginUserParams, IPasswordHashingMethods, ISlipAuthCoreOptions, SchemasMockValue, SlipAuthUser, tableNames } from "./types";
 import { createSlipHooks } from "./hooks";
 import { UsersRepository } from "./repositories/UsersRepository";

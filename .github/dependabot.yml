@@ -2,12 +2,12 @@
 # package ecosystems to update and where the package manifests are located.
 version: 2
 updates:
-- package-ecosystem: "pnpm" # See documentation for possible values
+- package-ecosystem: "npm" # See documentation for possible values
   directory: "/" # Location of package manifests
   schedule:
     interval: "weekly"
 updates:
-- package-ecosystem: "pnpm" # See documentation for possible values
+- package-ecosystem: "npm" # See documentation for possible values
   directory: "/playground" # Location of package manifests
   schedule:
     interval: "weekly"

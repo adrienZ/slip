@@ -10,7 +10,7 @@
   "dependencies": {
     "@libsql/client": "^0.14.0",
     "@nuxt/ui": "^2.19.2",
-    "@nuxthub/core": "^0.8.6",
+    "@nuxthub/core": "^0.8.7",
     "nuxt": "^3.14.1592"
   },
   "devDependencies": {

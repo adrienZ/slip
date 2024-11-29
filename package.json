@@ -63,7 +63,7 @@
     "changelogen": "^0.5.7",
     "citty": "^0.1.6",
     "dotenv": "^16.4.5",
-    "eslint": "^9.14.0",
+    "eslint": "^9.15.0",
     "hookable": "^5.5.3",
     "nuxt": "^3.14.159",
     "nuxt-auth-utils": "^0.4.4",

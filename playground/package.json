@@ -17,7 +17,7 @@
     "@iconify-json/heroicons": "^1.2.1",
     "@iconify-json/heroicons-solid": "^1.2.0",
     "@iconify-json/simple-icons": "^1.2.15",
-    "drizzle-kit": "^0.28.1",
+    "drizzle-kit": "^0.30.0",
     "wrangler": "^3.91.0"
   },
   "packageManager": "pnpm@9.9.0"

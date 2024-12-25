@@ -16,10 +16,10 @@ importers:
         version: 3.2.3
       db0:
         specifier: ^0.2.1
-        version: 0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))
+        version: 0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))
       drizzle-orm:
-        specifier: ^0.36.1
-        version: 0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)
+        specifier: ^0.38.3
+        version: 0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0)
       drizzle-schema-checker:
         specifier: ^1.2.0
         version: 1.2.0(magicast@0.3.5)
@@ -47,7 +47,7 @@ importers:
         version: 3.14.159(magicast@0.3.5)(rollup@4.25.0)
       '@nuxt/test-utils':
         specifier: ^3.14.4
-        version: 3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
+        version: 3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
       '@types/node':
         specifier: ^20.17.6
         version: 20.17.6
@@ -74,7 +74,7 @@ importers:
         version: 5.5.3
       nuxt:
         specifier: ^3.14.159
-        version: 3.14.159(@libsql/client@0.11.0)(@parcel/watcher@2.5.0)(@types/node@20.17.6)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(eslint@9.15.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.25.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.6.3))
+        version: 3.14.159(@libsql/client@0.11.0)(@parcel/watcher@2.5.0)(@types/node@20.17.6)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(eslint@9.15.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.25.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.6.3))
       nuxt-auth-utils:
         specifier: ^0.4.4
         version: 0.4.4(magicast@0.3.5)(rollup@4.25.0)
@@ -2601,15 +2601,15 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-orm@0.36.1:
-    resolution: {integrity: sha512-F4hbimnMEhyWzDowQB4xEuVJJWXLHZYD7FYwvo8RImY+N7pStGqsbfmT95jDbec1s4qKmQbiuxEDZY90LRrfIw==}
+  drizzle-orm@0.38.3:
+    resolution: {integrity: sha512-w41Y+PquMpSff/QDRGdItG0/aWca+/J3Sda9PPGkTxBtjWQvgU1jxlFBXdjog5tYvTu58uvi3PwR1NuCx0KeZg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
-      '@cloudflare/workers-types': '>=3'
+      '@cloudflare/workers-types': '>=4'
       '@electric-sql/pglite': '>=0.2.0'
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
-      '@neondatabase/serverless': '>=0.1'
+      '@neondatabase/serverless': '>=0.10.0'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1'
@@ -2623,7 +2623,7 @@ packages:
       '@xata.io/client': '*'
       better-sqlite3: '>=7'
       bun-types: '*'
-      expo-sqlite: '>=13.2.0'
+      expo-sqlite: '>=14.0.0'
       knex: '*'
       kysely: '*'
       mysql2: '>=2'
@@ -6207,7 +6207,7 @@ snapshots:
       - supports-color
       - webpack-sources
 
-  '@nuxt/test-utils@3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))':
+  '@nuxt/test-utils@3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))':
     dependencies:
       '@nuxt/kit': 3.14.159(magicast@0.3.5)(rollup@4.25.0)
       '@nuxt/schema': 3.14.159(magicast@0.3.5)(rollup@4.25.0)
@@ -6221,7 +6221,7 @@ snapshots:
       h3: 1.13.0
       local-pkg: 0.5.0
       magic-string: 0.30.12
-      nitropack: 2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3)
+      nitropack: 2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3)
       node-fetch-native: 1.6.4
       ofetch: 1.4.1
       pathe: 1.1.2
@@ -6234,7 +6234,7 @@ snapshots:
       unenv: 1.10.0
       unplugin: 1.15.0
       vite: 5.4.11(@types/node@20.17.6)(terser@5.36.0)
-      vitest-environment-nuxt: 1.0.1(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
+      vitest-environment-nuxt: 1.0.1(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
       vue: 3.5.12(typescript@5.6.3)
       vue-router: 4.4.5(vue@3.5.12(typescript@5.6.3))
     optionalDependencies:
@@ -7587,11 +7587,11 @@ snapshots:
 
   data-uri-to-buffer@4.0.1: {}
 
-  db0@0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)):
+  db0@0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0)):
     optionalDependencies:
       '@libsql/client': 0.11.0
       better-sqlite3: 11.5.0
-      drizzle-orm: 0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)
+      drizzle-orm: 0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0)
 
   de-indent@1.0.2: {}
 
@@ -7695,7 +7695,7 @@ snapshots:
       '@libsql/client': 0.11.0
       better-sqlite3: 11.5.0
 
-  drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0):
+  drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0):
     optionalDependencies:
       '@libsql/client': 0.11.0
       better-sqlite3: 11.5.0
@@ -8822,7 +8822,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3):
+  nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@netlify/functions': 2.8.2
@@ -8846,7 +8846,7 @@ snapshots:
       cookie-es: 1.2.2
       croner: 9.0.0
       crossws: 0.3.1
-      db0: 0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))
+      db0: 0.2.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))
       defu: 6.1.4
       destr: 2.0.3
       dot-prop: 9.0.0
@@ -9001,7 +9001,7 @@ snapshots:
       - supports-color
       - webpack-sources
 
-  nuxt@3.14.159(@libsql/client@0.11.0)(@parcel/watcher@2.5.0)(@types/node@20.17.6)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(eslint@9.15.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.25.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.6.3)):
+  nuxt@3.14.159(@libsql/client@0.11.0)(@parcel/watcher@2.5.0)(@types/node@20.17.6)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(eslint@9.15.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.25.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vue-tsc@2.1.10(typescript@5.6.3)):
     dependencies:
       '@nuxt/devalue': 2.0.2
       '@nuxt/devtools': 1.6.0(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))
@@ -9038,7 +9038,7 @@ snapshots:
       magic-string: 0.30.12
       mlly: 1.7.2
       nanotar: 0.1.1
-      nitropack: 2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3)
+      nitropack: 2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3)
       nuxi: 3.15.0
       nypm: 0.3.12
       ofetch: 1.4.1
@@ -10324,9 +10324,9 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.36.0
 
-  vitest-environment-nuxt@1.0.1(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3)):
+  vitest-environment-nuxt@1.0.1(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3)):
     dependencies:
-      '@nuxt/test-utils': 3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.36.1(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
+      '@nuxt/test-utils': 3.14.4(h3@1.13.0)(magicast@0.3.5)(nitropack@2.10.4(@libsql/client@0.11.0)(better-sqlite3@11.5.0)(drizzle-orm@0.38.3(@libsql/client@0.11.0)(better-sqlite3@11.5.0))(typescript@5.6.3))(rollup@4.25.0)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@2.1.4(@types/node@20.17.6)(terser@5.36.0))(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
     transitivePeerDependencies:
       - '@cucumber/cucumber'
       - '@jest/globals'

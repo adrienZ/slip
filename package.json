@@ -45,7 +45,7 @@
     "@nuxt/kit": "^3.14.159",
     "consola": "^3.2.3",
     "db0": "^0.2.1",
-    "drizzle-orm": "^0.36.1",
+    "drizzle-orm": "^0.38.3",
     "drizzle-schema-checker": "^1.2.0",
     "node-ipinfo": "^3.5.5",
     "oslo": "^1.2.1"

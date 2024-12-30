@@ -11,7 +11,7 @@
     "@libsql/client": "^0.14.0",
     "@nuxt/ui": "^2.20.0",
     "@nuxthub/core": "^0.8.10",
-    "nuxt": "^3.14.1592"
+    "nuxt": "^3.15.0"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.2",

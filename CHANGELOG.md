@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v0.1.46
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.46...v0.1.46)
+
+### 🏡 Chore
+
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#50](https://github.com/adrienZ/slip/pull/50))
+- **deps-dev:** Bump drizzle-kit from 0.28.1 to 0.30.0 in /playground ([#48](https://github.com/adrienZ/slip/pull/48))
+- **deps-dev:** Bump @iconify-json/heroicons-solid in /playground ([#55](https://github.com/adrienZ/slip/pull/55))
+- **deps-dev:** Bump drizzle-kit from 0.30.0 to 0.30.1 in /playground ([#54](https://github.com/adrienZ/slip/pull/54))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#56](https://github.com/adrienZ/slip/pull/56))
+- **deps-dev:** Bump wrangler from 3.91.0 to 3.99.0 in /playground ([#57](https://github.com/adrienZ/slip/pull/57))
+- **deps-dev:** Bump @iconify-json/heroicons in /playground ([#53](https://github.com/adrienZ/slip/pull/53))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#62](https://github.com/adrienZ/slip/pull/62))
+
 ## v0.1.45
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.44...v0.1.45)

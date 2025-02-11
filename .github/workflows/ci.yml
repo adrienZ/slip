@@ -13,13 +13,13 @@ jobs:
     timeout-minutes: 3
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/checkout@v4
-      - run: corepack enable pnpm
       - name: Install dependencies
-        run: pnpm install && cd playground && pnpm install
+        run: npx nypm@latest i && cd playground && npx nypm@latest i
 
       - name: Playground prepare
         run: npm run dev:prepare

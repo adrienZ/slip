@@ -22,7 +22,7 @@ jobs:
         run: npx nypm@latest i && cd playground && npx nypm@latest i
 
       - name: Playground prepare
-        run: ls && npm run dev:prepare
+        run: npm run dev:prepare
 
       - name: Typecheck
         run: npm run test:types

@@ -17,7 +17,7 @@ export class Throttler {
 
   public storage: Storage<ThrottlingCounter>;
 
-  constructor({ timeoutSeconds, storage }: { timeoutSeconds: number[], storage: Storage }) {
+  constructor({ timeoutSeconds, storage }: { timeoutSeconds: number[], storage: Storage<ThrottlingCounter> }) {
     this.timeoutSeconds = timeoutSeconds;
     this.storage = storage;
   }
@@ -63,7 +63,7 @@ export class Throttler {
   }
 }
 
-interface ThrottlingCounter {
+export interface ThrottlingCounter {
   timeout: number
   updatedAt: number
 }

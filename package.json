@@ -70,7 +70,7 @@
     "pkg-pr-new": "^0.0.30",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.2.0"
   },
   "peerDependencies": {
     "nuxt-auth-utils": "^0.3.2"

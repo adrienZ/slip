@@ -75,5 +75,5 @@
   "peerDependencies": {
     "nuxt-auth-utils": "^0.3.2"
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@10.3.0"
 }

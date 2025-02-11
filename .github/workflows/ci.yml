@@ -14,12 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: corepack enable
-      - uses: actions/setup-node@v4
+
+      - name: Enable Corepack
+        # https://pnpm.io/installation#using-corepack
+        run: npm install --global corepack@latest && corepack enable pnpm
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install dependencies
-        run: npx nypm@latest i && cd playground && npx nypm@latest i
+        run: pnpm i && cd playground && pnpm i
 
       - name: Playground prepare
         run: npm run dev:prepare

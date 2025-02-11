@@ -16,6 +16,7 @@ import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import type { H3Event } from "h3";
 import { SlipAuthRateLimiters } from "./rate-limit/SlipAuthRateLimiters";
 import type { Storage } from "unstorage";
+import type { ThrottlingCounter } from "./rate-limit/Throttler";
 
 export class SlipAuthCore {
   readonly #db: Database;
@@ -418,19 +419,19 @@ export class SlipAuthCore {
       this.#passwordHashingMethods = methods;
     },
 
-    setLoginRateLimiter: (fn: () => Storage) => {
+    setLoginRateLimiter: (fn: () => Storage<ThrottlingCounter>) => {
       this.#rateLimiters.login.storage = fn();
     },
-    setAskEmailRateLimiter: (fn: () => Storage) => {
+    setAskEmailRateLimiter: (fn: () => Storage<ThrottlingCounter>) => {
       this.#rateLimiters.askEmailVerification.storage = fn();
     },
-    setVerifyEmailRateLimiter: (fn: () => Storage) => {
+    setVerifyEmailRateLimiter: (fn: () => Storage<ThrottlingCounter>) => {
       this.#rateLimiters.verifyEmailVerification.storage = fn();
     },
-    setAskResetPasswordRateLimiter: (fn: () => Storage) => {
+    setAskResetPasswordRateLimiter: (fn: () => Storage<ThrottlingCounter>) => {
       this.#rateLimiters.askResetPassword.storage = fn();
     },
-    setVerifyResetPasswordRateLimiter: (fn: () => Storage) => {
+    setVerifyResetPasswordRateLimiter: (fn: () => Storage<ThrottlingCounter>) => {
       this.#rateLimiters.verifyResetPassword.storage = fn();
     },
   };

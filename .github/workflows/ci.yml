@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # - run: npm install -g corepack && corepack enable pnpm
+      # https://pnpm.io/installation#using-corepack
+      - run: npm install --global corepack@latest
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v4
         with:
           node-version: 20

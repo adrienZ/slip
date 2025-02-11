@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i && cd playground && pnpm i
 
+      - name: Approve Build Scripts
+        run: pnpm approve-builds
+
       - name: Playground prepare
         run: npm run dev:prepare
 

@@ -58,7 +58,7 @@
     "@nuxt/schema": "^3.14.159",
     "@nuxt/test-utils": "^3.14.4",
     "@types/node": "^20.17.6",
-    "@vitest/coverage-v8": "^2.1.4",
+    "@vitest/coverage-v8": "^3.0.5",
     "better-sqlite3": "^11.5.0",
     "changelogen": "^0.5.7",
     "citty": "^0.1.6",
@@ -68,8 +68,8 @@
     "nuxt": "^3.14.159",
     "nuxt-auth-utils": "^0.4.4",
     "pkg-pr-new": "^0.0.30",
-    "typescript": "latest",
-    "vitest": "^2.1.9",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5",
     "vue-tsc": "^2.1.10"
   },
   "peerDependencies": {

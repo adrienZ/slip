@@ -26,6 +26,9 @@
       "@parcel/watcher",
       "esbuild",
       "workerd"
-    ]
+    ],
+    "overrides": {
+      "koa": ">=2.15.4"
+    }
   }
 }

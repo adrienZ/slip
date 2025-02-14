@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v0.1.49
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.48...v0.1.49)
+
+### 🏡 Chore
+
+- **release:** V0.1.48 ([a128bfe](https://github.com/adrienZ/slip/commit/a128bfe))
+- **deps-dev:** Bump drizzle-kit from 0.30.1 to 0.30.2 in /playground ([#64](https://github.com/adrienZ/slip/pull/64))
+- **deps-dev:** Bump drizzle-kit from 0.30.2 to 0.30.3 in /playground ([#72](https://github.com/adrienZ/slip/pull/72))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.48
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.46...v0.1.48)

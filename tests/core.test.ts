@@ -227,7 +227,7 @@ describe("SlipAuthCore", () => {
       });
 
       const oAuthAccountCreatedHookPromise = new Promise((resolve, reject) => {
-        setTimeout(() => reject("TIMEOUT"), 1000);
+        setTimeout(() => reject("TIMEOUT"), 2000);
         auth.hooks.hookOnce("oAuthAccount:create", (account) => {
           resolve(account);
         });

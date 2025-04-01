@@ -10,14 +10,14 @@
   "dependencies": {
     "@libsql/client": "^0.15.2",
     "@nuxt/ui": "^2.21.1",
-    "@nuxthub/core": "^0.8.18",
-    "nuxt": "^3.16.1"
+    "@nuxthub/core": "^0.8.23",
+    "nuxt": "^3.16.2"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.2",
     "@iconify-json/heroicons-solid": "^1.2.1",
     "@iconify-json/simple-icons": "^1.2.30",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.30.6",
     "wrangler": "^4.6.0"
   },
   "packageManager": "pnpm@10.3.0+sha256.24dd5c65d86c7d0710aba16699fbc46d74fc9acf2b419f4945207f2de9e57e23",

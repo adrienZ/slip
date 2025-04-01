@@ -70,7 +70,7 @@ describe("SlipAuthCore", () => {
     it("should insert when database has no users", async () => {
       const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
-      expect(
+      await expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(1);
     });
@@ -79,7 +79,7 @@ describe("SlipAuthCore", () => {
       const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
       expect(inserted).toMatchObject(mockedCreateSession);
 
-      expect(
+      await expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(1);
     });
@@ -99,7 +99,7 @@ describe("SlipAuthCore", () => {
         providerUserId: "jioazdjuadiadaogfoz",
       });
       expect(inserted).toMatchObject(mockedCreateSession);
-      expect(inserted2).rejects.toThrowError(
+      await expect(inserted2).rejects.toThrowError(
         "user already have an account with another provider",
       );
     });
@@ -117,7 +117,7 @@ describe("SlipAuthCore", () => {
         id: "session-id-2",
         user_id: "user-id-2",
       });
-      expect(
+      await expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);
     });
@@ -143,7 +143,7 @@ describe("SlipAuthCore", () => {
       await auth.OAuthLoginUser(defaultInsert);
 
       const deletion = auth.deleteSession({ id: "notInDB" });
-      expect(deletion).rejects.toThrowError(
+      await expect(deletion).rejects.toThrowError(
         "Unable to delete session with id notInDB",
       );
     });
@@ -192,18 +192,18 @@ describe("SlipAuthCore", () => {
 
       const [_, inserted] = await auth.OAuthLoginUser(defaultInsert);
 
-      expect(userCreatedHookPromise).resolves.toMatchObject({
+      await expect(userCreatedHookPromise).resolves.toMatchObject({
         email: defaultInsert.email,
         id: "user-id-1",
       });
 
-      expect(oAuthAccountCreatedHookPromise).resolves.toMatchObject({
+      await expect(oAuthAccountCreatedHookPromise).resolves.toMatchObject({
         provider_id: defaultInsert.providerId,
         provider_user_id: defaultInsert.providerUserId,
         user_id: "user-id-1",
       });
 
-      expect(sessionCreatedHookPromise).resolves.toBe(inserted);
+      await expect(sessionCreatedHookPromise).resolves.toBe(inserted);
     });
 
     it("should only hook \"sessions:create\" when login an existing user", async () => {
@@ -236,10 +236,10 @@ describe("SlipAuthCore", () => {
       // login
       const [__, loginSession] = await auth.OAuthLoginUser(defaultInsert);
 
-      expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
-      expect(oAuthAccountCreatedHookPromise).rejects.toBe("TIMEOUT");
+      await expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
+      await expect(oAuthAccountCreatedHookPromise).rejects.toBe("TIMEOUT");
 
-      expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
+      await expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
     });
 
     it("should only hook \"sessions:delete\" on logout", async () => {
@@ -255,7 +255,7 @@ describe("SlipAuthCore", () => {
       // logout
       auth.deleteSession({ id: registerSession.id });
 
-      expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
+      await expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
   });
 });

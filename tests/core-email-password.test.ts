@@ -92,7 +92,7 @@ describe("SlipAuthCore", () => {
       });
 
       expect(inserted).toMatchObject(mockedCreateSession);
-      expect(inserted2).rejects.toThrowError(
+      await expect(inserted2).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "InvalidEmailOrPasswordError",
         }),
@@ -111,7 +111,7 @@ describe("SlipAuthCore", () => {
         id: "session-id-2",
         user_id: "user-id-2",
       });
-      expect(
+      await expect(
         db.prepare("SELECT * from slip_users").all(),
       ).resolves.toHaveLength(2);
     });
@@ -144,13 +144,13 @@ describe("SlipAuthCore", () => {
 
       const [_, inserted] = await auth.register(createH3Event(), defaultInsert);
 
-      expect(userCreatedHookPromise).resolves.toMatchObject({
+      await expect(userCreatedHookPromise).resolves.toMatchObject({
         email: defaultInsert.email,
         id: "user-id-1",
       });
 
-      expect(sessionCreatedHookPromise).resolves.toBe(inserted);
-      expect(emailVerificationCodeCreatedHookPromise).resolves.toMatchObject({
+      await expect(sessionCreatedHookPromise).resolves.toBe(inserted);
+      await expect(emailVerificationCodeCreatedHookPromise).resolves.toMatchObject({
         user_id: mockedCreateSession.user_id,
         email: defaultInsert.email,
       });
@@ -183,8 +183,8 @@ describe("SlipAuthCore", () => {
       // login
       const [__, loginSession] = await auth.login(createH3Event(), defaultInsert);
 
-      expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
-      expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
+      await expect(userCreatedHookPromise).rejects.toBe("TIMEOUT");
+      await expect(sessionCreatedHookPromise).resolves.toMatchObject(loginSession);
     });
 
     it("should only hook \"sessions:delete\" on logout", async () => {
@@ -200,7 +200,7 @@ describe("SlipAuthCore", () => {
       // logout
       auth.deleteSession({ id: registerSession.id });
 
-      expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
+      await expect(sessionDeletedHookPromise).resolves.toStrictEqual(registerSession);
     });
   });
 

@@ -87,7 +87,7 @@ describe("Reset password", () => {
     it("should throw an error when asking password reset of non-existant user", async () => {
       const askResetPasswordPromise = auth.askPasswordReset(createH3Event(), { userId: "notexisting" });
 
-      expect(askResetPasswordPromise).rejects.toThrowError(
+      await expect(askResetPasswordPromise).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "InvalidUserIdToResetPasswordError",
         }),
@@ -106,13 +106,13 @@ describe("Reset password", () => {
 
       const askResetPasswordPromise = auth.askPasswordReset(createH3Event(), { userId });
 
-      expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
+      await expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
         user_id: "user-id-1",
         expires_at: "1998-12-19 02:00:00",
         token_hash: "reset-password-token-1",
       });
 
-      expect(askResetPasswordPromise).resolves.toBeTypeOf("string");
+      await expect(askResetPasswordPromise).resolves.toBeTypeOf("string");
     });
   });
 
@@ -120,7 +120,7 @@ describe("Reset password", () => {
     it("should throw an error when asking forgotten password of non-existant user", async () => {
       const askForgottenPasswordPromise = auth.askForgotPasswordReset(createH3Event(), { emailAddress: "notexisting@mail" });
 
-      expect(askForgottenPasswordPromise).rejects.toThrowError(
+      await expect(askForgottenPasswordPromise).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "InvalidEmailToResetPasswordError",
         }),
@@ -139,21 +139,21 @@ describe("Reset password", () => {
 
       const askForgottenPasswordPromise = auth.askForgotPasswordReset(createH3Event(), { emailAddress: defaultInsert.email });
 
-      expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
+      await expect(resetPasswordTokenCreatedHookPromise).resolves.toMatchObject({
         user_id: "user-id-1",
         expires_at: "1998-12-19 02:00:00",
         token_hash: "reset-password-token-1",
       });
 
-      expect(askForgottenPasswordPromise).resolves.toBeTypeOf("string");
+      await expect(askForgottenPasswordPromise).resolves.toBeTypeOf("string");
     });
   });
 
   describe("validate reset password token", () => {
-    it("should throw error with invalid password value", () => {
+    it("should throw error with invalid password value", async () => {
       // @ts-expect-error testing value
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: Date() });
-      expect(checkPassword).rejects.toThrowError(
+      await expect(checkPassword).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "InvalidPasswordToResetError",
         }),
@@ -162,7 +162,7 @@ describe("Reset password", () => {
 
     it("should throw error with not-existing token", async () => {
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: "okokok", newPassword: defaultInsert.password });
-      expect(checkPassword).rejects.toThrowError(
+      await expect(checkPassword).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "ResetPasswordTokenExpiredError",
         }),
@@ -177,7 +177,7 @@ describe("Reset password", () => {
       vi.setSystemTime(new Date(date.getTime() + date.getTime()));
 
       const checkPassword = auth.resetPasswordWithResetToken(createH3Event(), { verificationToken: token, newPassword: defaultInsert.password });
-      expect(checkPassword).rejects.toThrowError(
+      await expect(checkPassword).rejects.toThrowError(
         expect.objectContaining({
           slipErrorName: "ResetPasswordTokenExpiredError",
         }),

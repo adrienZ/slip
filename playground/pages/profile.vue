@@ -44,7 +44,7 @@
             class="mt-2 w-full"
             color="primary"
             :loading="askEmailVerificationRequest.status.value === 'pending'"
-            @click="askEmailVerificationRequest.refresh"
+            @click="() => { askEmailVerificationRequest.refresh }"
           >
             Request email verification
           </UButton>

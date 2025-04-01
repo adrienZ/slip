@@ -58,10 +58,4 @@ export default defineNuxtConfig({
       dialect: "better-sqlite3",
     },
   },
-
-  // #region faster demo startup
-  tailwindcss: {
-    viewer: false,
-  },
-  // #endregion
 });

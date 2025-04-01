@@ -30,7 +30,7 @@ const selected = computed({
 const selectedAsString = computed(() => selected.value.toString());
 
 function loginToGithub() {
-  return navigateTo("/auth/github", {
+  navigateTo("/auth/github", {
     external: true,
   });
 }

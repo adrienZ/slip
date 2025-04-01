@@ -1,6 +1,32 @@
 # Changelog
 
 
+## v0.1.50
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.49...v0.1.50)
+
+### 🩹 Fixes
+
+- CVE-2024-12905 ([aa08984](https://github.com/adrienZ/slip/commit/aa08984))
+
+### 🏡 Chore
+
+- **release:** V0.1.49 ([5db1112](https://github.com/adrienZ/slip/commit/5db1112))
+- **deps-dev:** Bump wrangler from 3.107.3 to 3.109.1 in /playground ([#83](https://github.com/adrienZ/slip/pull/83))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#85](https://github.com/adrienZ/slip/pull/85))
+- **deps-dev:** Bump wrangler from 3.109.1 to 3.109.3 in /playground ([#84](https://github.com/adrienZ/slip/pull/84))
+- **deps-dev:** Bump wrangler from 3.109.3 to 3.111.0 in /playground ([#88](https://github.com/adrienZ/slip/pull/88))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#87](https://github.com/adrienZ/slip/pull/87))
+- **deps-dev:** Bump drizzle-kit from 0.30.4 to 0.30.5 in /playground ([#86](https://github.com/adrienZ/slip/pull/86))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#93](https://github.com/adrienZ/slip/pull/93))
+- **deps-dev:** Bump wrangler from 3.111.0 to 3.112.0 in /playground ([#91](https://github.com/adrienZ/slip/pull/91))
+- **deps-dev:** Bump wrangler from 3.114.1 to 4.6.0 in /playground ([#106](https://github.com/adrienZ/slip/pull/106))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#104](https://github.com/adrienZ/slip/pull/104))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.49
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.48...v0.1.49)

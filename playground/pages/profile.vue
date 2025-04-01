@@ -3,7 +3,7 @@
     v-if="user"
     class="mt-8 prose"
   >
-    <p class="text-neutral-900 dark:text-white">
+    <p class="text-gray-900 dark:text-white">
       Logged in until {{ new Date(session.expires_at).toLocaleDateString() }} - {{ new Date(session.expires_at).toLocaleTimeString() }}
     </p>
 
@@ -11,7 +11,7 @@
       <UCard
         class="w-96"
       >
-        <h3 class="mt-4 text-neutral-900 dark:text-white flex items-center">
+        <h3 class="mt-4 text-gray-900 dark:text-white flex items-center">
           Verify your email
           <UIcon
             v-if="user.email_verified"
@@ -25,18 +25,17 @@
             ref="form"
             novalidate
           >
-            <UFormField
+            <UFormGroup
               v-show="askEmailVerificationRequest.status.value === 'success'"
               label="Verification code"
               class="max-w-full mt-2"
             >
               <UInput
                 v-model="formData.code"
-                class="w-full"
                 name="code"
                 placeholder="XXXXXX"
               />
-            </UFormField>
+            </UFormGroup>
           </form>
 
           <UButton
@@ -44,7 +43,7 @@
             class="mt-2 w-full"
             color="primary"
             :loading="askEmailVerificationRequest.status.value === 'pending'"
-            @click="() => { askEmailVerificationRequest.refresh }"
+            @click="askEmailVerificationRequest.refresh"
           >
             Request email verification
           </UButton>
@@ -54,7 +53,7 @@
               askEmailVerificationRequest.status.value === 'success'
             "
             class="mt-2 w-full"
-            color="neutral"
+            color="black"
             :loading="validateEmailVerificationRequest.status.value === 'pending'"
             @click="validateCode"
           >
@@ -67,7 +66,7 @@
             class="not-prose mt-2"
             title="Check the terminal !"
             variant="subtle"
-            color="success"
+            color="green"
             description="As email are not implemented, the code has been sended in your terminal"
           />
         </div>

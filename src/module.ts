@@ -13,7 +13,7 @@ export default defineNuxtModule<ModuleOptions>({
   // Default configuration options of the Nuxt module
   defaults: {
     database: {
-      dialect: "better-sqlite3",
+      dialect: "sqlite",
       nitroDatabaseName: "default",
     },
     sessionMaxAge: 60 * 60 * 24 * 7, // 7 days

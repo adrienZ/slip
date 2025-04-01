@@ -1,15 +1,12 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
-
   modules: [
     "../src/module",
     "@nuxt/ui",
     // optional
     "@nuxthub/core",
   ],
-
-  css: ["~/assets/css/main.css"],
 
   // #region - codesandbox config
   runtimeConfig: {
@@ -28,7 +25,7 @@ export default defineNuxtConfig({
   nitro: {
     database: {
       default: {
-        connector: "better-sqlite3",
+        connector: "sqlite",
       },
       libsql: {
         connector: "libsql",
@@ -58,4 +55,10 @@ export default defineNuxtConfig({
       dialect: "better-sqlite3",
     },
   },
+
+  // #region faster demo startup
+  tailwindcss: {
+    viewer: false,
+  },
+  // #endregion
 });

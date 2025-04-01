@@ -1,12 +1,15 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
+
   modules: [
     "../src/module",
     "@nuxt/ui",
     // optional
     "@nuxthub/core",
   ],
+
+  css: ["~/assets/css/main.css"],
 
   // #region - codesandbox config
   runtimeConfig: {
@@ -25,7 +28,7 @@ export default defineNuxtConfig({
   nitro: {
     database: {
       default: {
-        connector: "sqlite",
+        connector: "better-sqlite3",
       },
       libsql: {
         connector: "libsql",
@@ -52,7 +55,7 @@ export default defineNuxtConfig({
   slipAuth: {
     database: {
       nitroDatabaseName: "default",
-      dialect: "sqlite",
+      dialect: "better-sqlite3",
     },
   },
 

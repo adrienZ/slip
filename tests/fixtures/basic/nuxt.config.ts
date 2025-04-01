@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   nitro: {
     database: {
       default: {
-        connector: "sqlite",
+        connector: "better-sqlite3",
         options: {
           name: "basic.test",
         },

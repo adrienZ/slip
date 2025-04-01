@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-background/75 backdrop-blur border-b border-gray-200 dark:border-gray-800 -mb-px sticky top-0 z-50">
+  <header class="bg-background/75 backdrop-blur border-b border-neutral-200 dark:border-neutral-800 -mb-px sticky top-0 z-50">
     <div class="py-4 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-3 h-[--header-height]">
       <div class="lg:flex-1 flex items-center gap-1.5">
         <img
@@ -10,7 +10,7 @@
       <div class="flex items-center justify-end lg:flex-1 gap-1.5">
         <ClientOnly>
           <UButton
-            color="gray"
+            color="neutral"
             variant="ghost"
             :icon="colorMode.value === 'dark' ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
             @click="colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'"
@@ -21,7 +21,7 @@
           to="https://github.com/adrienZ/slip"
           target="_blank"
           icon="i-simple-icons-github"
-          color="gray"
+          color="neutral"
           variant="ghost"
         />
       </div>
@@ -31,13 +31,13 @@
       class="py-4 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-3 h-[--header-height]"
     >
       <div class="lg:flex-1 flex items-center gap-1.5">
-        <h1 class="text-gray-900 text-xl font-bold dark:text-white mb-0">
+        <h1 class="text-neutral-900 text-xl font-bold dark:text-white mb-0">
           Welcome {{ user.id }}!
         </h1>
       </div>
       <div class="flex items-center justify-end lg:flex-1 gap-1.5">
         <UButton
-          color="red"
+          color="error"
           @click="logout"
         >
           Logout

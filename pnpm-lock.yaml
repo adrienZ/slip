@@ -18,8 +18,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(@libsql/client@0.15.2)(better-sqlite3@11.9.1)(drizzle-orm@0.41.0(@libsql/client@0.15.2)(better-sqlite3@11.9.1))
       drizzle-schema-checker:
-        specifier: ^1.2.3
-        version: 1.2.3(magicast@0.3.5)
+        specifier: ^1.2.2
+        version: 1.2.2(magicast@0.3.5)
       node-ipinfo:
         specifier: ^3.5.5
         version: 3.5.5
@@ -2688,8 +2688,8 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-schema-checker@1.2.3:
-    resolution: {integrity: sha512-9NJA3X1Zxaa9vjIDrTo87xjHpk8Dzls2QO5ygKhAiCpGeBerZrRGz6rBX/Fu9hkPGkE1ngwgitQARi7DCIcZwQ==}
+  drizzle-schema-checker@1.2.2:
+    resolution: {integrity: sha512-c3hixFILFUTEgDoRVqXkhszv+wtrBBF/HZvVc3LaZxTknDIpyU24ZGSBPKToAub6jZy8uX3nL5co/T4JNE4K6A==}
 
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
@@ -7563,7 +7563,7 @@ snapshots:
       '@libsql/client': 0.15.2
       better-sqlite3: 11.9.1
 
-  drizzle-schema-checker@1.2.3(magicast@0.3.5):
+  drizzle-schema-checker@1.2.2(magicast@0.3.5):
     dependencies:
       '@libsql/client': 0.15.2
       better-sqlite3: 11.9.1

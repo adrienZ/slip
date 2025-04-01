@@ -52,7 +52,7 @@ export default defineNuxtConfig({
   slipAuth: {
     database: {
       nitroDatabaseName: "default",
-      dialect: "better-sqlite3",
+      dialect: "sqlite",
     },
   },
 

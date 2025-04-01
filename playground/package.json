@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.2",
-    "@nuxt/ui": "^2.21.1",
+    "@nuxt/ui": "^3.0.0",
     "@nuxthub/core": "^0.8.23",
     "nuxt": "^3.16.2"
   },

@@ -27,7 +27,7 @@ export default defineNitroPlugin(async (nitro: NitroApp) => {
   }
 
   async function seedSqliteDatabase() {
-    if (config.database.dialect === "sqlite" || config.database.dialect === "libsql" || config.database.dialect === "bun-sqlite" || config.database.dialect === "cloudflare-d1") {
+    if (config.database.dialect === "sqlite" || config.database.dialect === "libsql" || config.database.dialect === "bun-sqlite" || config.database.dialect === "cloudflare-d1" || config.database.dialect === "better-sqlite3" || config.database.dialect === "node-sqlite" || config.database.dialect === "sqlite3") {
       await db.prepare(`
       CREATE TABLE IF NOT EXISTS ${config.tableNames.users} (
         "id" TEXT NOT NULL PRIMARY KEY,

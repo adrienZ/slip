@@ -31,7 +31,7 @@ describe("database", async () => {
     // @ts-expect-error its only testing
     expect(json.slipAuth).toStrictEqual({
       database: {
-        dialect: "sqlite",
+        dialect: "better-sqlite3",
         nitroDatabaseName: "default",
       },
       sessionMaxAge: 604800,

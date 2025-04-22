@@ -16,7 +16,7 @@
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.2",
     "@iconify-json/heroicons-solid": "^1.2.1",
-    "@iconify-json/simple-icons": "^1.2.32",
+    "@iconify-json/simple-icons": "^1.2.33",
     "drizzle-kit": "^0.31.0",
     "wrangler": "^4.11.0"
   },

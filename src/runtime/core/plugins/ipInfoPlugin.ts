@@ -14,7 +14,6 @@ export const setupIpInfoAddOn = (auth: SlipAuthCore, ipInfoToken: string) => {
   });
 
   auth.hooks.hook("sessions:create", async (session) => {
-    session.ip = "92.168.1.58";
     if (!session.ip) {
       return;
     }

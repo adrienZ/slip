@@ -44,7 +44,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.16.2",
     "consola": "^3.4.2",
-    "db0": "^0.3.1",
+    "db0": "^0.3.2",
     "drizzle-schema-checker": "^1.2.3",
     "node-ipinfo": "^3.5.5",
     "oslo": "^1.2.1"

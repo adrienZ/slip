@@ -25,8 +25,8 @@ importers:
         version: 3.17.5(@libsql/client@0.15.15)(@netlify/blobs@8.2.0)(@parcel/watcher@2.5.1)(@types/node@24.3.1)(db0@0.3.2(@libsql/client@0.15.15))(ioredis@5.6.1)(magicast@0.3.5)(rollup@4.42.0)(terser@5.42.0)(typescript@5.8.3)(vite@6.3.5(@types/node@24.3.1)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(yaml@2.8.0)
     devDependencies:
       '@iconify-json/heroicons':
-        specifier: ^1.2.2
-        version: 1.2.2
+        specifier: ^1.2.3
+        version: 1.2.3
       '@iconify-json/heroicons-solid':
         specifier: ^1.2.1
         version: 1.2.1
@@ -871,8 +871,8 @@ packages:
   '@iconify-json/heroicons-solid@1.2.1':
     resolution: {integrity: sha512-sRZ6U1FT1lkxtIuL+iQ9Fpm5IZxvJCDaKdLpP5elgZ6OkQn6j8HVJpxgFIcuJbHC/EeoNp3tHldMEELqN9pZDQ==}
 
-  '@iconify-json/heroicons@1.2.2':
-    resolution: {integrity: sha512-qoW4pXr5kTTL6juEjgTs83OJIwpePu7q1tdtKVEdj+i0zyyVHgg/dd9grsXJQnpTpBt6/VwNjrXBvFjRsKPENg==}
+  '@iconify-json/heroicons@1.2.3':
+    resolution: {integrity: sha512-n+vmCEgTesRsOpp5AB5ILB6srsgsYK+bieoQBNlafvoEhjVXLq8nIGN4B0v/s4DUfa0dOrjwE/cKJgIKdJXOEg==}
 
   '@iconify-json/simple-icons@1.2.52':
     resolution: {integrity: sha512-c41YOMzBhl3hp58WJLxT+Qq3UhBd8GZAMkbS8ddlCuIGLW0COGe2YSfOA2+poA8/bxLhUQODRNjAy3KhiAOtzA==}
@@ -5465,7 +5465,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/heroicons@1.2.2':
+  '@iconify-json/heroicons@1.2.3':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -6018,7 +6018,7 @@ snapshots:
     dependencies:
       '@headlessui/tailwindcss': 0.2.2(tailwindcss@3.4.17)
       '@headlessui/vue': 1.7.23(vue@3.5.16(typescript@5.8.3))
-      '@iconify-json/heroicons': 1.2.2
+      '@iconify-json/heroicons': 1.2.3
       '@nuxt/icon': 1.11.0(magicast@0.3.5)(vite@6.3.5(@types/node@24.3.1)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(vue@3.5.16(typescript@5.8.3))
       '@nuxt/kit': 3.16.2(magicast@0.3.5)
       '@nuxtjs/color-mode': 3.5.2(magicast@0.3.5)

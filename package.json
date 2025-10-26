@@ -37,7 +37,7 @@
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
-    "test:ci": "pnpm test -- --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
+    "test:ci": "pnpm test --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },

@@ -19,6 +19,7 @@ export default createConfigForNuxt({
     "@stylistic/quotes": ["error", "double"],
     "@stylistic/semi": ["error", "always"],
     "import/order": "off",
+    "jsdoc/check-alignment": "warn",
   })
   .append(
     // your custom flat config here...

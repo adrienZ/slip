@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { TableRepository } from "./_repo";
-import { TimeSpan, createDate } from "oslo";
+import { TimeSpan, createDate } from "../date-utils";
 
 export class EmailVerificationCodesRepository extends TableRepository<"emailVerificationCodes"> {
   async insert({ userId, email, code }: { userId: string, email: string, code: string }): Promise<void> {

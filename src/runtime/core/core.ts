@@ -12,7 +12,7 @@ import type { SlipAuthPublicSession } from "../types";
 import { defaultIdGenerationMethod, isValidEmail, defaultEmailVerificationCodeGenerationMethod, defaultHashPasswordMethod, defaultVerifyPasswordMethod, defaultResetPasswordTokenIdMethod, defaultResetPasswordTokenHashMethod } from "./email-and-password-utils";
 import { EmailVerificationCodeExpiredError, EmailVerificationFailedError, InvalidEmailOrPasswordError, InvalidEmailToResetPasswordError, InvalidPasswordToResetError, InvalidUserIdToResetPasswordError, RateLimitAskEmailVerificationError, RateLimitAskResetPasswordError, RateLimitLoginError, RateLimitVerifyEmailVerificationError, RateLimitVerifyResetPasswordError, ResetPasswordTokenExpiredError } from "./errors/SlipAuthError.js";
 import type { Database } from "db0";
-import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
+import { createDate, isWithinExpirationDate, TimeSpan } from "./date-utils";
 import type { H3Event } from "h3";
 import { SlipAuthRateLimiters } from "./rate-limit/SlipAuthRateLimiters";
 import type { Storage } from "unstorage";

@@ -68,9 +68,9 @@
     "nuxt": "^3.16.2",
     "nuxt-auth-utils": "^0.5.18",
     "pkg-pr-new": "^0.0.42",
-    "typescript": "^5.8.2",
+    "typescript": "^5.9.3",
     "vitest": "^3.1.1",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^2.2.12"
   },
   "peerDependencies": {
     "nuxt-auth-utils": "^0.3.2"

@@ -9,16 +9,16 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",
-    "@nuxt/ui": "^2.21.1",
-    "@nuxthub/core": "^0.9.0",
-    "nuxt": "^3.17.5"
+    "@nuxt/ui": "^2.22.3",
+    "@nuxthub/core": "^0.9.1",
+    "nuxt": "^3.21.2"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/heroicons-solid": "^1.2.1",
-    "@iconify-json/simple-icons": "^1.2.60",
-    "drizzle-kit": "^0.31.7",
-    "wrangler": "^4.50.0"
+    "@iconify-json/simple-icons": "^1.2.79",
+    "drizzle-kit": "^0.31.10",
+    "wrangler": "^4.84.0"
   },
   "packageManager": "pnpm@10.3.0+sha256.24dd5c65d86c7d0710aba16699fbc46d74fc9acf2b419f4945207f2de9e57e23",
   "pnpm": {

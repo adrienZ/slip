@@ -28,16 +28,16 @@ jobs:
         run: pnpm i && cd playground && pnpm i
 
       - name: Playground prepare
-        run: npm run dev:prepare
+        run: pnpm dev:prepare
 
       - name: Typecheck
-        run: npm run test:types
+        run: pnpm test:types
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
 
       - name: Test
-        run: npm run test:ci
+        run: pnpm test:ci
 
       - name: Coverage
         uses: codecov/codecov-action@v4

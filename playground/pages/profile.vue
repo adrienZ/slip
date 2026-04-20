@@ -1,6 +1,6 @@
 <template>
   <UContainer
-    v-if="user"
+    v-if="user && session"
     class="mt-8 prose"
   >
     <p class="text-gray-900 dark:text-white">

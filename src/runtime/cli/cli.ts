@@ -4,7 +4,7 @@ import { defineCommand, runMain } from "citty";
 import path from "node:path";
 import fs from "node:fs/promises";
 import dotenv from "dotenv";
-import consola from "consola";
+import { consola } from "consola";
 import { execSync } from "node:child_process";
 
 /**

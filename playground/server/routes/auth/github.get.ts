@@ -5,13 +5,20 @@ export default defineOAuthGitHubEventHandler({
     emailRequired: true,
   },
   async onSuccess(event, { user }) {
+    if (!user.email) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "GitHub account did not provide an email address",
+      });
+    }
+
     const auth = useSlipAuth();
     const db = drizzleIntegration(useDatabase());
 
     const [userId, sessionFromDb] = await auth.OAuthLoginUser({
       email: user.email,
       providerId: "github",
-      providerUserId: user.id,
+      providerUserId: String(user.id),
       ua: getRequestHeader(event, "User-Agent"),
       ip: getRequestIP(event),
     });

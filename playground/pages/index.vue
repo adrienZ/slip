@@ -75,7 +75,7 @@ async function handleSubmit() {
 <template>
   <UContainer>
     <div
-      v-if="loggedIn"
+      v-if="loggedIn && session"
       class="mt-8 prose"
     >
       <p class="text-gray-900 dark:text-white">

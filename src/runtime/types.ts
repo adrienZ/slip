@@ -22,7 +22,7 @@ export interface SlipModuleOptions extends ISlipAuthCoreOptions {
   tableNames: tableNames
 }
 
-declare module "nuxt/schema" {
+declare module "@nuxt/schema" {
   interface RuntimeConfig {
     slipAuth: SlipModuleOptions
     slipAuthIpInfoToken: string

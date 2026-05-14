@@ -1,6 +1,53 @@
 # Changelog
 
 
+## v0.1.51
+
+[compare changes](https://github.com/adrienZ/slip/compare/v0.1.50...v0.1.51)
+
+### 🏡 Chore
+
+- **release:** V0.1.50 ([6348535](https://github.com/adrienZ/slip/commit/6348535))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#114](https://github.com/adrienZ/slip/pull/114))
+- **deps-dev:** Bump wrangler from 4.6.0 to 4.10.0 in /playground ([#112](https://github.com/adrienZ/slip/pull/112))
+- **deps-dev:** Bump drizzle-kit from 0.30.6 to 0.31.0 in /playground ([#117](https://github.com/adrienZ/slip/pull/117))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#115](https://github.com/adrienZ/slip/pull/115))
+- **deps-dev:** Bump wrangler from 4.11.0 to 4.12.0 in /playground ([#116](https://github.com/adrienZ/slip/pull/116))
+- **deps-dev:** Bump wrangler from 4.12.1 to 4.13.2 in /playground ([#120](https://github.com/adrienZ/slip/pull/120))
+- **deps-dev:** Bump drizzle-kit from 0.31.0 to 0.31.1 in /playground ([#126](https://github.com/adrienZ/slip/pull/126))
+- **deps-dev:** Bump wrangler from 4.13.2 to 4.14.1 in /playground ([#123](https://github.com/adrienZ/slip/pull/123))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#129](https://github.com/adrienZ/slip/pull/129))
+- **deps-dev:** Bump wrangler from 4.14.4 to 4.15.2 in /playground ([#132](https://github.com/adrienZ/slip/pull/132))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#144](https://github.com/adrienZ/slip/pull/144))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#148](https://github.com/adrienZ/slip/pull/148))
+- **deps-dev:** Bump wrangler from 4.15.2 to 4.21.0 in /playground ([#147](https://github.com/adrienZ/slip/pull/147))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#174](https://github.com/adrienZ/slip/pull/174))
+- **deps-dev:** Bump wrangler from 4.21.0 to 4.32.0 in /playground ([#173](https://github.com/adrienZ/slip/pull/173))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#175](https://github.com/adrienZ/slip/pull/175))
+- **deps-dev:** Bump wrangler from 4.33.0 to 4.33.1 in /playground ([#178](https://github.com/adrienZ/slip/pull/178))
+- **deps-dev:** Bump wrangler from 4.33.1 to 4.34.0 in /playground ([#180](https://github.com/adrienZ/slip/pull/180))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#183](https://github.com/adrienZ/slip/pull/183))
+- **deps-dev:** Bump wrangler from 4.34.0 to 4.37.0 in /playground ([#184](https://github.com/adrienZ/slip/pull/184))
+- **deps-dev:** Bump wrangler from 4.37.0 to 4.42.0 in /playground ([#197](https://github.com/adrienZ/slip/pull/197))
+- **deps-dev:** Bump drizzle-kit from 0.31.1 to 0.31.5 in /playground ([#195](https://github.com/adrienZ/slip/pull/195))
+- **deps-dev:** Bump @iconify-json/heroicons in /playground ([#187](https://github.com/adrienZ/slip/pull/187))
+- **deps-dev:** Bump wrangler from 4.42.0 to 4.43.0 in /playground ([#202](https://github.com/adrienZ/slip/pull/202))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#201](https://github.com/adrienZ/slip/pull/201))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#204](https://github.com/adrienZ/slip/pull/204))
+- **deps-dev:** Bump wrangler from 4.45.0 to 4.45.3 in /playground ([#209](https://github.com/adrienZ/slip/pull/209))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#208](https://github.com/adrienZ/slip/pull/208))
+- **deps-dev:** Bump drizzle-kit from 0.31.5 to 0.31.6 in /playground ([#207](https://github.com/adrienZ/slip/pull/207))
+- **deps-dev:** Bump drizzle-kit from 0.31.6 to 0.31.7 in /playground ([#215](https://github.com/adrienZ/slip/pull/215))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#214](https://github.com/adrienZ/slip/pull/214))
+- **deps-dev:** Bump wrangler from 4.45.3 to 4.47.0 in /playground ([#213](https://github.com/adrienZ/slip/pull/213))
+- **deps-dev:** Bump @iconify-json/simple-icons in /playground ([#218](https://github.com/adrienZ/slip/pull/218))
+- **deps-dev:** Bump wrangler from 4.49.0 to 4.50.0 in /playground ([#216](https://github.com/adrienZ/slip/pull/216))
+- **node:** Node 24 ([8a0dced](https://github.com/adrienZ/slip/commit/8a0dced))
+
+### ❤️ Contributors
+
+- Adrien Zaganelli <adrienzaganelli@gmail.com>
+
 ## v0.1.50
 
 [compare changes](https://github.com/adrienZ/slip/compare/v0.1.49...v0.1.50)

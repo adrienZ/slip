@@ -66,7 +66,7 @@
     "drizzle-orm": "^0.41.0",
     "eslint": "^9.39.4",
     "hookable": "^5.5.3",
-    "nuxt": "^3.21.2",
+    "nuxt": "^3.21.5",
     "nuxt-auth-utils": "^0.5.29",
     "pkg-pr-new": "^0.0.42",
     "typescript": "^5.9.3",

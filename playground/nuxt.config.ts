@@ -3,7 +3,8 @@ import { defineNuxtConfig } from "nuxt/config";
 export default defineNuxtConfig({
   modules: [
     "../src/module",
-    "@nuxt/ui",
+    "@nuxt/icon",
+    "@nuxtjs/tailwindcss",
     // optional
     "@nuxthub/core",
   ],
@@ -47,6 +48,14 @@ export default defineNuxtConfig({
   hub: {
     database: true,
   },
+  icon: {
+    serverBundle: {
+      collections: [
+        "heroicons",
+        "simple-icons",
+      ],
+    },
+  },
   // #endregion
 
   slipAuth: {
@@ -58,6 +67,7 @@ export default defineNuxtConfig({
 
   // #region faster demo startup
   tailwindcss: {
+    cssPath: "~/assets/css/main.css",
     viewer: false,
   },
   // #endregion

@@ -1,6 +1,6 @@
 <template>
-  <header class="bg-background/75 backdrop-blur border-b border-gray-200 dark:border-gray-800 -mb-px sticky top-0 z-50">
-    <div class="py-4 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-3 h-[--header-height]">
+  <header class="sticky top-0 z-50 -mb-px border-b border-gray-200 bg-white/75 backdrop-blur dark:border-gray-800 dark:bg-gray-950/75">
+    <PlaygroundContainer class="py-4 flex items-center justify-between gap-3 h-[--header-height]">
       <div class="lg:flex-1 flex items-center gap-1.5">
         <img
           src="/logo.webp"
@@ -9,26 +9,38 @@
       </div>
       <div class="flex items-center justify-end lg:flex-1 gap-1.5">
         <ClientOnly>
-          <UButton
-            color="gray"
+          <PlaygroundButton
+            type="button"
             variant="ghost"
-            :icon="colorMode.value === 'dark' ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-            @click="colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'"
-          />
+            square
+            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+            @click="toggleTheme"
+          >
+            <Icon
+              :name="theme === 'dark' ? 'heroicons:moon-20-solid' : 'heroicons:sun-20-solid'"
+              class="h-5 w-5"
+            />
+          </PlaygroundButton>
         </ClientOnly>
 
-        <UButton
+        <PlaygroundButton
           to="https://github.com/adrienZ/slip"
           target="_blank"
-          icon="i-simple-icons-github"
-          color="gray"
+          rel="noopener noreferrer"
           variant="ghost"
-        />
+          square
+          aria-label="Open GitHub repository"
+        >
+          <Icon
+            name="simple-icons:github"
+            class="h-5 w-5"
+          />
+        </PlaygroundButton>
       </div>
-    </div>
-    <div
+    </PlaygroundContainer>
+    <PlaygroundContainer
       v-if="loggedIn && user"
-      class="py-4 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-3 h-[--header-height]"
+      class="py-4 flex items-center justify-between gap-3 h-[--header-height]"
     >
       <div class="lg:flex-1 flex items-center gap-1.5">
         <h1 class="text-gray-900 text-xl font-bold dark:text-white mb-0">
@@ -36,23 +48,40 @@
         </h1>
       </div>
       <div class="flex items-center justify-end lg:flex-1 gap-1.5">
-        <UButton
-          color="red"
+        <PlaygroundButton
+          type="button"
+          variant="danger"
           @click="logout"
         >
           Logout
-        </UButton>
+        </PlaygroundButton>
       </div>
-    </div>
+    </PlaygroundContainer>
   </header>
 </template>
 
 <script setup lang="ts">
 const { loggedIn, user, clear } = useUserSession();
+const theme = ref<"light" | "dark">("light");
+
+function applyTheme(value: "light" | "dark") {
+  theme.value = value;
+  document.documentElement.classList.toggle("dark", value === "dark");
+  localStorage.setItem("playground-theme", value);
+}
+
+function toggleTheme() {
+  applyTheme(theme.value === "dark" ? "light" : "dark");
+}
+
 async function logout() {
   await clear();
   navigateTo("/");
 }
 
-const colorMode = useColorMode();
+onMounted(() => {
+  const savedTheme = localStorage.getItem("playground-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(savedTheme === "dark" || (!savedTheme && prefersDark) ? "dark" : "light");
+});
 </script>

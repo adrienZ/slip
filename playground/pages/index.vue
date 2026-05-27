@@ -3,10 +3,10 @@ const { loggedIn, session, fetch: fetchSession } = useUserSession();
 
 const tabs = [{
   label: "Register",
-  icon: "i-heroicons-solid-user-plus",
+  icon: "heroicons:user-plus-20-solid",
 }, {
   label: "Login",
-  icon: "i-heroicons-solid-lock-open",
+  icon: "heroicons:lock-open-20-solid",
 }];
 
 const route = useRoute();
@@ -73,92 +73,81 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <UContainer>
+  <PlaygroundContainer>
     <div
       v-if="loggedIn && session"
-      class="mt-8 prose"
+      class="mt-8"
     >
       <p class="text-gray-900 dark:text-white">
         Logged in until {{ new Date(session.expires_at).toLocaleDateString() }} {{ new Date(session.expires_at).toLocaleTimeString() }}
       </p>
     </div>
     <div v-else>
-      <UTabs
-        v-model="selected"
-        :items="tabs"
+      <div
+        id="tab"
+        class="mx-auto mt-12 w-full max-w-sm"
       >
-        <template #item="{ item }">
-          <form
-            class="w-full max-w-sm space-y-6 mx-auto mt-12 register"
-            @submit.prevent="handleSubmit"
-          >
-            <p class="text-2xl text-gray-900 dark:text-white font-bold">
-              {{ item.label }}
-            </p>
+        <PlaygroundTabs
+          v-model="selected"
+          :items="tabs"
+        />
 
-            <div class="space-yy-6">
-              <UFormGroup
-                label="Email"
-              >
-                <UInput
-                  v-model="formData.email"
-                  placeholder="Enter your email"
-                  name="email"
-                  type="email"
-                  icon="i-heroicons-envelope"
-                  color="gray"
-                />
-              </UFormGroup>
-            </div>
-            <div class="space-yy-6">
-              <UFormGroup
-                label="Password"
-                class="space-yy-6"
-              >
-                <UInput
-                  v-model="formData.password"
+        <form
+          class="w-full space-y-6 pt-8 register"
+          @submit.prevent="handleSubmit"
+        >
+          <p class="text-2xl text-gray-900 dark:text-white font-bold">
+            {{ tabs[selected].label }}
+          </p>
 
-                  placeholder="Enter your password"
-                  name="password"
-                  type="password"
-                  icon="i-heroicons-lock-closed"
-                  color="gray"
-                />
-              </UFormGroup>
-            </div>
-
-            <UButton
-              type="submit"
-              block
-            >
-              Submit
-            </UButton>
-
-            <UDivider
-              label="or"
-              class="my-6"
-            />
-
-            <UButton
-              icon="i-simple-icons-github"
-              color="gray"
-              block
-              @click="loginToGithub"
-            >
-              Github
-            </UButton>
-          </form>
-
-          <UAlert
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }"
-            color="orange"
-            class="max-w-sm mt-2 mx-auto"
-            variant="subtle"
-            title="Warning !"
-            description="Github or any OAuth provider will not work inside an iframe, Stackblitz or Codesandbox"
+          <PlaygroundTextInput
+            id="email"
+            v-model="formData.email"
+            label="Email"
+            placeholder="Enter your email"
+            name="email"
+            type="email"
           />
-        </template>
-      </UTabs>
+
+          <PlaygroundTextInput
+            id="password"
+            v-model="formData.password"
+            label="Password"
+            placeholder="Enter your password"
+            name="password"
+            type="password"
+          />
+
+          <PlaygroundButton
+            type="submit"
+            block
+          >
+            Submit
+          </PlaygroundButton>
+
+          <PlaygroundDivider>or</PlaygroundDivider>
+
+          <PlaygroundButton
+            type="button"
+            variant="outline"
+            block
+            @click="loginToGithub"
+          >
+            <Icon
+              name="simple-icons:github"
+              class="h-4 w-4"
+            />
+            Github
+          </PlaygroundButton>
+        </form>
+
+        <PlaygroundAlert
+          title="Warning !"
+          class="mt-2"
+        >
+          Github or any OAuth provider will not work inside an iframe, Stackblitz or Codesandbox
+        </PlaygroundAlert>
+      </div>
     </div>
-  </UContainer>
+  </PlaygroundContainer>
 </template>

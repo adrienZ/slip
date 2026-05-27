@@ -1,14 +1,13 @@
-<script setup lang="ts">
-</script>
-
 <template>
-  <UContainer class="main-container min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <TheHeader />
 
-    <NuxtLayout>
-      <NuxtPage class="flex-grow w-full" />
-    </NuxtLayout>
+    <main class="flex-1 w-full">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </main>
 
     <TheFooter />
-  </UContainer>
+  </div>
 </template>

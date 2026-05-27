@@ -1,21 +1,19 @@
 <template>
-  <UContainer
+  <PlaygroundContainer
     v-if="user && session"
-    class="mt-8 prose"
+    class="mt-8"
   >
     <p class="text-gray-900 dark:text-white">
       Logged in until {{ new Date(session.expires_at).toLocaleDateString() }} - {{ new Date(session.expires_at).toLocaleTimeString() }}
     </p>
 
     <div class="flex flex-wrap gap-4">
-      <UCard
-        class="w-96"
-      >
+      <PlaygroundCard class="w-full max-w-sm">
         <h3 class="mt-4 text-gray-900 dark:text-white flex items-center">
           Verify your email
-          <UIcon
+          <Icon
             v-if="user.email_verified"
-            name="i-heroicons-check-circle"
+            name="heroicons:check-circle-20-solid"
             class="w-6 h-6 text-green-400 ml-1"
           />
         </h3>
@@ -25,54 +23,56 @@
             ref="form"
             novalidate
           >
-            <UFormGroup
+            <div
               v-show="askEmailVerificationRequest.status.value === 'success'"
-              label="Verification code"
               class="max-w-full mt-2"
             >
-              <UInput
+              <PlaygroundTextInput
+                id="verification-code"
                 v-model="formData.code"
+                label="Verification code"
                 name="code"
                 placeholder="XXXXXX"
               />
-            </UFormGroup>
+            </div>
           </form>
 
-          <UButton
+          <PlaygroundButton
             v-if="askEmailVerificationRequest.status.value !== 'success'"
-            class="mt-2 w-full"
-            color="primary"
-            :loading="askEmailVerificationRequest.status.value === 'pending'"
-            @click="askEmailVerificationRequest.refresh"
+            type="button"
+            class="mt-2"
+            block
+            :disabled="askEmailVerificationRequest.status.value === 'pending'"
+            @click="requestEmailVerification"
           >
-            Request email verification
-          </UButton>
+            {{ askEmailVerificationRequest.status.value === 'pending' ? "Requesting..." : "Request email verification" }}
+          </PlaygroundButton>
 
-          <UButton
+          <PlaygroundButton
             v-if="
               askEmailVerificationRequest.status.value === 'success'
             "
-            class="mt-2 w-full"
-            color="black"
-            :loading="validateEmailVerificationRequest.status.value === 'pending'"
+            type="button"
+            class="mt-2"
+            block
+            :disabled="validateEmailVerificationRequest.status.value === 'pending'"
             @click="validateCode"
           >
-            Validate code
-          </UButton>
+            {{ validateEmailVerificationRequest.status.value === 'pending' ? "Validating..." : "Validate code" }}
+          </PlaygroundButton>
 
-          <UAlert
+          <PlaygroundAlert
             v-if="askEmailVerificationRequest.status.value === 'success'"
-            icon="i-heroicons-command-line"
-            class="not-prose mt-2"
             title="Check the terminal !"
-            variant="subtle"
             color="green"
-            description="As email are not implemented, the code has been sended in your terminal"
-          />
+            class="mt-2"
+          >
+            As email are not implemented, the code has been sended in your terminal
+          </PlaygroundAlert>
         </div>
-      </UCard>
+      </PlaygroundCard>
     </div>
-  </UContainer>
+  </PlaygroundContainer>
 </template>
 
 <script setup lang="ts">
@@ -93,6 +93,10 @@ const form = ref<HTMLFormElement>();
 const validateEmailVerificationRequest = await useLazyAsyncData(() => authClient.verifyEmailVerificationCode(formData), {
   immediate: false,
 });
+
+function requestEmailVerification() {
+  return askEmailVerificationRequest.refresh();
+}
 
 async function validateCode() {
   await validateEmailVerificationRequest.execute();

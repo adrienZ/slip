@@ -34,7 +34,7 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "pnpm lint && pnpm test && pnpm prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release": "pnpm test:types && pnpm lint && pnpm test && pnpm prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "NUXT_SESSION_PASSWORD='7kP@G!hYvZ2#pL1mQx%3vU8c&RwT4oAs9bFnD#' vitest run",
     "test:ci": "pnpm test --coverage --reporter=default --reporter=junit --outputFile=./junit.xml",
@@ -74,7 +74,7 @@
     "vue-tsc": "^2.2.12"
   },
   "peerDependencies": {
-    "nuxt-auth-utils": "^0.3.2"
+    "nuxt-auth-utils": "^0.5.29"
   },
   "packageManager": "pnpm@10.3.0+sha256.24dd5c65d86c7d0710aba16699fbc46d74fc9acf2b419f4945207f2de9e57e23",
   "pnpm": {
